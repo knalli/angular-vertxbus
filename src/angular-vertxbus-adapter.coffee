@@ -13,7 +13,7 @@
   * urlPath (default '/eventbus'): path to the event bus
   * reconnectEnabled (default true): if false, the disconnect will be recognized but no further actions
   * sockjsStateInterval (default 10000 ms): defines the check interval of the underlayling SockJS connection
-  * sockjsReconnectIntervall (default 10000 ms): defines the wait time for a reconnect after a disconnect has been recognized
+  * sockjsReconnectInterval (default 10000 ms): defines the wait time for a reconnect after a disconnect has been recognized
   * sockjsOptions (default {}): optional SockJS options (new SockJS(url, undefined, options))
 ###
 module = angular.module('knalli.angular-vertxbus', ['ng'])

@@ -1,3 +1,6 @@
+/* jshint camelcase: false, undef: true, unused: true */
+/* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false */
+
 describe('knalli.angular-vertxbus', function () {
 
   beforeEach(module('knalli.angular-vertxbus'));
@@ -34,6 +37,30 @@ describe('knalli.angular-vertxbus', function () {
 
       it('should be a function', function () {
         expect(typeof vertxEventBus.close).toBe('function');
+      });
+    });
+  });
+
+  describe('vertxEventBusService', function () {
+
+    var vertxEventBusService;
+
+    beforeEach(inject(function (_vertxEventBusService_) {
+      vertxEventBusService = _vertxEventBusService_;
+    }));
+
+    it('should be an object', function () {
+      expect(typeof vertxEventBusService).toBe('object');
+    });
+
+    it('should have a method readyState()', function () {
+      expect(vertxEventBusService.readyState).toBeDefined();
+    });
+
+    describe('readyState()', function () {
+
+      it('should be a function', function () {
+        expect(typeof vertxEventBusService.readyState).toBe('function');
       });
     });
   });
