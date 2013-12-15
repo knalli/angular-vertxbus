@@ -17,7 +17,6 @@
   * sockjsOptions (default {}): optional SockJS options (new SockJS(url, undefined, options))
 ###
 module = angular.module('knalli.angular-vertxbus', ['ng'])
-module
 .value('enabled', true)
 .value('debugEnabled', false)
 .value('prefix', 'vertx-eventbus.')
