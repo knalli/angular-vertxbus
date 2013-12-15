@@ -124,4 +124,5 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['coffee', 'karma:unit']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngmin', 'uglify']);
+  grunt.registerTask('release', ['changelog', 'build']);
 };
