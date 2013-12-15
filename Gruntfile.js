@@ -120,8 +120,8 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('default', ['clean:temp', 'jshint', 'karma:unit']);
-  grunt.registerTask('test', ['karma:unit']);
+  grunt.registerTask('default', ['clean:temp', 'coffee', 'jshint', 'karma:unit']);
+  grunt.registerTask('test', ['coffee', 'karma:unit']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngmin', 'uglify']);
 };
