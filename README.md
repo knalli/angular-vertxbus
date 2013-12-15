@@ -16,6 +16,40 @@ angular.module('your-component', ['knalli.angular-vertxbus']).controller(functio
 });
 ```
 
+### Consume messages
+
+```javascript
+vertxEventBusService.on('myaddress', function(message) {
+  console.log('Received a message: ', message);
+});
+```
+
+### Publish a message
+
+```javascript
+vertxEventBusService.publish('myaddress', {data: 123});
+```
+
+### Send a message
+
+```javascript
+vertxEventBusService.send('myaddress', {data: 123});
+
+// expect a reply
+vertxEventBusService.send('myaddress', {data: 123}, true).then(function(reply){
+  console.log('A reply received: ', reply);
+}).catch(function(){
+  console.warn('No message');
+});
+
+// The "No reply message found" is controlled via a timeout (default 10000ms)
+vertxEventBusService.send('myaddress', {data: 123}, true, 3000).then(function(reply){
+  console.log('A reply received: ', reply);
+}).catch(function(){
+  console.warn('No message within 3 seconds');
+});
+```
+
 ## Advanced configuration
 
 The module has some advanced configuration options. Perhaps you do not have to change them, but at least you should know them!
