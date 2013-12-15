@@ -9,6 +9,11 @@
   "author": {
     "name": "Jan Philipp"
   },
+  "homepage": "http://github.com/knalli/angular-vertxbus",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/knalli/angular-vertxbus"
+  },
   "licenses": "MIT",
   "devDependencies": {
     "grunt": "~0.4.2",
