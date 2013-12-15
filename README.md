@@ -69,7 +69,7 @@ angular.module('your-component').run(function(){
 | enabled                 | `true`        | if false, the usage of the Event Bus will be disabled (actually, no vertx.EventBus will be created) |
 | debugEnabled            | `false`       | if true, some additional debug loggings will be displayed |
 | prefix                  | `vertx-eventbus.` | a prefix used for the global broadcasts |
-| urlServer               | `location.protocol + '//' + location.hostname + ':' + (location.port || 80)` | full URL to the server (change it if the server is not the origin) |
+| urlServer               | `location.protocol + '//' + location.hostname + ':' + (location.port \|\| 80)` | full URL to the server (change it if the server is not the origin) |
 | urlPath                 | `'/eventbus'` | path to the event bus |
 | reconnectEnabled        | `true`        | if false, the disconnect will be recognized but no further actions |
 | sockjsStateInterval     | `10000` (ms)  | defines the check interval of the underlayling SockJS connection |
