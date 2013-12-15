@@ -65,6 +65,7 @@ source. After running this task, you'll find the following files in a generated
 ````
 dist/angular-vertxbus-x.x.x.js
 dist/angular-vertxbus-x.x.x.min.js
+dist/requirejs/angular-vertxbus.js
 ````
 
 #### <code>grunt watch</code>
