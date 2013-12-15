@@ -1,3 +1,3 @@
-# angular-component-seed
+# angular-vertxbus
 
-> A seed for reusable Angular components
+Client side library using VertX Event Bus as an Angular Service module
