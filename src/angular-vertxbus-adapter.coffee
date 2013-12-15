@@ -1,5 +1,5 @@
 # jshint undef: true
-# global SockJS: false, vertx: false, EventBus: false
+# global SockJS: false, vertx: false
 
 ###
   An AngularJS wrapper for projects using the VertX Event Bus
