@@ -1,3 +1,11 @@
+<a name="v0.4.4"></a>
+### v0.4.4 (2013-12-16)
+
+
+#### Bug Fixes
+
+* fix issue with $q / typo ([4c455878](http://github.com/knalli/angular-vertxbus/commit/4c4558785b3cf729511909545f7ddf65f92478d8))
+
 <a name="v0.4.3"></a>
 ### v0.4.3 (2013-12-16)
 
