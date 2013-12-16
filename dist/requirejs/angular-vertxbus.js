@@ -205,7 +205,7 @@ define(['vertxbus'], function () {
             }
           },
           getConnectionState: function (immediate) {
-            if (enabled && vertxEventBus) {
+            if (enabled && (vertxEventBus != null ? vertxEventBus.EventBus : void 0)) {
               if (immediate) {
                 connectionState = vertxEventBus.readyState();
               }
