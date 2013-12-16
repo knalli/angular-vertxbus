@@ -1,3 +1,11 @@
+<a name="v0.4.3"></a>
+### v0.4.3 (2013-12-16)
+
+
+#### Bug Fixes
+
+* fix another npe ([b1cf79c2](http://github.com/knalli/angular-vertxbus/commit/b1cf79c250e6926bcde916fc848450677f274782))
+
 <a name="v0.4.2"></a>
 ### v0.4.2 (2013-12-16)
 
