@@ -87,8 +87,9 @@
     'vertxEventBus',
     'prefix',
     'enabled',
+    'debugEnabled',
     'sockjsStateInterval',
-    function ($rootScope, $q, $interval, $timeout, vertxEventBus, prefix, enabled, sockjsStateInterval) {
+    function ($rootScope, $q, $interval, $timeout, vertxEventBus, prefix, enabled, debugEnabled, sockjsStateInterval) {
       var api, connectionState, util, wrapped, _ref;
       connectionState = vertxEventBus != null ? (_ref = vertxEventBus.EventBus) != null ? _ref.CLOSED : void 0 : void 0;
       if (enabled && vertxEventBus) {
