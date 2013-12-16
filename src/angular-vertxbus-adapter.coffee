@@ -102,7 +102,7 @@ module.factory('vertxEventBus', ($timeout, prefix, urlServer, urlPath, sockjsOpt
 
   Note the additional configuration of the module itself.
 ###
-module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, vertxEventBus, prefix, enabled, sockjsStateInterval) ->
+module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, vertxEventBus, prefix, enabled, debugEnabled, sockjsStateInterval) ->
 
   connectionState = vertxEventBus?.EventBus?.CLOSED
 
@@ -124,14 +124,14 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
     # Register a callback handler for the specified address match.
     registerHandler : (address, callback) ->
       return unless typeof callback is 'function'
-      if debugEnabled then  console.debug "[VertX EventBus] Register handler for #{address}"
+      console.debug("[VertX EventBus] Register handler for #{address}") if debugEnabled
       vertxEventBus.registerHandler address, (message, replyTo) ->
         callback(message, replyTo)
         $rootScope.$digest()
     # Remove a callback handler for the specified address match.
     unregisterHandler : (address, callback) ->
       return unless typeof callback is 'function'
-      if debugEnabled then  console.debug "[VertX EventBus] Unregister handler for #{address}"
+      console.debug("[VertX EventBus] Unregister handler for #{address}") if debugEnabled
       vertxEventBus.unregisterHandler address, callback
     # Send a message to the specified address (using EventBus.send).
     # @param address a required string for the targeting address in the bus
