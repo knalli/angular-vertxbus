@@ -204,12 +204,16 @@
           }
         },
         getConnectionState: function (immediate) {
-          if (enabled && (vertxEventBus != null ? vertxEventBus.EventBus : void 0)) {
-            if (immediate) {
-              connectionState = vertxEventBus.readyState();
+          if (vertxEventBus != null ? vertxEventBus.EventBus : void 0) {
+            if (enabled) {
+              if (immediate) {
+                connectionState = vertxEventBus.readyState();
+              }
+            } else {
+              connectionState = vertxEventBus.EventBus.CLOSED;
             }
           } else {
-            connectionState = vertxEventBus.EventBus.CLOSED;
+            connectionState = 3;
           }
           return connectionState;
         }
