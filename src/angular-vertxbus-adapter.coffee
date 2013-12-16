@@ -151,7 +151,6 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
   # @param message a required piece of message data
     publish : (address, message) ->
       vertxEventBus.publish address, message
-      $q.resolve() # direct resolve because of publish
 
   # Wrapping methods for the api
   wrapped =
@@ -173,10 +172,10 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
       if connectionState is vertxEventBus.EventBus.OPEN then util.unregisterHandler(address, callback)
     # Stub for util.send
     send : (address, message, expectReply, timeout = 10000) ->
-      if connectionState is vertxEventBus.EventBus.OPEN then util.send(address, message, expectReply, timeout) else $q.reject()
+      if connectionState is vertxEventBus.EventBus.OPEN then util.send(address, message, expectReply, timeout) else $q.reject('unknown')
   # Stub for util.publish
     publish : (address, message) ->
-      if connectionState is vertxEventBus.EventBus.OPEN then util.publish(address, message) else $q.reject()
+      if connectionState is vertxEventBus.EventBus.OPEN then util.publish(address, message)
     # Get the current connection state of the event bus.
     # @param immediate if true the state will be re-fetched from the event bus
     getConnectionState : (immediate) ->
