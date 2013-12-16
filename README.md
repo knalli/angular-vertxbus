@@ -1,6 +1,14 @@
-# angular-vertxbus
+# angular-vertxbus [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 Client side library using VertX Event Bus as an Angular Service module
+
+## Status
+
+| Branch | Stability | Status |
+| --- | --- | --- |
+| Canary | unstable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.png?branch=master)](https://travis-ci.org/knalli/angular-vertxbus) |
+| Master | stable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.png?branch=master)](https://travis-ci.org/knalli/angular-vertxbus) |
+
 
 ## How to get
 
