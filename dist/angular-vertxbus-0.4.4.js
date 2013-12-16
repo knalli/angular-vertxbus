@@ -160,8 +160,7 @@
           return deferred != null ? deferred.promise : void 0;
         },
         publish: function (address, message) {
-          vertxEventBus.publish(address, message);
-          return $q.resolve();
+          return vertxEventBus.publish(address, message);
         }
       };
       wrapped = {
@@ -194,14 +193,12 @@
           if (connectionState === vertxEventBus.EventBus.OPEN) {
             return util.send(address, message, expectReply, timeout);
           } else {
-            return $q.reject();
+            return $q.reject('unknown');
           }
         },
         publish: function (address, message) {
           if (connectionState === vertxEventBus.EventBus.OPEN) {
             return util.publish(address, message);
-          } else {
-            return $q.reject();
           }
         },
         getConnectionState: function (immediate) {
