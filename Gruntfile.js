@@ -64,15 +64,7 @@ module.exports = function (grunt) {
         src: ['temp/**/*.js'],
         dest: 'dist/angular-vertxbus-<%= pkg.version %>.js'
       },
-      'requirejs-lib-vertxbus': {
-        src: [
-          'build-data-for-requirejs/vertxbus_start.txt',
-          'bower_components/vertxbus.js/index.js',
-          'build-data-for-requirejs/vertxbus_end.txt'
-        ],
-        dest: 'dist/requirejs/vertxbus.js'
-      },
-      'requirejs-lib-angular-vertxbus': {
+      lib: {
         options: {
           banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
             '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -116,6 +108,10 @@ module.exports = function (grunt) {
       src: {
         src: '<%= concat.src.dest %>',
         dest: '<%= concat.src.dest %>'
+      },
+      lib: {
+        src: '<%= concat.lib.dest %>',
+        dest: '<%= concat.lib.dest %>'
       }
     }
   });

@@ -77,7 +77,9 @@ or doesn't pass the tests.
 
 ## Contributing/Submitting changes
 
-- Checkout a new branch based on <code>master</code> and name it to what you intend to do:
+Note: In general, pull requests should be based on the `canary` branch. Most likely, `canary` will be most of time newer than the stable `master`. Therefor, you can make your changes based on `master` -- but you have to do it *always* based on `canary` in order to make a pull request.
+
+- Checkout a new branch based on <code>canary</code> and name it to what you intend to do:
   - Example:
     ````
     $ git checkout -b BRANCH_NAME
