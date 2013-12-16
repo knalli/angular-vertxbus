@@ -64,14 +64,6 @@ module.exports = function (grunt) {
         src: ['temp/**/*.js'],
         dest: 'dist/angular-vertxbus-<%= pkg.version %>.js'
       },
-      'requirejs-lib-vertxbus': {
-        src: [
-          'build-data-for-requirejs/vertxbus_start.txt',
-          'bower_components/vertxbus.js/index.js',
-          'build-data-for-requirejs/vertxbus_end.txt'
-        ],
-        dest: 'dist/requirejs/vertxbus.js'
-      },
       'requirejs-lib-angular-vertxbus': {
         options: {
           banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
