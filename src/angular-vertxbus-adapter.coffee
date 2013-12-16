@@ -180,10 +180,13 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
     # Get the current connection state of the event bus.
     # @param immediate if true the state will be re-fetched from the event bus
     getConnectionState : (immediate) ->
-      if enabled and vertxEventBus?.EventBus
-        connectionState = vertxEventBus.readyState() if immediate
+      if vertxEventBus?.EventBus
+        if enabled
+          connectionState = vertxEventBus.readyState() if immediate
+        else
+          connectionState = vertxEventBus.EventBus.CLOSED
       else
-        connectionState = vertxEventBus.EventBus.CLOSED
+        connectionState = 3 # CLOSED
       return connectionState
 
   # Update the current connection state periodially.
