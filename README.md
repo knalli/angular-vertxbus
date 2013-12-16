@@ -134,3 +134,7 @@ For each connect or disconnect, a global broadcast will be emitted (on `$rootSco
 ## License
 
 Copyright 2014 by Jan Philipp. Licensed under MIT.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/knalli/angular-vertxbus/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
