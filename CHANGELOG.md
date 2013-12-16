@@ -1,3 +1,11 @@
+<a name="v0.4.2"></a>
+### v0.4.2 (2013-12-16)
+
+
+#### Bug Fixes
+
+* fix possible npe if event bus is disabled (was not fixed in 0.4.1) ([15c58325](http://github.com/knalli/angular-vertxbus/commit/15c5832512a1fc1e00fc6ff7e487c172a5178a71))
+
 <a name="v0.4.1"></a>
 ### v0.4.1 (2013-12-16)
 
