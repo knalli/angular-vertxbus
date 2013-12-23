@@ -17,6 +17,7 @@ describe('knalli.angular-vertxbus', function () {
     });
   });
 
+
   describe('vertxEventBus', function () {
 
     var vertxEventBus;
@@ -34,12 +35,13 @@ describe('knalli.angular-vertxbus', function () {
     });
 
     describe('close()', function () {
-
       it('should be a function', function () {
         expect(typeof vertxEventBus.close).toBe('function');
       });
     });
+
   });
+
 
   describe('vertxEventBusService', function () {
 
@@ -58,10 +60,11 @@ describe('knalli.angular-vertxbus', function () {
     });
 
     describe('readyState()', function () {
-
       it('should be a function', function () {
         expect(typeof vertxEventBusService.readyState).toBe('function');
       });
     });
+
   });
+
 });
