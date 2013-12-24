@@ -3,10 +3,8 @@ node_js:
   - "0.10"
 
 before_install:
-  - npm install -g grunt-cli karma
-
-install:
-  - node_modules/.bin/bower install
+  - npm install -g grunt-cli karma bower@1.2.7
+  - bower install
 
 before_script:
   - export DISPLAY=:99.0
