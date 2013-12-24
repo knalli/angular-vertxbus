@@ -30,7 +30,11 @@
     "lodash": "~2.4.x",
     "coffee-script": "~1.6.3",
     "mocha": "~1.16.2",
+    "karma": "~0.11.0",
     "karma-mocha": "~0.1.1",
-    "karma-expect": "~1.0.0"
+    "karma-expect": "~1.0.0",
+    "karma-chrome-launcher": "~0.1.2",
+    "karma-firefox-launcher": "~0.1.2",
+    "karma-phantomjs-launcher": "~0.1.1"
   }
 }
