@@ -17,7 +17,7 @@ module.exports = function(config) {
       'test/**/*Spec.js'
     ],
 
-    frameworks: ['jasmine'],
+    frameworks: ['mocha', 'expect'],
 
 
     // list of files to exclude
