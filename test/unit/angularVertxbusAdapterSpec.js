@@ -1,5 +1,5 @@
-/* jshint camelcase: false, undef: true, unused: true */
-/* global angular: false, module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false */
+/* jshint camelcase: false, undef: true, unused: true, browser: true */
+/* global console: false, angular: false, module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false */
 
 describe('knalli.angular-vertxbus', function () {
 
