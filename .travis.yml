@@ -4,6 +4,8 @@ node_js:
 
 before_install:
   - npm install -g grunt-cli karma
+
+install:
   - node_modules/.bin/bower install
 
 before_script:
