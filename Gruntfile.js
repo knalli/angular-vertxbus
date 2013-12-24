@@ -24,9 +24,13 @@ module.exports = function (grunt) {
       temp: 'temp/'
     },
     watch: {
-      coffee: {
+      'coffee-src': {
         files: ['src/**/*.coffee'],
-        tasks: ['coffee']
+        tasks: ['coffee:src']
+      },
+      'coffee-test': {
+        files: ['test/**/*.coffee'],
+        tasks: ['coffee:test']
       },
       scripts: {
         files: ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
@@ -48,7 +52,17 @@ module.exports = function (grunt) {
         flatten: true,
         cwd: 'src/',
         src: ['*.coffee'],
-        dest: 'temp/',
+        dest: 'temp/src/',
+        ext: '.js'
+      },
+      test: {
+        options: {
+          bare: true
+        },
+        expand: true,
+        cwd: 'test/',
+        src: ['**/*.coffee'],
+        dest: 'temp/test/',
         ext: '.js'
       }
     },
@@ -61,7 +75,7 @@ module.exports = function (grunt) {
             '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
             ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n'
         },
-        src: ['temp/**/*.js'],
+        src: ['temp/src/**/*.js'],
         dest: 'dist/angular-vertxbus-<%= pkg.version %>.js'
       },
       lib: {
@@ -74,7 +88,7 @@ module.exports = function (grunt) {
         },
         src: [
           'build-data-for-requirejs/angular-vertxbus_start.txt',
-          'temp/**/*.js',
+          'temp/src/**/*.js',
           'build-data-for-requirejs/angular-vertxbus_end.txt'
         ],
         dest: 'dist/requirejs/angular-vertxbus.js'

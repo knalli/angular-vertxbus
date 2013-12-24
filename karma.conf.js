@@ -11,13 +11,13 @@ module.exports = function(config) {
     files: [
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'bower_components/sockjs/sockjs.js',
+      'temp/test/unit/mock/sockjs.js',
       'bower_components/vertxbus.js/index.js',
       'temp/**/*.js',
       'test/**/*Spec.js'
     ],
 
-    frameworks: ['jasmine'],
+    frameworks: ['mocha', 'expect'],
 
 
     // list of files to exclude
