@@ -1,3 +1,21 @@
+<a name="v0.5.0"></a>
+## v0.5.0 (2014-03-17)
+
+#### Breaking changes
+
+All options have been moved into a dedicated options object
+`angularVertxBusOptions` which MAY be injected or modified. However, the
+new module provider `vertxEventBus` provides shortcuts to all options (6b71de33).
+
+For instance:
+
+```javascript
+var app = angular.module('app', ['knalli.vertx-eventbus']
+.config(function(vertxEventBus){
+  vertxEventBus.useDebug(true).useUrlPath('/eventbus');
+});
+```
+
 <a name="v0.4.5"></a>
 ### v0.4.5 (2013-12-24)
 
