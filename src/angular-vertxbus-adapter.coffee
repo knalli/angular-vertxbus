@@ -1,10 +1,21 @@
 # jshint undef: true
 # global SockJS: false, vertx: false
 
+DEFAULT_OPTIONS =
+  enabled: true
+  debugEnabled: false
+  prefix: 'vertx-eventbus.'
+  urlServer: "#{location.protocol}//#{location.hostname}:#{location.port or 80}"
+  urlPath: '/eventbus'
+  reconnectEnabled: true
+  sockjsStateInterval: 10000
+  sockjsReconnectInterval: 10000
+  sockjsOptions: {}
+
 ###
   An AngularJS wrapper for projects using the VertX Event Bus
 
-  This module as some options
+  This module as some options (as constant property object "angularVertxbusOptions")
 
   * enabled (default true): if false, the usage of the Event Bus will be disabled (actually, no vertx.EventBus will be created)
   * debugEnabled (default false): if true, some additional debug loggings will be displayed
@@ -17,70 +28,107 @@
   * sockjsOptions (default {}): optional SockJS options (new SockJS(url, undefined, options))
 ###
 module = angular.module('knalli.angular-vertxbus', ['ng'])
-.value('enabled', true)
-.value('debugEnabled', false)
-.value('prefix', 'vertx-eventbus.')
-.value('urlServer', "#{location.protocol}//#{location.hostname}:#{location.port or 80}")
-.value('urlPath', '/eventbus')
-.value('reconnectEnabled', true)
-.value('sockjsStateInterval', 10000)
-.value('sockjsReconnectInterval', 10000)
-.value('sockjsOptions', {})
+.constant('angularVertxbusOptions', DEFAULT_OPTIONS)
 
-###
-  A stub representing the VertX Event Bus (core functionality)
+.provider('vertxEventBus', (angularVertxbusOptions) ->
 
-  Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a new instance of the bus have to be created.
-  This stub ensures only one object holding the current active instance of the bus.
+  @enable = (value = DEFAULT_OPTIONS.enabled) ->
+    angularVertxbusOptions.enabled = value is true
+    return this
 
-  The stub supports theses VertX Event Bus APIs:
-  - close()
-  - login(username, password, replyHandler)
-  - send(address, message, handler)
-  - publish(address, message)
-  - registerHandler(adress, handler)
-  - unregisterHandler(address, handler)
-  - readyState()
+  @useDebug = (value = DEFAULT_OPTIONS.debugEnabled) ->
+    angularVertxbusOptions.debugEnabled = value is true
+    return this
 
-  Furthermore, the stub supports theses extra APIs:
-  - recconnect()
-###
-module.factory('vertxEventBus', ($timeout, prefix, urlServer, urlPath, sockjsOptions, enabled, debugEnabled, reconnectEnabled, sockjsReconnectInterval) ->
-  stub = null
-  EventBus_ = vertx?.EventBus
-  if enabled and EventBus_
-    url = "#{urlServer}#{urlPath}"
-    console.debug("[Vertex EventBus] Enabled: connecting '#{url}'") if debugEnabled
-    # Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
-    # we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
-    eventBus = null
-    connect = ->
-      eventBus = new EventBus_ url, undefined, sockjsOptions
-      eventBus.onopen = ->
-        console.debug("[VertX EventBus] Connected") if debugEnabled
-        stub.onopen() if typeof stub.onopen is 'function'
+  @usePrefix = (value = DEFAULT_OPTIONS.prefix) ->
+    angularVertxbusOptions.prefix = value
+    return
+
+  @useUrlServer = (value = DEFAULT_OPTIONS.urlServer) ->
+    angularVertxbusOptions.urlServer = value
+    return
+
+  @useUrlPath = (value = DEFAULT_OPTIONS.urlPath) ->
+    angularVertxbusOptions.urlPath = value
+    return
+
+  @useReconnect = (value = DEFAULT_OPTIONS.reconnectEnabled) ->
+    angularVertxbusOptions.reconnectEnabled = value
+    return
+
+  @useSockJsStateInterval = (value = DEFAULT_OPTIONS.sockjsStateInterval) ->
+    angularVertxbusOptions.sockjsStateInterval = value
+    return
+
+  @useSockJsReconnectInterval = (value = DEFAULT_OPTIONS.sockjsReconnectInterval) ->
+    angularVertxbusOptions.sockjsReconnectInterval = value
+    return
+
+  @useSockJsOptions = (value = DEFAULT_OPTIONS.sockjsOptions) ->
+    angularVertxbusOptions.sockjsOptions = value
+    return
+
+  ###
+    A stub representing the VertX Event Bus (core functionality)
+
+    Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a new instance of the bus have to be created.
+    This stub ensures only one object holding the current active instance of the bus.
+
+    The stub supports theses VertX Event Bus APIs:
+    - close()
+    - login(username, password, replyHandler)
+    - send(address, message, handler)
+    - publish(address, message)
+    - registerHandler(adress, handler)
+    - unregisterHandler(address, handler)
+    - readyState()
+
+    Furthermore, the stub supports theses extra APIs:
+    - recconnect()
+  ###
+  @$get = (angularVertxbusOptions, $timeout) ->
+    # Extract options (with defaults)
+    { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
+      sockjsStateInterval, sockjsReconnectInterval, sockjsOptions
+    } = angular.extend {}, DEFAULT_OPTIONS, angularVertxbusOptions
+
+    stub = null
+    EventBus_ = vertx?.EventBus
+    if enabled and EventBus_
+      url = "#{urlServer}#{urlPath}"
+      console.debug("[Vertex EventBus] Enabled: connecting '#{url}'") if debugEnabled
+      # Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
+      # we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
+      eventBus = null
+      connect = ->
+        eventBus = new EventBus_ url, undefined, sockjsOptions
+        eventBus.onopen = ->
+          console.debug("[VertX EventBus] Connected") if debugEnabled
+          stub.onopen() if typeof stub.onopen is 'function'
+          return
+        eventBus.onclose = ->
+          console.debug("[VertX EventBus] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
+          stub.onclose() if typeof stub.onclose is 'function'
+          $timeout(connect, sockjsReconnectInterval) if reconnectEnabled
+          return
         return
-      eventBus.onclose = ->
-        console.debug("[VertX EventBus] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
-        stub.onclose() if typeof stub.onclose is 'function'
-        $timeout(connect, sockjsReconnectInterval) if reconnectEnabled
-        return
-      return
-    connect()
-    stub =
-      reconnect: ->
-        eventBus.close()
-      close: -> eventBus.close()
-      login: (username, password, replyHandler) -> eventBus.login(username, password, replyHandler)
-      send: (address, message, replyHandler) -> eventBus.send(address, message, replyHandler)
-      publish: (address, message) -> eventBus.publish(address, message)
-      registerHandler: (address, handler) -> eventBus.registerHandler(address, handler)
-      unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
-      readyState: -> eventBus.readyState()
-      EventBus: EventBus_ #expose used object
-  else
-    console.debug("[VertX EventBus] Disabled") if debugEnabled
-  return stub
+      connect()
+      stub =
+        reconnect: ->
+          eventBus.close()
+        close: -> eventBus.close()
+        login: (username, password, replyHandler) -> eventBus.login(username, password, replyHandler)
+        send: (address, message, replyHandler) -> eventBus.send(address, message, replyHandler)
+        publish: (address, message) -> eventBus.publish(address, message)
+        registerHandler: (address, handler) -> eventBus.registerHandler(address, handler)
+        unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
+        readyState: -> eventBus.readyState()
+        EventBus: EventBus_ #expose used object
+    else
+      console.debug("[VertX EventBus] Disabled") if debugEnabled
+    return stub
+
+  return
 )
 
 ###
@@ -102,7 +150,12 @@ module.factory('vertxEventBus', ($timeout, prefix, urlServer, urlPath, sockjsOpt
 
   Note the additional configuration of the module itself.
 ###
-module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, vertxEventBus, prefix, enabled, debugEnabled, sockjsStateInterval) ->
+module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, vertxEventBus, angularVertxbusOptions) ->
+
+  # Extract options (with defaults)
+  { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
+    sockjsStateInterval, sockjsReconnectInterval, sockjsOptions
+  } = angular.extend {}, DEFAULT_OPTIONS, angularVertxbusOptions
 
   connectionState = vertxEventBus?.EventBus?.CLOSED
 

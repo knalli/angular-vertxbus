@@ -1,5 +1,5 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
-/* global console: false, angular: false, module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false */
+/* global console: false, module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false */
 
 describe('knalli.angular-vertxbus', function () {
 
@@ -22,10 +22,10 @@ describe('knalli.angular-vertxbus', function () {
 
     var vertxEventBus, $timeout, $rootScope;
 
-    beforeEach(function () {
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
       // Override (improve test running time)
-      angular.module('knalli.angular-vertxbus').value('sockjsReconnectInterval', 2000).value('debugEnabled', true);
-    });
+      vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000);
+    }));
 
     beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_) {
       vertxEventBus = _vertxEventBus_;
