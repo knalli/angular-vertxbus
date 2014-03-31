@@ -69,24 +69,25 @@ The module has some advanced configuration options. Perhaps you do not have to c
 Each module configuration option must be defined in the `run` phase, i.e.:
 
 ```javascript
-angular.module('your-component').run(function(){
-  angular.module('knalli.angular-vertxbus')
-  .value('enabled', vertxServerIsEnabled)
-  .value('reconnectEnabled', vertxServerReconnectIsSupported)
-  .value('urlServer', 'http://live.example.org:8888')
+var module = angular.module('your-component', ['knalli.angular-vertxbus']);
+module.config(function(vertxEventBusProvider) {
+  vertxEventBusProvider
+  .enable()
+  .useReconnect()
+  .useUrlServer('http://live.example.org:8888');
 });
 ```
-| Key                     | Default       | Description         |
-| ----------------------- | ------------- | ------------------- |
-| enabled                 | `true`        | if false, the usage of the Event Bus will be disabled (actually, no `vertx.EventBus` will be created) |
-| debugEnabled            | `false`       | if true, some additional debug loggings will be displayed |
-| prefix                  | `'vertx-eventbus.'` | a prefix used for the global broadcasts |
-| urlServer               | (same origin)\* | full URL to the server (must be changed if the target server is not the origin) |
-| urlPath                 | `'/eventbus'` | path to the event bus |
-| reconnectEnabled        | `true`        | if false, the disconnect will be recognized but no further actions |
-| sockjsStateInterval     | `10000` (ms)  | defines the check interval of the underlayling SockJS connection |
-| sockjsReconnectInterval | `10000` (ms)  | defines the wait time for a reconnect after a disconnect has been recognized |
-| sockjsOptions           | `{}`          | optional SockJS options (technically `new SockJS(url, undefined, sockjsOptions)`) |
+| Config Function            | Default         | Description         |
+| -------------------------- | --------------- | ------------------- |
+| enable(bool)               | `true`          | if false, the usage of the Event Bus will be disabled (actually, no `vertx.EventBus` will be created) |
+| useDebug(bool)             | `false`         | if true, some additional debug loggings will be displayed |
+| usePrefix(string)          | `'vertx-eventbus.'` | a prefix used for the global broadcasts |
+| useUrlServer(string)       | (same origin)\* | full URL to the server (must be changed if the target server is not the origin) |
+| useUrlPath(string)         | `'/eventbus'`   | path to the event bus |
+| useReconnect               | `true`          | if false, the disconnect will be recognized but no further actions |
+| useSockjsStateInterval     | `10000` (ms)    | defines the check interval of the underlayling SockJS connection |
+| useSockjsReconnectInterval | `10000` (ms)    | defines the wait time for a reconnect after a disconnect has been recognized |
+| useSockjsOptions           | `{}`            | optional SockJS options (technically `new SockJS(url, undefined, sockjsOptions)`) |
 
 * `location.protocol + '//' + location.hostname + ':' + (location.port or 80)`
 
