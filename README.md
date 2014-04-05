@@ -1,4 +1,4 @@
-# angular-vertxbus [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# angular-vertxbus [![Bower version](https://badge.fury.io/bo/angular-vertxbus.svg)](http://badge.fury.io/bo/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
