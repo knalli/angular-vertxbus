@@ -37,6 +37,6 @@
     "karma-chrome-launcher": "~0.1.2",
     "karma-firefox-launcher": "~0.1.3",
     "karma-phantomjs-launcher": "~0.1.2",
-    "bower": "https://github.com/knalli/bower/tarball/bugfix/fix-proposal-for-933"
+    "bower": "~1.3.2"
   }
 }
