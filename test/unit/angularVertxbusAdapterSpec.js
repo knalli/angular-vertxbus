@@ -247,6 +247,7 @@ describe('knalli.angular-vertxbus', function () {
       describe('should replay queued items', function () {
         it('when eventbus is reopened', function (done) {
           setTimeout(function () {
+            vertxEventBusService.send('xyz', {data: 0});
             vertxEventBusService.send('xyz', {data: 1});
             vertxEventBusService.send('xyz', {data: 2});
             vertxEventBusService.send('xyz', {data: 3});
