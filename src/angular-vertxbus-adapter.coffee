@@ -28,7 +28,7 @@ DEFAULT_OPTIONS =
   * sockjsOptions (default {}): optional SockJS options (new SockJS(url, undefined, options))
 ###
 module = angular.module('knalli.angular-vertxbus', ['ng'])
-.constant('angularVertxbusOptions', DEFAULT_OPTIONS)
+.constant('angularVertxbusOptions', angular.extend({}, DEFAULT_OPTIONS))
 
 .provider('vertxEventBus', (angularVertxbusOptions) ->
 
