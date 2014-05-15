@@ -42,31 +42,31 @@ module = angular.module('knalli.angular-vertxbus', ['ng'])
 
   @usePrefix = (value = DEFAULT_OPTIONS.prefix) ->
     angularVertxbusOptions.prefix = value
-    return
+    return this
 
   @useUrlServer = (value = DEFAULT_OPTIONS.urlServer) ->
     angularVertxbusOptions.urlServer = value
-    return
+    return this
 
   @useUrlPath = (value = DEFAULT_OPTIONS.urlPath) ->
     angularVertxbusOptions.urlPath = value
-    return
+    return this
 
   @useReconnect = (value = DEFAULT_OPTIONS.reconnectEnabled) ->
     angularVertxbusOptions.reconnectEnabled = value
-    return
+    return this
 
   @useSockJsStateInterval = (value = DEFAULT_OPTIONS.sockjsStateInterval) ->
     angularVertxbusOptions.sockjsStateInterval = value
-    return
+    return this
 
   @useSockJsReconnectInterval = (value = DEFAULT_OPTIONS.sockjsReconnectInterval) ->
     angularVertxbusOptions.sockjsReconnectInterval = value
-    return
+    return this
 
   @useSockJsOptions = (value = DEFAULT_OPTIONS.sockjsOptions) ->
     angularVertxbusOptions.sockjsOptions = value
-    return
+    return this
 
   ###
     A stub representing the VertX Event Bus (core functionality)
