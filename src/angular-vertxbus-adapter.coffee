@@ -212,13 +212,17 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
     # Stub for util.registerHandler: Hold back all registers which will be performed when the
     # EventBus will be online
     registerHandler : (address, callback) ->
-      wrapped.handlers[address] = [] unless wrapped.handlers[address]
-      wrapped.handlers[address].push callback
+      addrHandlers = wrapped.handlers[address]
+      wrapped.handlers[address] = addrHandlers = [] unless addrHandlers
+      addrHandlers.push callback
       if connectionState is vertxEventBus.EventBus.OPEN then util.registerHandler(address, callback)
+      () ->
+        wrapped.unregisterHandler(address, callback)
+        return
     # Stub for util.unregisterHandler (see registerHandler)
     unregisterHandler : (address, callback) ->
       # Remove from internal map
-      if wrapped.handlers[address] and callback wrapped.handlers[address]
+      if wrapped.handlers[address] and callback {action: ""}
         index = wrapped.handlers[address].indexOf(callback)
         wrapped.handlers[address].splice(index, 1) if index > -1
       # Remove from real instance
