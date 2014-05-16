@@ -4,7 +4,12 @@ class SockJS
   onclose: undefined
   onmessage: undefined
 
+  @mockInstances: []
+  @currentMockInstance: null
+
   constructor: (@url, @whitelist, @options, mockOptions) ->
+    SockJS.mockInstances.push this
+    SockJS.currentMockInstance = this
     console.debug "[MOCK] SockJS Constructur(#{url})"
     fn = =>
         @onopen() if typeof @onopen is 'function'
