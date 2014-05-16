@@ -199,16 +199,12 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
       $rootScope.$broadcast "#{prefix}system.disconnected"
 
   ensureOpenConnection = (fn) ->
-    console.debug "ensure open connection"
     if wrapped.getConnectionState() is vertxEventBus.EventBus.OPEN
-      console.debug "is open"
       fn()
       return true
     else if messageBuffer
-      console.debug "is not open, but buffer"
       messageQueueHolder.push(fn)
       return true
-    console.debug "is not open and no buffer"
     return false
 
   # All utility methods working directly on the event bus object.
