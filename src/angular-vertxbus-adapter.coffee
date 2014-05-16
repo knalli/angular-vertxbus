@@ -262,7 +262,7 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
     # Stub for util.unregisterHandler (see registerHandler)
     unregisterHandler : (address, callback) ->
       # Remove from internal map
-      if wrapped.handlers[address] and callback wrapped.handlers[address]
+      if wrapped.handlers[address]
         index = wrapped.handlers[address].indexOf(callback)
         wrapped.handlers[address].splice(index, 1) if index > -1
       # Remove from real instance
