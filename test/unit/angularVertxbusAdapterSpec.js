@@ -137,6 +137,35 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+    describe('after adding and removing a handler via "registerHandler"', function () {
+      it('should be not called', function (done) {
+        var abcCalled, xyzCalled;
+        setTimeout(function () {
+          var abcHandler = function (message) {
+            abcCalled = message;
+          }, xyzHandler = function (message) {
+            xyzCalled = message;
+          };
+          var abcFunct = vertxEventBus.registerHandler('abc', abcHandler);
+          var xyzFunct = vertxEventBus.registerHandler('xyz', xyzHandler);
+          abcFunct();
+          xyzFunct();
+          SockJS.currentMockInstance.onmessage({
+            data: JSON.stringify({
+              address: 'xyz',
+              body: {
+                data: '1x'
+              },
+              replyAddress: undefined
+            })
+          });
+          expect(abcCalled).to.be(undefined);
+          expect(xyzCalled).to.be(undefined);
+          done();
+        }, 200);
+      });
+    });
+
     describe('after removing a registered handler via "unregisterHandler"', function () {
       it('should not be called', function (done) {
         var abcCalled, xyzCalled;

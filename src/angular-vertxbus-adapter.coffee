@@ -125,7 +125,11 @@ module = angular.module('knalli.angular-vertxbus', ['ng'])
         login: (username, password, replyHandler) -> eventBus.login(username, password, replyHandler)
         send: (address, message, replyHandler) -> eventBus.send(address, message, replyHandler)
         publish: (address, message) -> eventBus.publish(address, message)
-        registerHandler: (address, handler) -> eventBus.registerHandler(address, handler)
+        registerHandler: (address, handler) ->
+          eventBus.registerHandler(address, handler)
+          () ->
+            stub.unregisterHandler(address, handler)
+            return
         unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
         readyState: -> eventBus.readyState()
         EventBus: EventBus_ #expose used object
@@ -255,6 +259,9 @@ module.service('vertxEventBusService', ($rootScope, $q, $interval, $timeout, ver
       wrapped.handlers[address] = [] unless wrapped.handlers[address]
       wrapped.handlers[address].push callback
       if connectionState is vertxEventBus.EventBus.OPEN then util.registerHandler(address, callback)
+      () ->
+        wrapped.unregisterHandler(address, callback)
+        return
     # Stub for util.unregisterHandler (see registerHandler)
     unregisterHandler : (address, callback) ->
       # Remove from internal map
