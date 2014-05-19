@@ -355,6 +355,74 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+
+    describe('when the service is not connected', function () {
+      var vertxEventBus, vertxEventBusService, $timeout;
+
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+        vertxEventBusProvider.useMessageBuffer(0);
+      }));
+
+      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+        $timeout = _$timeout_;
+        vertxEventBus = _vertxEventBus_;
+        vertxEventBusService = _vertxEventBusService_;
+        // Mock bus is closed
+        _vertxEventBus_.readyState = function () {
+          return _vertxEventBus_.EventBus.OPEN;
+        };
+        var sendCalls = 0;
+        _vertxEventBus_.send = function () {
+          // do nothing, let it timeout
+        };
+        // extend object
+        vertxEventBus.getSendCalls = function () {
+          return sendCalls;
+        };
+      }));
+
+      describe('send() should call the error callback', function () {
+
+        it('via promise.then()', function (done) {
+          var successCalled, errorCalled;
+          setTimeout(function () {
+            // very short timeout: 10
+            vertxEventBusService.send('xyz', {data: 1}, true, 10).then(function () {
+              successCalled = true;
+            }, function () {
+              errorCalled = true;
+            });
+            setTimeout(function () {
+              $timeout.flush();
+              expect(successCalled).to.be(undefined);
+              expect(errorCalled).to.be(true);
+              done();
+            }, 300);
+          }, 200);
+        });
+
+        it('via promise.catch()', function (done) {
+          var successCalled, errorCalled;
+          setTimeout(function () {
+            // very short timeout: 10
+            vertxEventBusService.send('xyz', {data: 1}, true, 10).then(function () {
+              successCalled = true;
+            })['catch'](function () {
+              errorCalled = true;
+            });
+            setTimeout(function () {
+              $timeout.flush();
+              expect(successCalled).to.be(undefined);
+              expect(errorCalled).to.be(true);
+              done();
+            }, 300);
+          }, 200);
+        });
+
+      });
+
+    });
+
   });
 
 
