@@ -1,3 +1,21 @@
+<a name="v0.6.0"></a>
+## v0.6.0 (2014-05-19)
+
+
+#### Bug Fixes
+
+* **vertxEventBusProvider:**
+  * avoid default options object mutations ([031871cf](http://github.com/knalli/angular-vertxbus/commit/031871cf345cdfc375b5a81c41a2ab1142fb5642))
+  * make config functions chainable ([7b02eab6](http://github.com/knalli/angular-vertxbus/commit/7b02eab6124bd5fb5e4b0cd2fe433b1af787ff74))
+* **vertxEventBusService:**
+  * on registerHandler, return function to unregister this handler ([1f1b6bd7](http://github.com/knalli/angular-vertxbus/commit/1f1b6bd7394ad1a4716db8fc3703a5e9c337b2c2))
+  * on unregistering a handler, the callback was called accidently itself ([2dfcd112](http://github.com/knalli/angular-vertxbus/commit/2dfcd1128d250b587496f6fb33d5419cd9b69e29))
+
+
+#### Features
+
+* **vertxEventBusService:** add opt-in feature buffering messages ([de0e1345](http://github.com/knalli/angular-vertxbus/commit/de0e1345687fa21a94cc40e7b2fef783b312a4b2))
+
 <a name="v0.5.0"></a>
 ## v0.5.0 (2014-03-17)
 
