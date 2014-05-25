@@ -48,12 +48,14 @@ module.exports = function (grunt) {
     },
     coffee: {
       src: {
-        expand: true,
-        flatten: true,
-        cwd: 'src/',
-        src: ['*.coffee'],
-        dest: 'temp/src/',
-        ext: '.js'
+        options: {
+          join: true
+        },
+        files: {
+          'temp/src/angular-vertxbus-adapter.js': [
+            'src/module.coffee', 'src/wrapper.coffee', 'src/service.coffee'
+          ]
+        }
       },
       test: {
         options: {
