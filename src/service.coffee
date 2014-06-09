@@ -22,8 +22,8 @@ angular.module('knalli.angular-vertxbus')
 
   DEFAULT_OPTIONS =
     loginRequired: false
-    loginBlockForSession: true
-    skipUnauthorizeds: true
+    loginBlockForSession: false #NYI
+    skipUnauthorizeds: true #NYI
 
   class MessageQueueHolder
     constructor: (@maxSize = 10) ->
@@ -45,12 +45,12 @@ angular.module('knalli.angular-vertxbus')
     options.loginRequired = value
     return this
 
-  # private
+  # private: NYI
   @blockForSession = (value = options.loginBlockForSession) ->
     options.loginBlockForSession = value
     return this
 
-  # private
+  # private: NYI
   @skipUnauthorizeds = (value = options.skipUnauthorizeds) ->
     options.skipUnauthorizeds = value
     return this
@@ -95,20 +95,34 @@ angular.module('knalli.angular-vertxbus')
         return true
       return false
 
+    ensureOpenAuthConnection = (fn) ->
+      unless options.loginRequired
+        # easy: no login required
+        ensureOpenConnection fn
+      else
+        ensureOpenConnection ->
+          if validSession
+            fn()
+            return true
+          else
+            # ignore this message
+            console.debug("[VertX EB Service] Message was not sent because login is required") if debugEnabled
+            return false
+
     # All utility methods working directly on the event bus object.
     # The object "vertxEventBus" must be available.
     util =
       # Register a callback handler for the specified address match.
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
-        console.debug("[VertX EventBus] Register handler for #{address}") if debugEnabled
+        console.debug("[VertX EB Service] Register handler for #{address}") if debugEnabled
         vertxEventBus.registerHandler address, (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
-        console.debug("[VertX EventBus] Unregister handler for #{address}") if debugEnabled
+        console.debug("[VertX EB Service] Unregister handler for #{address}") if debugEnabled
         vertxEventBus.unregisterHandler address, callback
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
@@ -117,7 +131,7 @@ angular.module('knalli.angular-vertxbus')
       # @param timeout an optional number for a timout after which the promise will be rejected
       send : (address, message, expectReply, timeout = 10000) ->
         deferred = $q.defer() if expectReply
-        dispatched = ensureOpenConnection ->
+        dispatched = ensureOpenAuthConnection ->
           vertxEventBus.send address, message, (reply) ->
             if deferred then deferred.resolve reply
             if typeof expectReply is 'function' then expectReply(reply) # Handle a "callback"
@@ -129,7 +143,7 @@ angular.module('knalli.angular-vertxbus')
       # @param address a required string for the targeting address in the bus
       # @param message a required piece of message data
       publish : (address, message) ->
-        dispatched = ensureOpenConnection ->
+        dispatched = ensureOpenAuthConnection ->
           vertxEventBus.publish address, message
         return dispatched
       # Send a login message

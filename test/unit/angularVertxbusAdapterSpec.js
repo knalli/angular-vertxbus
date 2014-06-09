@@ -413,6 +413,40 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+    describe('should not send message', function () {
+      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, result;
+
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
+        vertxEventBusProvider.useMessageBuffer(0);
+        vertxEventBusServiceProvider.requireLogin(true);
+      }));
+
+      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_) {
+        vertxEventBus = _vertxEventBus_;
+        vertxEventBusService = _vertxEventBusService_;
+        $rootScope = _$rootScope_;
+        $timeout = _$timeout_;
+        vertxEventBus.readyState = function () {
+          return vertxEventBus.EventBus.OPEN;
+        };
+        vertxEventBus.send = function (address, message, replyHandler) {
+          console.debug('XY', address, message, replyHandler);
+          result = true;
+        };
+      }));
+
+      it('when login is required', function (done) {
+        setTimeout(function () {
+          vertxEventBusService.send('xyz', 'blabla');
+        }, 500);
+        setTimeout(function () {
+          // should not be true (because this would mean the message was sent)
+          expect(result).to.be(undefined);
+          done();
+        }, 1000);
+      });
+    });
+
     describe('when the service is not connected', function () {
       var vertxEventBus, vertxEventBusService, $timeout;
 
