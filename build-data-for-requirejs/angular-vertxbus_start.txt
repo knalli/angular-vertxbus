@@ -1,1 +1,1 @@
-define(['vertxbus'], function() {
+define(['angular', 'vertxbus'], function() {
