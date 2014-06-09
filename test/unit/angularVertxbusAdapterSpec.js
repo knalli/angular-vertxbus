@@ -355,6 +355,63 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+    describe('should broadcast event', function () {
+      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, result;
+
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+        vertxEventBusProvider.useMessageBuffer(0);
+      }));
+
+      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_) {
+        vertxEventBus = _vertxEventBus_;
+        vertxEventBusService = _vertxEventBusService_;
+        $rootScope = _$rootScope_;
+        $timeout = _$timeout_;
+        vertxEventBus.readyState = function () {
+          return vertxEventBus.EventBus.OPEN;
+        };
+      }));
+
+      it('"system connected"', function (done) {
+        $rootScope.$on('vertx-eventbus.system.connected', function () {
+          result = true;
+          done();
+        });
+        setTimeout(function () {
+          expect(result).to.be(true);
+        }, 1000);
+      });
+
+      it('"system login succeeded"', function (done) {
+        var result;
+        $rootScope.$on('vertx-eventbus.system.login.succeeded', function () {
+          result = true;
+          done();
+        });
+        setTimeout(function () {
+          vertxEventBusService.login('username', 'password');
+          setTimeout(function () {
+            expect(result).to.be(true);
+          }, 1000);
+        }, 1000);
+      });
+
+      it('"system login failed"', function (done) {
+        var result;
+        SockJS.currentMockInstance.nextLoginState = false;
+        $rootScope.$on('vertx-eventbus.system.login.failed', function () {
+          result = true;
+          SockJS.currentMockInstance.nextLoginState = true;
+          done();
+        });
+        setTimeout(function () {
+          vertxEventBusService.login('username', 'password');
+          setTimeout(function () {
+            expect(result).to.be(true);
+          }, 1000);
+        }, 1000);
+      });
+    });
 
     describe('when the service is not connected', function () {
       var vertxEventBus, vertxEventBusService, $timeout;

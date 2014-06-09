@@ -20,6 +20,11 @@
 angular.module('knalli.angular-vertxbus')
 .provider('vertxEventBusService', () ->
 
+  DEFAULT_OPTIONS =
+    loginRequired: false
+    loginBlockForSession: true
+    skipUnauthorizeds: true
+
   class MessageQueueHolder
     constructor: (@maxSize = 10) ->
       @items = []
@@ -33,6 +38,23 @@ angular.module('knalli.angular-vertxbus')
     first: -> @items.shift(0)
     size: -> @items.length
 
+  options = angular.extend({}, DEFAULT_OPTIONS)
+
+  # private
+  @requireLogin = (value = options.loginRequired) ->
+    options.loginRequired = value
+    return this
+
+  # private
+  @blockForSession = (value = options.loginBlockForSession) ->
+    options.loginBlockForSession = value
+    return this
+
+  # private
+  @skipUnauthorizeds = (value = options.skipUnauthorizeds) ->
+    options.skipUnauthorizeds = value
+    return this
+
   @$get = ($rootScope, $q, $interval, $timeout, vertxEventBus) ->
     # Extract options (with defaults)
     { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
@@ -41,6 +63,8 @@ angular.module('knalli.angular-vertxbus')
     } = vertxEventBus.getOptions()
 
     connectionState = vertxEventBus?.EventBus?.CLOSED
+    validSession = false
+    loginPromise = null
     messageQueueHolder = new MessageQueueHolder(messageBuffer)
 
     if enabled and vertxEventBus
@@ -108,6 +132,21 @@ angular.module('knalli.angular-vertxbus')
         dispatched = ensureOpenConnection ->
           vertxEventBus.publish address, message
         return dispatched
+      # Send a login message
+      # @param username
+      # @param password
+      # @param timeout
+      login : (username, password, timeout = 5000) ->
+        deferred = $q.defer()
+        vertxEventBus.login username, password, (reply) ->
+          if reply.status is 'ok'
+            deferred.resolve reply
+            $rootScope.$broadcast "#{prefix}system.login.succeeded", (status: reply.status)
+          else
+            deferred.reject reply
+            $rootScope.$broadcast "#{prefix}system.login.failed", (status: reply.status)
+        $timeout (-> deferred.reject()), timeout
+        return deferred.promise
 
     # Wrapping methods for the api
     wrapped =
@@ -147,6 +186,17 @@ angular.module('knalli.angular-vertxbus')
         else
           connectionState = 3 # CLOSED
         return connectionState
+      isValidSession: -> validSession
+      login : (username, password) ->
+        deferred = $q.defer()
+        util.login(username, password)
+        .then (reply) ->
+          validSession = true
+          return
+        .catch (reply) ->
+          validSession = false
+          return
+        return deferred.promise
 
     # Update the current connection state periodially.
     $interval (-> wrapped.getConnectionState(true)), sockjsStateInterval
@@ -162,6 +212,8 @@ angular.module('knalli.angular-vertxbus')
       readyState : wrapped.getConnectionState
       isEnabled : -> enabled
       getBufferCount: -> messageQueueHolder.size()
+      isValidSession : -> wrapped.validSession
+      login : wrapped.login
     return api
 
   return
