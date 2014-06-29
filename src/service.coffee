@@ -202,15 +202,13 @@ angular.module('knalli.angular-vertxbus')
         return connectionState
       isValidSession: -> validSession
       login : (username, password) ->
-        deferred = $q.defer()
         util.login(username, password)
         .then (reply) ->
           validSession = true
-          return
+          return reply
         .catch (reply) ->
           validSession = false
-          return
-        return deferred.promise
+          return reply
 
     # Update the current connection state periodially.
     $interval (-> wrapped.getConnectionState(true)), sockjsStateInterval
