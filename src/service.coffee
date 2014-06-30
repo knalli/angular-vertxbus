@@ -67,6 +67,8 @@ angular.module('knalli.angular-vertxbus')
     loginPromise = null
     messageQueueHolder = new MessageQueueHolder(messageBuffer)
 
+    fnWrapperMap = {} # handlers are wrapped, so we have to keep track
+
     if enabled and vertxEventBus
       vertxEventBus.onopen = ->
         wrapped.getConnectionState(true)
@@ -116,14 +118,18 @@ angular.module('knalli.angular-vertxbus')
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
         console.debug("[VertX EB Service] Register handler for #{address}") if debugEnabled
-        vertxEventBus.registerHandler address, (message, replyTo) ->
+        return fnWrapperMap[callback] if fnWrapperMap[callback] # already known
+        fnWrapperMap[callback] = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
+        vertxEventBus.registerHandler address, fnWrapperMap[callback]
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
         console.debug("[VertX EB Service] Unregister handler for #{address}") if debugEnabled
-        vertxEventBus.unregisterHandler address, callback
+        vertxEventBus.unregisterHandler address, fnWrapperMap[callback]
+        fnWrapperMap[callback] = undefined
+        return
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
       # @param message a required piece of message data
@@ -171,9 +177,15 @@ angular.module('knalli.angular-vertxbus')
       registerHandler : (address, callback) ->
         wrapped.handlers[address] = [] unless wrapped.handlers[address]
         wrapped.handlers[address].push callback
-        if connectionState is vertxEventBus.EventBus.OPEN then util.registerHandler(address, callback)
+        unregisterFn = null
+        if connectionState is vertxEventBus.EventBus.OPEN
+          unregisterFn = util.registerHandler(address, callback)
         () ->
-          wrapped.unregisterHandler(address, callback)
+          unregisterFn() if unregisterFn
+          # Remove from internal map
+          if wrapped.handlers[address]
+            index = wrapped.handlers[address].indexOf(callback)
+            wrapped.handlers[address].splice(index, 1) if index > -1
           return
       # Stub for util.unregisterHandler (see registerHandler)
       unregisterHandler : (address, callback) ->

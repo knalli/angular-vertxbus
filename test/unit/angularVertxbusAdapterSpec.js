@@ -514,6 +514,91 @@ describe('knalli.angular-vertxbus', function () {
 
     });
 
+
+    describe('after adding and removing a handler via "registerHandler"', function () {
+
+      var vertxEventBusService;
+
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+        vertxEventBusProvider.useMessageBuffer(0);
+      }));
+
+      beforeEach(inject(function (_vertxEventBusService_) {
+        vertxEventBusService = _vertxEventBusService_;
+      }));
+
+      it('should not be called', function (done) {
+        var abcCalled, xyzCalled;
+        setTimeout(function () {
+          var abcHandler = function (message) {
+            abcCalled = message;
+          }, xyzHandler = function (message) {
+            xyzCalled = message;
+          };
+
+          var abcFunct = vertxEventBusService.addListener('abc', abcHandler);
+          var xyzFunct = vertxEventBusService.addListener('xyz', xyzHandler);
+          // remove again!
+          abcFunct();
+          xyzFunct();
+          SockJS.currentMockInstance.onmessage({
+            data: JSON.stringify({
+              address: 'xyz',
+              body: {
+                data: '1x'
+              },
+              replyAddress: undefined
+            })
+          });
+          expect(abcCalled).to.be(undefined);
+          expect(xyzCalled).to.be(undefined);
+          done();
+        }, 200);
+      });
+    });
+
+  });
+
+  describe('after removing a registered handler via "unregisterHandler"', function () {
+
+    var vertxEventBusService;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+        vertxEventBusProvider.useMessageBuffer(0);
+      }));
+
+    beforeEach(inject(function (_vertxEventBusService_) {
+      vertxEventBusService = _vertxEventBusService_;
+    }));
+
+    it('should not be called', function (done) {
+      var abcCalled, xyzCalled;
+      setTimeout(function () {
+        var abcHandler = function (message) {
+          abcCalled = message;
+        }, xyzHandler = function (message) {
+          xyzCalled = message;
+        };
+        vertxEventBusService.addListener('abc', abcHandler);
+        vertxEventBusService.addListener('xyz', xyzHandler);
+        // remove again!
+        vertxEventBusService.removeListener('abc', abcHandler);
+        vertxEventBusService.removeListener('xyz', xyzHandler);
+        SockJS.currentMockInstance.onmessage({
+          data: JSON.stringify({
+            address: 'xyz',
+            body: {
+              data: '1x'
+            },
+            replyAddress: undefined
+          })
+        });
+        expect(abcCalled).to.be(undefined);
+        expect(xyzCalled).to.be(undefined);
+        done();
+      }, 200);
+    });
+
   });
 
 
