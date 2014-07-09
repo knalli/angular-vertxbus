@@ -236,7 +236,7 @@ angular.module('knalli.angular-vertxbus')
       readyState : wrapped.getConnectionState
       isEnabled : -> enabled
       getBufferCount: -> messageQueueHolder.size()
-      isValidSession : -> wrapped.validSession
+      isValidSession : -> validSession
       login : wrapped.login
     return api
 
