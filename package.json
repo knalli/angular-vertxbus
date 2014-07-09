@@ -5,7 +5,10 @@
   "main": "dist/angular-vertxbus.min.js",
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install",
-    "test": "./node_modules/karma/bin/karma start --browsers Firefox --single-run"
+    "test": "./node_modules/karma/bin/karma start --browsers Firefox --single-run",
+    "start-it-web-server": "coffee test/e2e/server.coffee",
+    "install-it-vertx-server": "cd test/e2e/vertx && ./install.sh",
+    "start-it-vertx-server": "cd test/e2e/vertx/app && ../vert.x-2.1.1/bin/vertx run config.js"
   },
   "author": {
     "name": "Jan Philipp"
@@ -37,6 +40,7 @@
     "karma-chrome-launcher": "~0.1.2",
     "karma-firefox-launcher": "~0.1.3",
     "karma-phantomjs-launcher": "~0.1.2",
-    "bower": "~1.3.2"
+    "bower": "~1.3.2",
+    "express": "~4.4.5"
   }
 }

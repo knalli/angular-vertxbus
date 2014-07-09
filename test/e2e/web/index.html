@@ -1,0 +1,31 @@
+<html>
+<head>
+  <title>knalli.angular-vertxbus</title>
+</head>
+
+<body ng-app="app">
+
+  <div ng-controller="MyController">
+    <form ng-init="register={username:'invalid-username',password:'password'}" ng-submit="login(register.username, register.password)">
+      <label for="username">Username</label>
+      <input type="text" id="username" ng-model="register.username"/>
+      <label for="password">Password</label>
+      <input type="password" ng-model="register.password"/>
+      <input type="submit" value="Login" >
+      <input type="button" value="Demo: Valid user login" ng-click="login('valid', register.password)">
+    </form>
+  </div>
+
+  <div>
+    <span ng-show="sessionIsValid">Valid Session</span>
+    <span ng-hide="sessionIsValid">Invalid Session</span>
+  </div>
+
+  <script src="bower_components/sockjs/sockjs.js"></script>
+  <script src="bower_components/vertxbus.js/index.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="temp/src/angular-vertxbus-adapter.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
