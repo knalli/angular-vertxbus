@@ -159,12 +159,12 @@ angular.module('knalli.angular-vertxbus')
       login : (username, password, timeout = 5000) ->
         deferred = $q.defer()
         vertxEventBus.login username, password, (reply) ->
-          if reply.status is 'ok'
+          if reply?.status is 'ok'
             deferred.resolve reply
-            $rootScope.$broadcast "#{prefix}system.login.succeeded", (status: reply.status)
+            $rootScope.$broadcast "#{prefix}system.login.succeeded", (status: reply?.status)
           else
             deferred.reject reply
-            $rootScope.$broadcast "#{prefix}system.login.failed", (status: reply.status)
+            $rootScope.$broadcast "#{prefix}system.login.failed", (status: reply?.status)
         $timeout (-> deferred.reject()), timeout
         return deferred.promise
 
