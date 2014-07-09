@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       }
     },
     jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
+      all: ['Gruntfile.js', 'src/**/*.js', 'test/unit/*.js'],
       options: {
         eqeqeq: true,
         globals: {
