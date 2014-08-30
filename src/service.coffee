@@ -225,7 +225,8 @@ angular.module('knalli.angular-vertxbus')
     # Update the current connection state periodially.
     $interval (-> wrapped.getConnectionState(true)), sockjsStateInterval
 
-    api =
+    ### building and exposing the actual service API ###
+    return (
       on : wrapped.registerHandler
       addListener : wrapped.registerHandler
       un : wrapped.unregisterHandler
@@ -238,7 +239,7 @@ angular.module('knalli.angular-vertxbus')
       getBufferCount: -> messageQueueHolder.size()
       isValidSession : -> validSession
       login : wrapped.login
-    return api
+    )
 
   return
 )
