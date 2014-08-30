@@ -96,7 +96,7 @@ angular.module('knalli.angular-vertxbus')
     EventBus_ = vertx?.EventBus
     if enabled and EventBus_
       url = "#{urlServer}#{urlPath}"
-      console.debug("[Vertex EventBus] Enabled: connecting '#{url}'") if debugEnabled
+      console.debug("[VertX EventBus] Enabled: connecting '#{url}'") if debugEnabled
       # Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
       # we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
       eventBus = null
