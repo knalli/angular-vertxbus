@@ -122,12 +122,14 @@ angular.module('knalli.angular-vertxbus')
         publish: (address, message) -> eventBus.publish(address, message)
         registerHandler: (address, handler) ->
           eventBus.registerHandler(address, handler)
-          () ->
+          ### and return the deregister callback ###
+          return ->
             stub.unregisterHandler(address, handler)
             return
         unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
         readyState: -> eventBus.readyState()
-        EventBus: EventBus_ #expose used object
+        ### expose current used internal instance of actual EventBus ###
+        EventBus: EventBus_
         getOptions: -> angular.extend({}, options)
     else
       console.debug("[VertX EventBus] Disabled") if debugEnabled
