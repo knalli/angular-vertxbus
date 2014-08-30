@@ -1,3 +1,25 @@
+<a name="v0.7.0"></a>
+## v0.7.0 (2014-08-30)
+
+
+#### Bug Fixes
+
+* **artifact:** (requirejs) add `angular` as a missing dependency ([a566c537](http://github.com/knalli/angular-vertxbus/commit/a566c537a81da5ec9994bbd74e9c2cad21e44ccf))
+* **service:**
+  * fix service.isValidSession() ([0cbfb105](http://github.com/knalli/angular-vertxbus/commit/0cbfb105f4e9f80247b5e069c78db8a7fadc78f7))
+  * Fix issue with registerHandler/unregisterHandler #18 ([e7231850](http://github.com/knalli/angular-vertxbus/commit/e72318507be4649b6c8f7362b559de0b5b08a35a))
+  * invalid promise on login (see also #17 & ca65a8d2) ([8e2cd8c8](http://github.com/knalli/angular-vertxbus/commit/8e2cd8c895d4e57a7d038fe4d7ae92ba4a14eede))
+* **wrapper:** fix typo in debug message ([0acd99bc](http://github.com/knalli/angular-vertxbus/commit/0acd99bc69d7d403ddb638ba70b5d21eaeb469b9))
+
+
+#### Features
+
+* **mock:** sockjs mock can emulate a login shake ([3618edef](http://github.com/knalli/angular-vertxbus/commit/3618edef25997e845c95e3afd9a086e32da2a192))
+* **service:**
+  * breaking change: service.send(addr, data, timeout) ([55716e46](http://github.com/knalli/angular-vertxbus/commit/55716e46796bf51d593671262272d73b74592981))
+  * send/publish will additionally check login state ([e16083fa](http://github.com/knalli/angular-vertxbus/commit/e16083faf85d71284048726523c96eb6c0427658))
+  * the service handles a login if defined ([7727da73](http://github.com/knalli/angular-vertxbus/commit/7727da73c5426ae69466dd88ff7dd40fa6773762))
+
 <a name="v0.6.0"></a>
 ## v0.6.0 (2014-05-19)
 
