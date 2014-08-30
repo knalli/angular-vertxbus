@@ -133,14 +133,12 @@ angular.module('knalli.angular-vertxbus')
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
       # @param message a required piece of message data
-      # @param expectReply an optional true which returns a promise waiting for a direct reply
       # @param timeout an optional number for a timout after which the promise will be rejected
-      send : (address, message, expectReply, timeout = 10000) ->
-        deferred = $q.defer() if expectReply
+      send : (address, message, timeout = 10000) ->
+        deferred = $q.defer()
         dispatched = ensureOpenAuthConnection ->
           vertxEventBus.send address, message, (reply) ->
             if deferred then deferred.resolve reply
-            if typeof expectReply is 'function' then expectReply(reply) # Handle a "callback"
           # Register timeout for promise rejecting.
           if deferred then $timeout (-> deferred.reject()), timeout
         if deferred and !dispatched then deferred.reject()
@@ -197,8 +195,8 @@ angular.module('knalli.angular-vertxbus')
         # Remove from real instance
         if connectionState is vertxEventBus.EventBus.OPEN then util.unregisterHandler(address, callback)
       # Stub for util.send
-      send : (address, message, expectReply, timeout = 10000) ->
-        util.send(address, message, expectReply, timeout)
+      send : (address, message, timeout = 10000) ->
+        util.send(address, message, timeout)
       # Stub for util.publish
       publish : (address, message) ->
         util.publish(address, message)
