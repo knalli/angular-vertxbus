@@ -83,7 +83,7 @@ angular.module('knalli.angular-vertxbus')
             fn = messageQueueHolder.first()
             fn() if typeof fn is 'function'
           $rootScope.$digest()
-        return
+        return #void
       vertxEventBus.onclose = ->
         wrapped.getConnectionState(true)
         $rootScope.$broadcast "#{prefix}system.disconnected"
@@ -129,7 +129,7 @@ angular.module('knalli.angular-vertxbus')
         console.debug("[VertX EB Service] Unregister handler for #{address}") if debugEnabled
         vertxEventBus.unregisterHandler address, fnWrapperMap[callback]
         fnWrapperMap[callback] = undefined
-        return
+        return #void
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
       # @param message a required piece of message data
@@ -180,13 +180,14 @@ angular.module('knalli.angular-vertxbus')
         unregisterFn = null
         if connectionState is vertxEventBus.EventBus.OPEN
           unregisterFn = util.registerHandler(address, callback)
-        () ->
+        ### and return the deregister callback ###
+        return ->
           unregisterFn() if unregisterFn
           # Remove from internal map
           if wrapped.handlers[address]
             index = wrapped.handlers[address].indexOf(callback)
             wrapped.handlers[address].splice(index, 1) if index > -1
-          return
+          return #void
       # Stub for util.unregisterHandler (see registerHandler)
       unregisterHandler : (address, callback) ->
         # Remove from internal map
@@ -241,5 +242,5 @@ angular.module('knalli.angular-vertxbus')
       login : wrapped.login
     )
 
-  return
+  return #void
 )

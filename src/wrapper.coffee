@@ -105,13 +105,13 @@ angular.module('knalli.angular-vertxbus')
         eventBus.onopen = ->
           console.debug("[VertX EventBus] Connected") if debugEnabled
           stub.onopen() if typeof stub.onopen is 'function'
-          return
+          return #void
         eventBus.onclose = ->
           console.debug("[VertX EventBus] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
           stub.onclose() if typeof stub.onclose is 'function'
           $timeout(connect, sockjsReconnectInterval) if reconnectEnabled
-          return
-        return
+          return #void
+        return #void
       connect()
       stub =
         reconnect: ->
@@ -125,7 +125,7 @@ angular.module('knalli.angular-vertxbus')
           ### and return the deregister callback ###
           return ->
             stub.unregisterHandler(address, handler)
-            return
+            return #void
         unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
         readyState: -> eventBus.readyState()
         ### expose current used internal instance of actual EventBus ###
@@ -135,5 +135,5 @@ angular.module('knalli.angular-vertxbus')
       console.debug("[VertX EventBus] Disabled") if debugEnabled
     return stub
 
-  return
+  return #void
 )
