@@ -3,6 +3,10 @@ class SockJS
   onopen: undefined
   onclose: undefined
   onmessage: undefined
+  sessionId: undefined
+
+  # for mocks
+  nextLoginState: true
 
   @mockInstances: []
   @currentMockInstance: null
@@ -31,4 +35,36 @@ class SockJS
     return
 
   send: (message) ->
+    json = JSON.parse message
+    return if json.type isnt 'send'
+    data = null
+    try
+      data = @_unwrapFromEvent(message)
+    catch e
+      return
     console.debug "[MOCK] SockJS.send(#{message})"
+    if data.address is 'vertx.basicauthmanager.login'
+      reply = if @nextLoginState
+                @_buildLoginReplyAsSuccess(data.body.username, data.body.password)
+              else
+                @_buildLoginReplyAsFail(data.body.username, data.body.password)
+      @onmessage @_wrapToEvent data.replyAddress, reply
+    return
+
+  onmessage: null
+
+  _unwrapFromEvent: (msg) ->
+    JSON.parse msg
+
+  _wrapToEvent: (address, body, replyAddress) ->
+    data: JSON.stringify {address, body, replyAddress}
+
+  _buildLoginReplyAsSuccess: (username, password) ->
+    @sessionId = "SESSION#{Math.round 1000000 * Math.random()}"
+    # return
+    status: 'ok'
+    sessionID: @sessionId
+
+  _buildLoginReplyAsFail: (username, password) ->
+    # return
+    status: 'fail'

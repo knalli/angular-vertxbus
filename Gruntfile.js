@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       }
     },
     jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
+      all: ['Gruntfile.js', 'src/**/*.js', 'test/unit/*.js'],
       options: {
         eqeqeq: true,
         globals: {
@@ -48,12 +48,14 @@ module.exports = function (grunt) {
     },
     coffee: {
       src: {
-        expand: true,
-        flatten: true,
-        cwd: 'src/',
-        src: ['*.coffee'],
-        dest: 'temp/src/',
-        ext: '.js'
+        options: {
+          join: true
+        },
+        files: {
+          'temp/src/angular-vertxbus-adapter.js': [
+            'src/module.coffee', 'src/wrapper.coffee', 'src/service.coffee'
+          ]
+        }
       },
       test: {
         options: {
@@ -61,7 +63,7 @@ module.exports = function (grunt) {
         },
         expand: true,
         cwd: 'test/',
-        src: ['**/*.coffee'],
+        src: ['unit/**/*.coffee'],
         dest: 'temp/test/',
         ext: '.js'
       }
