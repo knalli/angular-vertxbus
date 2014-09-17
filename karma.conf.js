@@ -1,18 +1,50 @@
+'use strict';
+
+var fs = require('fs');
+
+var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope;
+
+(function(undefined){
+  AVAILABLE_SCOPES = fs.readdirSync('./test_scopes').filter(function (filename) {
+    return filename[0] !== '.';
+  });
+  isValidScope = function (scope) {
+    return AVAILABLE_SCOPES.indexOf(scope) > -1;
+  };
+  getAffectiveScope = function (scope) {
+    if (isValidScope(scope)) {
+      return scope;
+    } else {
+      return '(default)';
+    }
+  };
+  injectByScope = function (scope, path) {
+    var prefix = '';
+    // unless a scope is given, use the default resources
+    if (scope && isValidScope(scope)) {
+      prefix = 'test_scopes/' + scope + '/';
+    }
+    return prefix + 'bower_components/' + path;
+  };
+})();
+
 module.exports = function(config) {
-  'use strict';
+
+  var scope = process.env.TEST_SCOPE;
+  console.log('Available test scopes: ', AVAILABLE_SCOPES);
+  console.log('Currently selected scope: ', getAffectiveScope(scope));
 
   config.set({
 
     // base path, that will be used to resolve files and exclude
     basePath: '',
 
-
     // list of files / patterns to load in the browser
     files: [
-      'bower_components/angular/angular.js',
-      'bower_components/angular-mocks/angular-mocks.js',
+      injectByScope(scope, 'angular/angular.js'),
+      injectByScope(scope, 'angular-mocks/angular-mocks.js'),
       'temp/test/unit/mock/sockjs.js',
-      'bower_components/vertxbus.js/index.js',
+      injectByScope(scope, 'vertxbus.js/index.js'),
       'temp/**/*.js',
       'test/**/*Spec.js'
     ],
@@ -59,7 +91,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['Chrome'],
+    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
 
 
     // If browser does not capture in given timeout [ms], kill it

@@ -129,11 +129,30 @@ module.exports = function (grunt) {
         src: '<%= concat.lib.dest %>',
         dest: '<%= concat.lib.dest %>'
       }
+    },
+    'bower-install-simple': {
+      options: {
+        color: false,
+        interactive: false
+      },
+      'test_scopes_angular_1.2.x': {
+        options: {
+          cwd: 'test_scopes/angular_1.2.x',
+          production: false
+        }
+      },
+      'test_scopes_angular_1.3.x': {
+        options: {
+          cwd: 'test_scopes/angular_1.3.x',
+          production: false
+        }
+      }
     }
   });
 
   grunt.registerTask('default', ['clean:temp', 'coffee', 'jshint', 'karma:unit']);
   grunt.registerTask('test', ['coffee', 'karma:unit']);
+  grunt.registerTask('install-test', ['bower-install-simple']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngmin', 'uglify']);
   grunt.registerTask('release', ['changelog', 'build']);
