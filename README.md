@@ -85,9 +85,9 @@ module.config(function(vertxEventBusProvider) {
 | useUrlServer(string)       | (same origin)\* | full URL to the server (must be changed if the target server is not the origin) |
 | useUrlPath(string)         | `'/eventbus'`   | path to the event bus |
 | useReconnect               | `true`          | if false, the disconnect will be recognized but no further actions |
-| useSockjsStateInterval     | `10000` (ms)    | defines the check interval of the underlayling SockJS connection |
-| useSockjsReconnectInterval | `10000` (ms)    | defines the wait time for a reconnect after a disconnect has been recognized |
-| useSockjsOptions           | `{}`            | optional SockJS options (technically `new SockJS(url, undefined, sockjsOptions)`) |
+| useSockJsStateInterval     | `10000` (ms)    | defines the check interval of the underlayling SockJS connection |
+| useSockJsReconnectInterval | `10000` (ms)    | defines the wait time for a reconnect after a disconnect has been recognized |
+| useSockJsOptions           | `{}`            | optional SockJS options (technically `new SockJS(url, undefined, sockjsOptions)`) |
 
 * `location.protocol + '//' + location.hostname + ':' + (location.port or 80)`
 
