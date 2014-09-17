@@ -23,7 +23,7 @@ In case of an AMD styled project, there is also a package available at `dist/req
 You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
 
 ```javascript
-angular.module('your-component', ['knalli.angular-vertxbus']).controller(function(vertxEventBus){
+angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl', function(vertxEventBus){
   vertxEventBus.send('my.address', {data: 123});
 });
 ```
