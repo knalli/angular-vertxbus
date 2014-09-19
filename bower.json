@@ -5,7 +5,15 @@
   "version": "0.7.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "main": "./dist/angular-vertxbus.min.js",
-  "ignore": [],
+  "ignore": [
+    ".editorconfig",
+    ".jshintrc",
+    ".travis.yml",
+    "karma.conf.js",
+    "/temp/",
+    "/test/",
+    "/test_scopes/"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/knalli/angular-vertxbus"
