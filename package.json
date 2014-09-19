@@ -6,6 +6,7 @@
   "scripts": {
     "prepublish": "bower install",
     "test": "grunt install-test && grunt test",
+    "test-scopes": "grunt install-test && for f in test_scopes/*; do TEST_SCOPE=\"`basename $f`\" grunt test; done",
     "start-it-web-server": "coffee test/e2e/server.coffee",
     "install-it-vertx-server": "cd test/e2e/vertx && ./install.sh",
     "start-it-vertx-server": "cd test/e2e/vertx/app && ../vert.x-2.1.1/bin/vertx run config.js"

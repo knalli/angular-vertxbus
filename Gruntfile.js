@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 module.exports = function (grunt) {
   'use strict';
 
@@ -8,6 +10,30 @@ module.exports = function (grunt) {
     var options = { configFile: configFile, keepalive: true };
     var travisOptions = process.env.TRAVIS && { browsers: ['Firefox'], reporters: 'dots' };
     return _.extend(options, customOptions, travisOptions);
+  };
+
+  // Returns configuration for bower-install plugin
+  var loadTestScopeConfigurations = function () {
+    var scopes = fs.readdirSync('./test_scopes').filter(function (filename) {
+      return filename[0] !== '.';
+    });
+    var config = {
+      options : {
+        color : false,
+        interactive : false
+      }
+    };
+    // Create a sub config for each test scope
+    for (var idx in scopes) {
+      var scope = scopes[idx];
+      config['test_scopes_' + scope] = {
+        options : {
+          cwd : 'test_scopes/' + scope,
+          production : false
+        }
+      };
+    }
+    return  config;
   };
 
   grunt.initConfig({
@@ -130,24 +156,9 @@ module.exports = function (grunt) {
         dest: '<%= concat.lib.dest %>'
       }
     },
-    'bower-install-simple': {
-      options: {
-        color: false,
-        interactive: false
-      },
-      'test_scopes_angular_1.2.x': {
-        options: {
-          cwd: 'test_scopes/angular_1.2.x',
-          production: false
-        }
-      },
-      'test_scopes_angular_1.3.x': {
-        options: {
-          cwd: 'test_scopes/angular_1.3.x',
-          production: false
-        }
-      }
-    }
+
+    'bower-install-simple': loadTestScopeConfigurations()
+
   });
 
   grunt.registerTask('default', ['clean:temp', 'coffee', 'jshint', 'karma:unit']);
