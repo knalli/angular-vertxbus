@@ -4,6 +4,8 @@
   "description": "Seed for reusable Angular components.",
   "version": "0.7.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
+  "main": "./dist/angular-vertxbus.min.js",
+  "ignore": [],
   "repository": {
     "type": "git",
     "url": "git://github.com/knalli/angular-vertxbus"

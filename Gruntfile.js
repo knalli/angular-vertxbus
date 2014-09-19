@@ -104,7 +104,7 @@ module.exports = function (grunt) {
             ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n'
         },
         src: ['temp/src/**/*.js'],
-        dest: 'dist/angular-vertxbus-<%= pkg.version %>.js'
+        dest: 'dist/angular-vertxbus.js'
       },
       lib: {
         options: {
@@ -125,7 +125,7 @@ module.exports = function (grunt) {
     uglify: {
       src: {
         files: {
-          'dist/angular-vertxbus-<%= pkg.version %>.min.js': '<%= concat.src.dest %>'
+          'dist/angular-vertxbus.min.js': '<%= concat.src.dest %>'
         }
       }
     },
