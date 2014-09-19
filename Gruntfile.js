@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 module.exports = function (grunt) {
   'use strict';
 
@@ -8,6 +10,30 @@ module.exports = function (grunt) {
     var options = { configFile: configFile, keepalive: true };
     var travisOptions = process.env.TRAVIS && { browsers: ['Firefox'], reporters: 'dots' };
     return _.extend(options, customOptions, travisOptions);
+  };
+
+  // Returns configuration for bower-install plugin
+  var loadTestScopeConfigurations = function () {
+    var scopes = fs.readdirSync('./test_scopes').filter(function (filename) {
+      return filename[0] !== '.';
+    });
+    var config = {
+      options : {
+        color : false,
+        interactive : false
+      }
+    };
+    // Create a sub config for each test scope
+    for (var idx in scopes) {
+      var scope = scopes[idx];
+      config['test_scopes_' + scope] = {
+        options : {
+          cwd : 'test_scopes/' + scope,
+          production : false
+        }
+      };
+    }
+    return  config;
   };
 
   grunt.initConfig({
@@ -78,7 +104,7 @@ module.exports = function (grunt) {
             ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n'
         },
         src: ['temp/src/**/*.js'],
-        dest: 'dist/angular-vertxbus-<%= pkg.version %>.js'
+        dest: 'dist/angular-vertxbus.js'
       },
       lib: {
         options: {
@@ -99,7 +125,7 @@ module.exports = function (grunt) {
     uglify: {
       src: {
         files: {
-          'dist/angular-vertxbus-<%= pkg.version %>.min.js': '<%= concat.src.dest %>'
+          'dist/angular-vertxbus.min.js': '<%= concat.src.dest %>'
         }
       }
     },
@@ -129,11 +155,15 @@ module.exports = function (grunt) {
         src: '<%= concat.lib.dest %>',
         dest: '<%= concat.lib.dest %>'
       }
-    }
+    },
+
+    'bower-install-simple': loadTestScopeConfigurations()
+
   });
 
   grunt.registerTask('default', ['clean:temp', 'coffee', 'jshint', 'karma:unit']);
   grunt.registerTask('test', ['coffee', 'karma:unit']);
+  grunt.registerTask('install-test', ['bower-install-simple']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngmin', 'uglify']);
   grunt.registerTask('release', ['changelog', 'build']);
