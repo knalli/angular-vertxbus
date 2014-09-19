@@ -2,7 +2,7 @@
   "author": "Jan Philipp",
   "name": "angular-vertxbus",
   "description": "Seed for reusable Angular components.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "main": "./dist/angular-vertxbus.min.js",
   "ignore": [
