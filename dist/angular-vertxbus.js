@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.7.0 - 2014-08-30
+/*! angular-vertxbus - v0.7.1 - 2014-09-19
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2014 ; Licensed  */
 (function () {

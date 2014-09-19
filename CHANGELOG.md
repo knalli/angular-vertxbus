@@ -1,3 +1,19 @@
+<a name="v0.7.1"></a>
+### v0.7.1 (2014-09-19)
+
+No new features, but a fixed package release.
+
+
+#### Features
+
+* **tests:** introduce automatic tests against latest AJS 1.2 & 1.3 ([89d6a3d6](http://github.com/knalli/angular-vertxbus/commit/89d6a3d6d63dbd5eab4b7c44188a670b6d1ee9da))
+
+
+#### Breaking Changes
+
+* The name of the artifact in `dist/` is without version suffix now.
+ ([339a6aa3](http://github.com/knalli/angular-vertxbus/commit/339a6aa33d97a3c6a9a4c3ba91c4bb3f07657497))
+
 <a name="v0.7.0"></a>
 ## v0.7.0 (2014-08-30)
 
