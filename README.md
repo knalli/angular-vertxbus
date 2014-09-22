@@ -127,7 +127,7 @@ In addition to this, when sending a message with an expected reply:
 
 ```javascript
 // Same as vertx.EventBus.send() but with a promise
-service.send('myaddress', data, true).then(function(replyMessage) {})
+service.send('myaddress', data).then(function(replyMessage) {})
 ```
 
 For each connect or disconnect, a global broadcast will be emitted (on `$rootScope` with `'vertx-eventbus.system.connected'`, `'vertx-eventbus.system.disconnected'`)
