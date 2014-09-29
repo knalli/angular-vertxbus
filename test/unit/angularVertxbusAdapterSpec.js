@@ -196,6 +196,77 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+    describe('adding two handlers with the same address, different callbacks.', function () {
+      it('both handlers should be called - with same address', function (done) {
+          var abcCalled, abcCalled2;
+          setTimeout(function () {
+              var abcHandler = function (message) {
+                  abcCalled = message;
+              }, abcHandler2 = function (message) {
+                  // use a copy of the data so that we don't change
+                  // the message sent to other callbacks.
+                  var copy = angular.copy(message);
+                  copy.data = copy.data+"-2";
+                  abcCalled2 = copy;
+              };
+              vertxEventBus.registerHandler('abc', abcHandler);
+              vertxEventBus.registerHandler('abc', abcHandler2);
+              // remove again!
+              SockJS.currentMockInstance.onmessage({
+                  data: JSON.stringify({
+                      address: 'abc',
+                      body: {
+                          data: '1x'
+                      },
+                      replyAddress: undefined
+                  })
+              });
+              expect(abcCalled.data).to.be('1x');
+              expect(abcCalled2.data).to.be('1x-2');
+              // remove handlers
+              vertxEventBus.unregisterHandler('abc', abcHandler);
+              vertxEventBus.unregisterHandler('abc', abcHandler2);
+              done();
+          }, 200);
+      });
+    });
+
+    describe('adding two handlers with the same callback, different addresses.', function () {
+      it('handler should be called twice - with two different values - two different addresses', function (done) {
+          var singleCallbackValue;
+          setTimeout(function () {
+              var handler = function (message) {
+                  singleCallbackValue = message;
+              };
+              vertxEventBus.registerHandler('abc', handler);
+              vertxEventBus.registerHandler('xyz', handler);
+              SockJS.currentMockInstance.onmessage({
+                  data: JSON.stringify({
+                      address: 'abc',
+                      body: {
+                          data: 'abc'
+                      },
+                      replyAddress: undefined
+                  })
+              });
+              expect(singleCallbackValue.data).to.be('abc');
+              SockJS.currentMockInstance.onmessage({
+                  data: JSON.stringify({
+                      address: 'xyz',
+                      body: {
+                          data: 'xyz'
+                      },
+                      replyAddress: undefined
+                  })
+              });
+              expect(singleCallbackValue.data).to.be('xyz');
+              // remove handlers
+              vertxEventBus.unregisterHandler('abc', handler);
+              vertxEventBus.unregisterHandler('xyz', handler);
+              done();
+          }, 200);
+      });
+    });
   });
 
 

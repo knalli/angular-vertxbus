@@ -120,19 +120,19 @@ angular.module('knalli.angular-vertxbus')
         return unless angular.isString(address)
         console.debug("[VertX EB Service] Register handler for #{address}") if debugEnabled
         addressSanitized = encodeURIComponent(address);
-        return fnWrapperMap[addressSanitized] if fnWrapperMap[addressSanitized] # already known
-        fnWrapperMap[addressSanitized] = (message, replyTo) ->
+        return fnWrapperMap[addressSanitized+callback] if fnWrapperMap[addressSanitized+callback] # already known
+        fnWrapperMap[addressSanitized+callback] = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
-        vertxEventBus.registerHandler address, fnWrapperMap[addressSanitized]
+        vertxEventBus.registerHandler address, fnWrapperMap[addressSanitized+callback]
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
         return unless angular.isString(address)
         console.debug("[VertX EB Service] Unregister handler for #{address}") if debugEnabled
         addressSanitized = encodeURIComponent(address);
-        vertxEventBus.unregisterHandler address, fnWrapperMap[addressSanitized]
-        fnWrapperMap[addressSanitized] = undefined
+        vertxEventBus.unregisterHandler address, fnWrapperMap[addressSanitized+callback]
+        fnWrapperMap[addressSanitized+callback] = undefined
         return #void
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
