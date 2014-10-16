@@ -221,6 +221,78 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+    describe('adding two handlers with the same address, different callbacks.', function () {
+      it('both handlers should be called - with same address', function (done) {
+          var abcCalled, abcCalled2;
+          setTimeout(function () {
+              var abcHandler = function (message) {
+                  abcCalled = message;
+              }, abcHandler2 = function (message) {
+                  // use a copy of the data so that we don't change
+                  // the message sent to other callbacks.
+                  var copy = angular.copy(message);
+                  copy = copy+"-2";
+                  abcCalled2 = copy;
+              };
+              vertxEventBusService.addListener('abc', abcHandler);
+              vertxEventBusService.addListener('abc', abcHandler2);
+              // remove again!
+              SockJS.currentMockInstance.onmessage({
+                  data: JSON.stringify({
+                      address: 'abc',
+                      body: '1x',
+                      replyAddress: undefined
+                  })
+              });
+              expect(abcCalled).to.be('1x');
+              expect(abcCalled2).to.be('1x-2');
+              // remove handlers
+              vertxEventBusService.removeListener('abc', abcHandler);
+              vertxEventBusService.removeListener('abc', abcHandler2);
+              done();
+          }, 200);
+      });
+    });
+
+    describe('adding two handlers with the same callback, different addresses.', function () {
+      it('handler should be called twice - with two different values - two different addresses', function (done) {
+          var singleCallbackValue;
+          function FunctionHolder(){
+              "use strict";
+              return {
+                  handler: function (message) {
+                      singleCallbackValue = message;
+                  }
+              }
+          };
+          setTimeout(function () {
+              var funcOne = new FunctionHolder();
+              var funcTwo = new FunctionHolder();
+              vertxEventBusService.addListener('abc', funcOne.handler);
+              vertxEventBusService.addListener('xyz', funcTwo.handler);
+              SockJS.currentMockInstance.onmessage({
+                  data: JSON.stringify({
+                      address: 'abc',
+                      body: 'abc',
+                      replyAddress: undefined
+                  })
+              });
+              expect(singleCallbackValue).to.be('abc');
+              SockJS.currentMockInstance.onmessage({
+                  data: JSON.stringify({
+                      address: 'xyz',
+                      body: 'xyz',
+                      replyAddress: undefined
+                  })
+              });
+              expect(singleCallbackValue).to.be('xyz');
+              // remove handlers
+              vertxEventBusService.removeListener('abc', funcOne.handler);
+              vertxEventBusService.removeListener('xyz', funcTwo.handler);
+              done();
+          }, 200);
+      });
+    });
   });
 
 
