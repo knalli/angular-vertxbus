@@ -162,7 +162,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('default', ['clean:temp', 'coffee', 'jshint', 'karma:unit']);
-  grunt.registerTask('test', ['coffee', 'karma:unit']);
+  grunt.registerTask('test', ['coffee', 'jshint', 'karma:unit']);
   grunt.registerTask('install-test', ['bower-install-simple']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngmin', 'uglify']);
