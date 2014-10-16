@@ -256,12 +256,19 @@ describe('knalli.angular-vertxbus', function () {
     describe('adding two handlers with the same callback, different addresses.', function () {
       it('handler should be called twice - with two different values - two different addresses', function (done) {
           var singleCallbackValue;
+          function FunctionHolder(){
+              "use strict";
+              return {
+                  handler: function (message) {
+                      singleCallbackValue = message;
+                  }
+              }
+          };
           setTimeout(function () {
-              var handler = function (message) {
-                  singleCallbackValue = message;
-              };
-              vertxEventBusService.addListener('abc', handler);
-              vertxEventBusService.addListener('xyz', handler);
+              var funcOne = new FunctionHolder();
+              var funcTwo = new FunctionHolder();
+              vertxEventBusService.addListener('abc', funcOne.handler);
+              vertxEventBusService.addListener('xyz', funcTwo.handler);
               SockJS.currentMockInstance.onmessage({
                   data: JSON.stringify({
                       address: 'abc',
@@ -279,8 +286,8 @@ describe('knalli.angular-vertxbus', function () {
               });
               expect(singleCallbackValue).to.be('xyz');
               // remove handlers
-              vertxEventBusService.removeListener('abc', handler);
-              vertxEventBusService.removeListener('xyz', handler);
+              vertxEventBusService.removeListener('abc', funcOne.handler);
+              vertxEventBusService.removeListener('xyz', funcTwo.handler);
               done();
           }, 200);
       });
