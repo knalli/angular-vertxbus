@@ -38,6 +38,50 @@ angular.module('knalli.angular-vertxbus')
     first: -> @items.shift(0)
     size: -> @items.length
 
+  class SimpleMap
+    keys: null
+    values: null
+    constructor: ->
+      @keys = []
+      @values = []
+    put: (key, value) ->
+      idx = @_indexForKey key
+      if idx > -1
+        @values[idx] = value
+      else
+        @keys.push key
+        @values.push value
+      return this
+    _indexForKey: (key) ->
+      for k, i in @keys when key is k
+        return i
+      return -1
+    _indexForValue: (value) ->
+      for v, i in @values when value is v
+        return i
+      return -1
+    containsKey: (key) ->
+      idx = @_indexForKey key
+      return idx > -1
+    containsValue: (value) ->
+      idx = @_indexForValue value
+      return idx > -1
+    get: (key) ->
+      idx = @_indexForKey key
+      if idx > -1
+        return @values[idx]
+      return undefined
+    remove: (key) ->
+      idx = @_indexForKey key
+      if idx > -1
+        @keys[idx] = undefined
+        @values[idx] = undefined
+      return undefined
+    clear: ->
+      @keys = []
+      @values = []
+      return this
+
   options = angular.extend({}, DEFAULT_OPTIONS)
 
   # private
@@ -67,7 +111,7 @@ angular.module('knalli.angular-vertxbus')
     loginPromise = null
     messageQueueHolder = new MessageQueueHolder(messageBuffer)
 
-    fnWrapperMap = {} # handlers are wrapped, so we have to keep track
+    fnWrapperMap = new SimpleMap # handlers are wrapped, so we have to keep track
 
     if enabled and vertxEventBus
       vertxEventBus.onopen = ->
@@ -118,17 +162,18 @@ angular.module('knalli.angular-vertxbus')
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
         console.debug("[VertX EB Service] Register handler for #{address}") if debugEnabled
-        return fnWrapperMap[callback] if fnWrapperMap[callback] # already known
-        fnWrapperMap[callback] = (message, replyTo) ->
+        return fnWrapperMap.get(callback) if fnWrapperMap.containsKey(callback) # already known
+        fnWrapperMap.put(callback, (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
-        vertxEventBus.registerHandler address, fnWrapperMap[callback]
+        )
+        vertxEventBus.registerHandler address, fnWrapperMap.get(callback)
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
         console.debug("[VertX EB Service] Unregister handler for #{address}") if debugEnabled
-        vertxEventBus.unregisterHandler address, fnWrapperMap[callback]
-        fnWrapperMap[callback] = undefined
+        vertxEventBus.unregisterHandler address, fnWrapperMap.get(callback)
+        fnWrapperMap.remove(callback)
         return #void
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
