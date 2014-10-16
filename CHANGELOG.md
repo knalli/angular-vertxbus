@@ -1,3 +1,11 @@
+<a name="v0.8.0"></a>
+## v0.8.0 (2014-10-16)
+
+
+#### Features
+
+* **service:** use a simple map internally avoiding callbacks issues ([8a5bd54e](http://github.com/knalli/angular-vertxbus/commit/8a5bd54ef33d8cbc90dc139d693e34b3340f70c2))
+
 <a name="v0.7.1"></a>
 ### v0.7.1 (2014-09-19)
 

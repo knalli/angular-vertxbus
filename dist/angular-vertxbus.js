@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.7.1 - 2014-09-19
+/*! angular-vertxbus - v0.8.0 - 2014-10-16
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2014 ; Licensed  */
 (function () {
@@ -219,7 +219,7 @@
     Note the additional configuration of the module itself.
   */
   angular.module('knalli.angular-vertxbus').provider('vertxEventBusService', function () {
-    var DEFAULT_OPTIONS, MessageQueueHolder, options;
+    var DEFAULT_OPTIONS, MessageQueueHolder, SimpleMap, options;
     DEFAULT_OPTIONS = {
       loginRequired: false,
       loginBlockForSession: false,
@@ -250,6 +250,80 @@
         return this.items.length;
       };
       return MessageQueueHolder;
+    }();
+    SimpleMap = function () {
+      SimpleMap.prototype.keys = null;
+      SimpleMap.prototype.values = null;
+      function SimpleMap() {
+        this.keys = [];
+        this.values = [];
+      }
+      SimpleMap.prototype.put = function (key, value) {
+        var idx;
+        idx = this._indexForKey(key);
+        if (idx > -1) {
+          this.values[idx] = value;
+        } else {
+          this.keys.push(key);
+          this.values.push(value);
+        }
+        return this;
+      };
+      SimpleMap.prototype._indexForKey = function (key) {
+        var i, k, _i, _len, _ref;
+        _ref = this.keys;
+        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+          k = _ref[i];
+          if (key === k) {
+            return i;
+          }
+        }
+        return -1;
+      };
+      SimpleMap.prototype._indexForValue = function (value) {
+        var i, v, _i, _len, _ref;
+        _ref = this.values;
+        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+          v = _ref[i];
+          if (value === v) {
+            return i;
+          }
+        }
+        return -1;
+      };
+      SimpleMap.prototype.containsKey = function (key) {
+        var idx;
+        idx = this._indexForKey(key);
+        return idx > -1;
+      };
+      SimpleMap.prototype.containsValue = function (value) {
+        var idx;
+        idx = this._indexForValue(value);
+        return idx > -1;
+      };
+      SimpleMap.prototype.get = function (key) {
+        var idx;
+        idx = this._indexForKey(key);
+        if (idx > -1) {
+          return this.values[idx];
+        }
+        return void 0;
+      };
+      SimpleMap.prototype.remove = function (key) {
+        var idx;
+        idx = this._indexForKey(key);
+        if (idx > -1) {
+          this.keys[idx] = void 0;
+          this.values[idx] = void 0;
+        }
+        return void 0;
+      };
+      SimpleMap.prototype.clear = function () {
+        this.keys = [];
+        this.values = [];
+        return this;
+      };
+      return SimpleMap;
     }();
     options = angular.extend({}, DEFAULT_OPTIONS);
     this.requireLogin = function (value) {
@@ -286,7 +360,7 @@
         validSession = false;
         loginPromise = null;
         messageQueueHolder = new MessageQueueHolder(messageBuffer);
-        fnWrapperMap = {};
+        fnWrapperMap = new SimpleMap();
         if (enabled && vertxEventBus) {
           vertxEventBus.onopen = function () {
             var address, callback, callbacks, fn, _i, _len, _ref2;
@@ -353,14 +427,14 @@
             if (debugEnabled) {
               console.debug('[VertX EB Service] Register handler for ' + address);
             }
-            if (fnWrapperMap[callback]) {
-              return fnWrapperMap[callback];
+            if (fnWrapperMap.containsKey(callback)) {
+              return fnWrapperMap.get(callback);
             }
-            fnWrapperMap[callback] = function (message, replyTo) {
+            fnWrapperMap.put(callback, function (message, replyTo) {
               callback(message, replyTo);
               return $rootScope.$digest();
-            };
-            return vertxEventBus.registerHandler(address, fnWrapperMap[callback]);
+            });
+            return vertxEventBus.registerHandler(address, fnWrapperMap.get(callback));
           },
           unregisterHandler: function (address, callback) {
             if (typeof callback !== 'function') {
@@ -369,8 +443,8 @@
             if (debugEnabled) {
               console.debug('[VertX EB Service] Unregister handler for ' + address);
             }
-            vertxEventBus.unregisterHandler(address, fnWrapperMap[callback]);
-            fnWrapperMap[callback] = void 0;
+            vertxEventBus.unregisterHandler(address, fnWrapperMap.get(callback));
+            fnWrapperMap.remove(callback);
           },
           send: function (address, message, timeout) {
             var deferred, dispatched;
