@@ -22,8 +22,8 @@ angular.module('knalli.angular-vertxbus')
 
   DEFAULT_OPTIONS =
     loginRequired: false
-    loginBlockForSession: false #NYI
-    skipUnauthorizeds: true #NYI
+    loginBlockForSession: false #NYI?
+    skipUnauthorizeds: true #NYI?
 
   class MessageQueueHolder
     constructor: (@maxSize = 10) ->
@@ -107,7 +107,7 @@ angular.module('knalli.angular-vertxbus')
     } = vertxEventBus.getOptions()
 
     connectionState = vertxEventBus?.EventBus?.CLOSED
-    validSession = false
+    validSession = no
     loginPromise = null
     messageQueueHolder = new MessageQueueHolder(messageBuffer)
 
@@ -135,11 +135,11 @@ angular.module('knalli.angular-vertxbus')
     ensureOpenConnection = (fn) ->
       if wrapped.getConnectionState() is vertxEventBus.EventBus.OPEN
         fn()
-        return true
+        return yes
       else if messageBuffer
         messageQueueHolder.push(fn)
-        return true
-      return false
+        return yes
+      return no
 
     ensureOpenAuthConnection = (fn) ->
       unless options.loginRequired
@@ -149,7 +149,7 @@ angular.module('knalli.angular-vertxbus')
         ensureOpenConnection ->
           if validSession
             fn()
-            return true
+            return yes
           else
             # ignore this message
             console.debug("[VertX EB Service] Message was not sent because login is required") if debugEnabled
