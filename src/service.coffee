@@ -119,7 +119,7 @@ angular.module('knalli.angular-vertxbus')
         $rootScope.$broadcast "#{prefix}system.connected"
         for own address, callbacks of wrapped.handlers
           for callback in callbacks
-             util.registerHandler(address, callback)
+            util.registerHandler(address, callback)
         $rootScope.$digest()
         # consume message queue?
         if messageBuffer and messageQueueHolder.size()
