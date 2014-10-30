@@ -104,7 +104,7 @@ angular.module('knalli.angular-vertxbus')
     { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
       sockjsStateInterval, sockjsReconnectInterval, sockjsOptions,
       messageBuffer
-    } = vertxEventBus.getOptions()
+    } = vertxEventBus?.getOptions() or {}
 
     connectionState = vertxEventBus?.EventBus?.CLOSED
     validSession = false
