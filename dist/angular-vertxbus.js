@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.8.0 - 2014-10-16
+/*! angular-vertxbus - v0.8.1 - 2014-10-30
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2014 ; Licensed  */
 (function () {
@@ -355,7 +355,7 @@
       'vertxEventBus',
       function ($rootScope, $q, $interval, $timeout, vertxEventBus) {
         var connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, fnWrapperMap, loginPromise, messageBuffer, messageQueueHolder, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
-        _ref = vertxEventBus.getOptions(), enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
+        _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
         connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
         validSession = false;
         loginPromise = null;
