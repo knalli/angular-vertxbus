@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "angular": "~1.2.0",
-    "sockjs": "~0.3.4",
+    "sockjs-client": "~0.3.4",
     "vertxbus.js": "http://cdnjs.cloudflare.com/ajax/libs/vertx/2.0.0/vertxbus.js"
   },
   "devDependencies": {

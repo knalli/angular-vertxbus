@@ -1,7 +1,7 @@
 {
   "author": "Jan Philipp",
   "name": "angular-vertxbus",
-  "description": "Seed for reusable Angular components.",
+  "description": "",
   "version": "0.0.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "repository": {
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "angular": "~1.2.0",
-    "sockjs": "~0.3.4",
+    "sockjs-client": "~0.3.4",
     "vertxbus.js": "http://cdnjs.cloudflare.com/ajax/libs/vertx/2.0.0/vertxbus.js"
   },
   "devDependencies": {
