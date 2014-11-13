@@ -2,7 +2,7 @@
   "name": "angular-vertxbus",
   "version": "0.9.0",
   "description": "AngularJS facade and service acting as a Vert.x SockJS client",
-  "main": "dist/angular-vertxbus.min.js",
+  "main": "dist/angular-vertxbus.js",
   "scripts": {
     "prepublish": "bower install",
     "test": "grunt install-test && grunt test",
