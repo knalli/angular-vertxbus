@@ -1,7 +1,7 @@
 {
   "author": "Jan Philipp",
   "name": "angular-vertxbus",
-  "description": "Seed for reusable Angular components.",
+  "description": "AngularJS facade and service acting as a Vert.x SockJS client",
   "version": "0.9.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "main": "./dist/angular-vertxbus.min.js",
