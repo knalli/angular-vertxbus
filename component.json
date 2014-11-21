@@ -1,0 +1,11 @@
+{
+  "name": "angular-vertxbus",
+  "dependencies": {
+  },
+  "main": "dist/angular-vertxbus.js",
+  "scripts": [
+    "dist/angular-vertxbus.js"
+  ],
+  "repository": "knalli/angular-vertxbus",
+  "version": "master"
+}
