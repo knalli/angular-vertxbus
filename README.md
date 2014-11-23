@@ -1,4 +1,4 @@
-# angular-vertxbus [![Bower version](https://badge.fury.io/bo/angular-vertxbus.svg)](http://badge.fury.io/bo/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# angular-vertxbus [![Bower version](https://badge.fury.io/bo/angular-vertxbus.svg)](http://badge.fury.io/bo/angular-vertxbus) [![npm version](https://badge.fury.io/js/angular-vertxbus.svg)](http://badge.fury.io/js/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
@@ -134,12 +134,12 @@ For each connect or disconnect, a global broadcast will be emitted (on `$rootSco
 
 ### Setup for using same callback with different addresses
 
-In some scenarios you will want to use a single callback definition to many different addresses.  To do this you will 
-have to follow this pattern.  
+In some scenarios you will want to use a single callback definition to many different addresses.  To do this you will
+have to follow this pattern.
 
 Create a javascript object that defines your callback.  Do not attempt to use `.prototype` as the methods defined
 as such will always point to the same memory allocation - so will always be found identical when adding to the internal
-array.  
+array.
 ```javascript
 function FunctionHolder(){
   "use strict";
@@ -151,7 +151,7 @@ function FunctionHolder(){
 };
 ```
 
-Then when adding the listeners, you will create a new instance of your object and use your defined function. 
+Then when adding the listeners, you will create a new instance of your object and use your defined function.
 ```javascript
 var funcHolder = new FunctionHolder();
 vertxEventBusService.addListener('address', funcHolder.handler);

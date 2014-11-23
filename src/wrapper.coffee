@@ -14,6 +14,10 @@
 angular.module('knalli.angular-vertxbus')
 .provider('vertxEventBus', () ->
 
+  CONSTANTS =
+    MODULE: 'angular-vertxbus'
+    COMPONENT: 'wrapper'
+
   DEFAULT_OPTIONS =
     enabled: true
     debugEnabled: false
@@ -123,17 +127,29 @@ angular.module('knalli.angular-vertxbus')
         registerHandler: (address, handler) ->
           eventBus.registerHandler(address, handler)
           ### and return the deregister callback ###
-          return ->
+          deconstructor = ->
             stub.unregisterHandler(address, handler)
             return #void
+          deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.registerHandler (deconstructor)"
+          return deconstructor
         unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
         readyState: -> eventBus.readyState()
         ### expose current used internal instance of actual EventBus ###
         EventBus: EventBus_
         getOptions: -> angular.extend({}, options)
+      stub.reconnect.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.reconnect"
+      stub.close.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.close"
+      stub.login.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.login"
+      stub.send.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.send"
+      stub.publish.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.publish"
+      stub.registerHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.registerHandler"
+      stub.unregisterHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.unregisterHandler"
+      stub.readyState.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.readyState"
+      stub.getOptions.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.getOptions"
     else
       console.debug("[VertX EventBus] Disabled") if debugEnabled
     return stub
+  @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: initializer"
 
   return #void
 )
