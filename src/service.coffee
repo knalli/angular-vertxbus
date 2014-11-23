@@ -20,6 +20,10 @@
 angular.module('knalli.angular-vertxbus')
 .provider('vertxEventBusService', () ->
 
+  CONSTANTS =
+    MODULE: 'angular-vertxbus'
+    COMPONENT: 'service'
+
   DEFAULT_OPTIONS =
     loginRequired: false
     loginBlockForSession: false #NYI
@@ -88,16 +92,19 @@ angular.module('knalli.angular-vertxbus')
   @requireLogin = (value = options.loginRequired) ->
     options.loginRequired = value
     return this
+  @requireLogin.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: requireLogin"
 
   # private: NYI
   @blockForSession = (value = options.loginBlockForSession) ->
     options.loginBlockForSession = value
     return this
+  @blockForSession.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: blockForSession"
 
   # private: NYI
   @skipUnauthorizeds = (value = options.skipUnauthorizeds) ->
     options.skipUnauthorizeds = value
     return this
+  @skipUnauthorizeds.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: skipUnauthorizeds"
 
   @$get = ($rootScope, $q, $interval, $timeout, vertxEventBus) ->
     # Extract options (with defaults)
@@ -131,6 +138,7 @@ angular.module('knalli.angular-vertxbus')
       vertxEventBus.onclose = ->
         wrapped.getConnectionState(true)
         $rootScope.$broadcast "#{prefix}system.disconnected"
+      vertxEventBus.onclose.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: 'onclose' handler"
 
     ensureOpenConnection = (fn) ->
       if wrapped.getConnectionState() is vertxEventBus.EventBus.OPEN
@@ -140,13 +148,14 @@ angular.module('knalli.angular-vertxbus')
         messageQueueHolder.push(fn)
         return true
       return false
+    ensureOpenConnection.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: ensureOpenConnection"
 
     ensureOpenAuthConnection = (fn) ->
       unless options.loginRequired
         # easy: no login required
         ensureOpenConnection fn
       else
-        ensureOpenConnection ->
+        wrapFn = ->
           if validSession
             fn()
             return true
@@ -154,6 +163,9 @@ angular.module('knalli.angular-vertxbus')
             # ignore this message
             console.debug("[VertX EB Service] Message was not sent because login is required") if debugEnabled
             return false
+        wrapFn.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: ensureOpenAuthConnection function wrapper"
+        ensureOpenConnection wrapFn
+    ensureOpenAuthConnection.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: ensureOpenAuthConnection"
 
     # All utility methods working directly on the event bus object.
     # The object "vertxEventBus" must be available.
@@ -163,10 +175,11 @@ angular.module('knalli.angular-vertxbus')
         return unless typeof callback is 'function'
         console.debug("[VertX EB Service] Register handler for #{address}") if debugEnabled
         return fnWrapperMap.get(callback) if fnWrapperMap.containsKey(callback) # already known
-        fnWrapperMap.put(callback, (message, replyTo) ->
+        deconstructor = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
-        )
+        deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.registerHandler (deconstructor)"
+        fnWrapperMap.put(callback, deconstructor)
         vertxEventBus.registerHandler address, fnWrapperMap.get(callback)
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
@@ -181,19 +194,23 @@ angular.module('knalli.angular-vertxbus')
       # @param timeout an optional number for a timout after which the promise will be rejected
       send : (address, message, timeout = 10000) ->
         deferred = $q.defer()
-        dispatched = ensureOpenAuthConnection ->
+        next = ->
           vertxEventBus.send address, message, (reply) ->
             if deferred then deferred.resolve reply
           # Register timeout for promise rejecting.
           if deferred then $timeout (-> deferred.reject()), timeout
+        next.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.send (ensureOpenAuthConnection callback)"
+        dispatched = ensureOpenAuthConnection next
         if deferred and !dispatched then deferred.reject()
         return deferred?.promise
       # Publish a message to the specified address (using EventBus.publish).
       # @param address a required string for the targeting address in the bus
       # @param message a required piece of message data
       publish : (address, message) ->
-        dispatched = ensureOpenAuthConnection ->
+        next = ->
           vertxEventBus.publish address, message
+        next.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.publish (ensureOpenAuthConnection callback)"
+        dispatched = ensureOpenAuthConnection next
         return dispatched
       # Send a login message
       # @param username
@@ -201,15 +218,23 @@ angular.module('knalli.angular-vertxbus')
       # @param timeout
       login : (username, password, timeout = 5000) ->
         deferred = $q.defer()
-        vertxEventBus.login username, password, (reply) ->
+        next = (reply) ->
           if reply?.status is 'ok'
             deferred.resolve reply
             $rootScope.$broadcast "#{prefix}system.login.succeeded", (status: reply?.status)
           else
             deferred.reject reply
             $rootScope.$broadcast "#{prefix}system.login.failed", (status: reply?.status)
+        next.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.login (callback)"
+        vertxEventBus.login username, password, next
         $timeout (-> deferred.reject()), timeout
         return deferred.promise
+
+    util.registerHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.registerHandler"
+    util.unregisterHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.unregisterHandler"
+    util.send.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.send"
+    util.publish.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.publish"
+    util.login.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.login"
 
     # Wrapping methods for the api
     wrapped =
@@ -266,8 +291,18 @@ angular.module('knalli.angular-vertxbus')
           validSession = false
           return reply
 
+    wrapped.registerHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.registerHandler"
+    wrapped.unregisterHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.unregisterHandler"
+    wrapped.send.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.send"
+    wrapped.publish.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.publish"
+    wrapped.getConnectionState.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.getConnectionState"
+    wrapped.isValidSession.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.isValidSession"
+    wrapped.login.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.login"
+
     # Update the current connection state periodially.
-    $interval (-> wrapped.getConnectionState(true)), sockjsStateInterval
+    connectionIntervalCheck = -> wrapped.getConnectionState(true)
+    connectionIntervalCheck.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: periodic connection check"
+    $interval connectionIntervalCheck, sockjsStateInterval
 
     ### building and exposing the actual service API ###
     return (
@@ -284,6 +319,7 @@ angular.module('knalli.angular-vertxbus')
       isValidSession : -> validSession
       login : wrapped.login
     )
+  @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: initializer"
 
   return #void
 )
