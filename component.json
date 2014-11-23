@@ -1,11 +1,13 @@
 {
   "name": "angular-vertxbus",
-  "dependencies": {
-  },
+  "description": "AngularJS facade and service acting as a Vert.x SockJS client",
+  "version": "master",
   "main": "dist/angular-vertxbus.js",
+  "repository": "knalli/angular-vertxbus",
   "scripts": [
     "dist/angular-vertxbus.js"
   ],
-  "repository": "knalli/angular-vertxbus",
-  "version": "master"
+  "dependencies": {
+    "components/angular.js": "~1.2.0"
+  }
 }
