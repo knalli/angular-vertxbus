@@ -1,3 +1,24 @@
+<a name="v0.9.0"></a>
+## v0.9.0 (2014-11-23)
+
+
+#### Bug Fixes
+
+* **package:** use non minified artifact as 'main' ([72b51654](http://github.com/knalli/angular-vertxbus/commit/72b51654618d6d3e0519845b2a8f35c83b7e9c98), closes [#27](http://github.com/knalli/angular-vertxbus/issues/27))
+
+
+#### Features
+
+* improve debugger-readibility w/ fn.displayName ([8e5006e7](http://github.com/knalli/angular-vertxbus/commit/8e5006e73ac0bc6d1157ffc4d7d2334ac7b2df4a))
+* **componentjs:**
+  * add support for componentjs and related builds ([9a763d6f](http://github.com/knalli/angular-vertxbus/commit/9a763d6f90ba2633cae8510e1f0370128b4c7b0b)) ([d748944d](http://github.com/knalli/angular-vertxbus/commit/d748944dae9e10c5332f046904f8a4ee331e6125)) ([2755038e](http://github.com/knalli/angular-vertxbus/commit/2755038ee618f939ee58d78e5cc7642072eb1297))
+
+
+#### Breaking Changes
+
+* The bower dependency for SockJS has been changed from 'sockjs' to 'sockjs-client' officially supported since https://github.com/sockjs/sockjs-client/commit/3cbe21423e7f2c93f4b6853059f38ae1a7b2a2b2
+ ([86b06b6d](http://github.com/knalli/angular-vertxbus/commit/86b06b6d583353965f74bacf2a7995c9830e474d))
+
 <a name="v0.8.1"></a>
 ### v0.8.1 (2014-10-30)
 

@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.8.1 - 2014-10-30
+/*! angular-vertxbus - v0.9.0 - 2014-11-23
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2014 ; Licensed  */
 define([
@@ -22,7 +22,11 @@ define([
     * sockjsOptions (default {}): optional SockJS options (new SockJS(url, undefined, options))
   */
     angular.module('knalli.angular-vertxbus').provider('vertxEventBus', function () {
-      var DEFAULT_OPTIONS, options;
+      var CONSTANTS, DEFAULT_OPTIONS, options;
+      CONSTANTS = {
+        MODULE: 'angular-vertxbus',
+        COMPONENT: 'wrapper'
+      };
       DEFAULT_OPTIONS = {
         enabled: true,
         debugEnabled: false,
@@ -177,11 +181,14 @@ define([
                 return eventBus.publish(address, message);
               },
               registerHandler: function (address, handler) {
+                var deconstructor;
                 eventBus.registerHandler(address, handler);
                 /* and return the deregister callback*/
-                return function () {
+                deconstructor = function () {
                   stub.unregisterHandler(address, handler);
                 };
+                deconstructor.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.registerHandler (deconstructor)';
+                return deconstructor;
               },
               unregisterHandler: function (address, handler) {
                 return eventBus.unregisterHandler(address, handler);
@@ -194,6 +201,15 @@ define([
                 return angular.extend({}, options);
               }
             };
+            stub.reconnect.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.reconnect';
+            stub.close.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.close';
+            stub.login.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.login';
+            stub.send.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.send';
+            stub.publish.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.publish';
+            stub.registerHandler.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.registerHandler';
+            stub.unregisterHandler.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.unregisterHandler';
+            stub.readyState.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.readyState';
+            stub.getOptions.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': EventBusWrapper.getOptions';
           } else {
             if (debugEnabled) {
               console.debug('[VertX EventBus] Disabled');
@@ -202,6 +218,7 @@ define([
           return stub;
         }
       ];
+      this.$get.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': initializer';
     });
     /*
     A service utilitzing an underlaying Vertx Event Bus
@@ -223,7 +240,11 @@ define([
     Note the additional configuration of the module itself.
   */
     angular.module('knalli.angular-vertxbus').provider('vertxEventBusService', function () {
-      var DEFAULT_OPTIONS, MessageQueueHolder, SimpleMap, options;
+      var CONSTANTS, DEFAULT_OPTIONS, MessageQueueHolder, SimpleMap, options;
+      CONSTANTS = {
+        MODULE: 'angular-vertxbus',
+        COMPONENT: 'service'
+      };
       DEFAULT_OPTIONS = {
         loginRequired: false,
         loginBlockForSession: false,
@@ -337,6 +358,7 @@ define([
         options.loginRequired = value;
         return this;
       };
+      this.requireLogin.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': requireLogin';
       this.blockForSession = function (value) {
         if (value == null) {
           value = options.loginBlockForSession;
@@ -344,6 +366,7 @@ define([
         options.loginBlockForSession = value;
         return this;
       };
+      this.blockForSession.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': blockForSession';
       this.skipUnauthorizeds = function (value) {
         if (value == null) {
           value = options.skipUnauthorizeds;
@@ -351,6 +374,7 @@ define([
         options.skipUnauthorizeds = value;
         return this;
       };
+      this.skipUnauthorizeds.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': skipUnauthorizeds';
       this.$get = [
         '$rootScope',
         '$q',
@@ -358,7 +382,7 @@ define([
         '$timeout',
         'vertxEventBus',
         function ($rootScope, $q, $interval, $timeout, vertxEventBus) {
-          var connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, fnWrapperMap, loginPromise, messageBuffer, messageQueueHolder, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
+          var connectionIntervalCheck, connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, fnWrapperMap, loginPromise, messageBuffer, messageQueueHolder, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
           _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
           connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
           validSession = false;
@@ -395,6 +419,7 @@ define([
               wrapped.getConnectionState(true);
               return $rootScope.$broadcast('' + prefix + 'system.disconnected');
             };
+            vertxEventBus.onclose.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': \'onclose\' handler';
           }
           ensureOpenConnection = function (fn) {
             if (wrapped.getConnectionState() === vertxEventBus.EventBus.OPEN) {
@@ -406,11 +431,13 @@ define([
             }
             return false;
           };
+          ensureOpenConnection.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': ensureOpenConnection';
           ensureOpenAuthConnection = function (fn) {
+            var wrapFn;
             if (!options.loginRequired) {
               return ensureOpenConnection(fn);
             } else {
-              return ensureOpenConnection(function () {
+              wrapFn = function () {
                 if (validSession) {
                   fn();
                   return true;
@@ -420,11 +447,15 @@ define([
                   }
                   return false;
                 }
-              });
+              };
+              wrapFn.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': ensureOpenAuthConnection function wrapper';
+              return ensureOpenConnection(wrapFn);
             }
           };
+          ensureOpenAuthConnection.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': ensureOpenAuthConnection';
           util = {
             registerHandler: function (address, callback) {
+              var deconstructor;
               if (typeof callback !== 'function') {
                 return;
               }
@@ -434,10 +465,12 @@ define([
               if (fnWrapperMap.containsKey(callback)) {
                 return fnWrapperMap.get(callback);
               }
-              fnWrapperMap.put(callback, function (message, replyTo) {
+              deconstructor = function (message, replyTo) {
                 callback(message, replyTo);
                 return $rootScope.$digest();
-              });
+              };
+              deconstructor.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.registerHandler (deconstructor)';
+              fnWrapperMap.put(callback, deconstructor);
               return vertxEventBus.registerHandler(address, fnWrapperMap.get(callback));
             },
             unregisterHandler: function (address, callback) {
@@ -451,12 +484,12 @@ define([
               fnWrapperMap.remove(callback);
             },
             send: function (address, message, timeout) {
-              var deferred, dispatched;
+              var deferred, dispatched, next;
               if (timeout == null) {
                 timeout = 10000;
               }
               deferred = $q.defer();
-              dispatched = ensureOpenAuthConnection(function () {
+              next = function () {
                 vertxEventBus.send(address, message, function (reply) {
                   if (deferred) {
                     return deferred.resolve(reply);
@@ -467,26 +500,30 @@ define([
                     return deferred.reject();
                   }, timeout);
                 }
-              });
+              };
+              next.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.send (ensureOpenAuthConnection callback)';
+              dispatched = ensureOpenAuthConnection(next);
               if (deferred && !dispatched) {
                 deferred.reject();
               }
               return deferred != null ? deferred.promise : void 0;
             },
             publish: function (address, message) {
-              var dispatched;
-              dispatched = ensureOpenAuthConnection(function () {
+              var dispatched, next;
+              next = function () {
                 return vertxEventBus.publish(address, message);
-              });
+              };
+              next.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.publish (ensureOpenAuthConnection callback)';
+              dispatched = ensureOpenAuthConnection(next);
               return dispatched;
             },
             login: function (username, password, timeout) {
-              var deferred;
+              var deferred, next;
               if (timeout == null) {
                 timeout = 5000;
               }
               deferred = $q.defer();
-              vertxEventBus.login(username, password, function (reply) {
+              next = function (reply) {
                 if ((reply != null ? reply.status : void 0) === 'ok') {
                   deferred.resolve(reply);
                   return $rootScope.$broadcast('' + prefix + 'system.login.succeeded', { status: reply != null ? reply.status : void 0 });
@@ -494,13 +531,20 @@ define([
                   deferred.reject(reply);
                   return $rootScope.$broadcast('' + prefix + 'system.login.failed', { status: reply != null ? reply.status : void 0 });
                 }
-              });
+              };
+              next.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.login (callback)';
+              vertxEventBus.login(username, password, next);
               $timeout(function () {
                 return deferred.reject();
               }, timeout);
               return deferred.promise;
             }
           };
+          util.registerHandler.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.registerHandler';
+          util.unregisterHandler.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.unregisterHandler';
+          util.send.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.send';
+          util.publish.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.publish';
+          util.login.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': util.login';
           wrapped = {
             handlers: {},
             registerHandler: function (address, callback) {
@@ -575,9 +619,18 @@ define([
               });
             }
           };
-          $interval(function () {
+          wrapped.registerHandler.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.registerHandler';
+          wrapped.unregisterHandler.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.unregisterHandler';
+          wrapped.send.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.send';
+          wrapped.publish.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.publish';
+          wrapped.getConnectionState.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.getConnectionState';
+          wrapped.isValidSession.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.isValidSession';
+          wrapped.login.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': wrapped.login';
+          connectionIntervalCheck = function () {
             return wrapped.getConnectionState(true);
-          }, sockjsStateInterval);
+          };
+          connectionIntervalCheck.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': periodic connection check';
+          $interval(connectionIntervalCheck, sockjsStateInterval);
           /* building and exposing the actual service API*/
           return {
             on: wrapped.registerHandler,
@@ -601,6 +654,7 @@ define([
           };
         }
       ];
+      this.$get.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': initializer';
     });
   }.call(this));
 });
