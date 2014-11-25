@@ -36,6 +36,14 @@ angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl
 
 ### Consume messages
 
+First, make sure to have the vertxEventBusService available in your controller function.
+
+```javascript
+angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl', function(vertxEventBusService){
+  // ...
+});
+```
+
 ```javascript
 vertxEventBusService.on('myaddress', function(message) {
   console.log('Received a message: ', message);
