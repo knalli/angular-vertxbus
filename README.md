@@ -51,9 +51,6 @@ vertxEventBusService.publish('myaddress', {data: 123});
 ### Send a message
 
 ```javascript
-vertxEventBusService.send('myaddress', {data: 123});
-
-// expect a reply
 vertxEventBusService.send('myaddress', {data: 123}).then(function(reply){
   console.log('A reply received: ', reply);
 }).catch(function(){
