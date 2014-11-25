@@ -30,6 +30,14 @@ angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl
 
 ### Consume messages
 
+First, make sure to have the vertxEventBusService available in your controller function.
+
+```javascript
+angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl', function(vertxEventBusService){
+  // ...
+});
+```
+
 ```javascript
 vertxEventBusService.on('myaddress', function(message) {
   console.log('Received a message: ', message);
@@ -48,14 +56,14 @@ vertxEventBusService.publish('myaddress', {data: 123});
 vertxEventBusService.send('myaddress', {data: 123});
 
 // expect a reply
-vertxEventBusService.send('myaddress', {data: 123}, true).then(function(reply){
+vertxEventBusService.send('myaddress', {data: 123}).then(function(reply){
   console.log('A reply received: ', reply);
 }).catch(function(){
   console.warn('No message');
 });
 
 // The "No reply message found" is controlled via a timeout (default 10000ms)
-vertxEventBusService.send('myaddress', {data: 123}, true, 3000).then(function(reply){
+vertxEventBusService.send('myaddress', {data: 123}, 3000).then(function(reply){
   console.log('A reply received: ', reply);
 }).catch(function(){
   console.warn('No message within 3 seconds');
