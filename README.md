@@ -23,8 +23,14 @@ In case of an AMD styled project, there is also a package available at `dist/req
 You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
 
 ```javascript
-angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl', function(vertxEventBus){
+angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl', function(vertxEventBus, vertxEventBusService){
+
+  // using the EventBus directly
   vertxEventBus.send('my.address', {data: 123});
+
+  // using the service
+  vertxEventBusService.send('my.address', {data: 123})
+
 });
 ```
 
@@ -48,14 +54,14 @@ vertxEventBusService.publish('myaddress', {data: 123});
 vertxEventBusService.send('myaddress', {data: 123});
 
 // expect a reply
-vertxEventBusService.send('myaddress', {data: 123}, true).then(function(reply){
+vertxEventBusService.send('myaddress', {data: 123}).then(function(reply){
   console.log('A reply received: ', reply);
 }).catch(function(){
   console.warn('No message');
 });
 
 // The "No reply message found" is controlled via a timeout (default 10000ms)
-vertxEventBusService.send('myaddress', {data: 123}, true, 3000).then(function(reply){
+vertxEventBusService.send('myaddress', {data: 123}, 3000).then(function(reply){
   console.log('A reply received: ', reply);
 }).catch(function(){
   console.warn('No message within 3 seconds');
