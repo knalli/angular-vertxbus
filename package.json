@@ -12,14 +12,15 @@
     "start-it-vertx-server": "cd test/e2e/vertx/app && ../vert.x-2.1.1/bin/vertx run config.js"
   },
   "author": {
-    "name": "Jan Philipp"
+    "name": "Jan Philipp",
+    "email": "knallisworld@googlemail.com"
   },
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "repository": {
     "type": "git",
     "url": "git://github.com/knalli/angular-vertxbus"
   },
-  "licenses": "MIT",
+  "license": "MIT",
   "devDependencies": {
     "bower": "~1.3.2",
     "coffee-script": "~1.6.3",
