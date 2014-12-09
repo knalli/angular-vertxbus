@@ -1,4 +1,6 @@
-# angular-vertxbus [![Bower version](https://badge.fury.io/bo/angular-vertxbus.svg)](http://badge.fury.io/bo/angular-vertxbus) [![npm version](https://badge.fury.io/js/angular-vertxbus.svg)](http://badge.fury.io/js/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+# angular-vertxbus
+
+![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
@@ -6,8 +8,8 @@ Client side library using VertX Event Bus as an Angular Service module
 
 | Branch | Stability | Status |
 | --- | --- | --- |
-| Canary | unstable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.png?branch=canary)](https://travis-ci.org/knalli/angular-vertxbus) |
-| Master | stable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.png?branch=master)](https://travis-ci.org/knalli/angular-vertxbus) |
+| Canary | unstable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.svg?branch=canary)](https://travis-ci.org/knalli/angular-vertxbus) |
+| Master | stable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.svg?branch=master)](https://travis-ci.org/knalli/angular-vertxbus) |
 
 
 ## How to get
