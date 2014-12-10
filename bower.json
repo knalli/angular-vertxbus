@@ -12,7 +12,8 @@
     "karma.conf.js",
     "/temp/",
     "/test/",
-    "/test_scopes/"
+    "/test_scopes/",
+    "/build/"
   ],
   "repository": {
     "type": "git",
