@@ -35,42 +35,52 @@ angular.module('knalli.angular-vertxbus')
   @enable = (value = DEFAULT_OPTIONS.enabled) ->
     options.enabled = value is true
     return this
+  @enable.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.enable"
 
   @useDebug = (value = DEFAULT_OPTIONS.debugEnabled) ->
     options.debugEnabled = value is true
     return this
+  @useDebug.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useDebug"
 
   @usePrefix = (value = DEFAULT_OPTIONS.prefix) ->
     options.prefix = value
     return this
+  @usePrefix.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.usePrefix"
 
   @useUrlServer = (value = DEFAULT_OPTIONS.urlServer) ->
     options.urlServer = value
     return this
+  @useUrlServer.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useUrlServer"
 
   @useUrlPath = (value = DEFAULT_OPTIONS.urlPath) ->
     options.urlPath = value
     return this
+  @useUrlPath.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useUrlPath"
 
   @useReconnect = (value = DEFAULT_OPTIONS.reconnectEnabled) ->
     options.reconnectEnabled = value
     return this
+  @useReconnect.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useReconnect"
 
   @useSockJsStateInterval = (value = DEFAULT_OPTIONS.sockjsStateInterval) ->
     options.sockjsStateInterval = value
     return this
+  @useSockJsStateInterval.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useSockJsStateInterval"
 
   @useSockJsReconnectInterval = (value = DEFAULT_OPTIONS.sockjsReconnectInterval) ->
     options.sockjsReconnectInterval = value
     return this
+  @useSockJsReconnectInterval.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useSockJsReconnectInterval"
 
   @useSockJsOptions = (value = DEFAULT_OPTIONS.sockjsOptions) ->
     options.sockjsOptions = value
     return this
+  @useSockJsOptions.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useSockJsOptions"
 
   @useMessageBuffer = (value = DEFAULT_OPTIONS.messageBuffer) ->
     options.messageBuffer = value
     return this
+  @useMessageBuffer.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.useMessageBuffer"
 
   ###
     A stub representing the VertX Event Bus (core functionality)
@@ -96,60 +106,73 @@ angular.module('knalli.angular-vertxbus')
       sockjsStateInterval, sockjsReconnectInterval, sockjsOptions
     } = angular.extend {}, DEFAULT_OPTIONS, options
 
-    stub = null
-    EventBus_ = vertx?.EventBus
-    if enabled and EventBus_
+    EventBusStub = null
+    EventBusOriginal = vertx?.EventBus
+
+    if enabled and EventBusOriginal
       url = "#{urlServer}#{urlPath}"
-      console.debug("[VertX EventBus] Enabled: connecting '#{url}'") if debugEnabled
+      console.debug("[Vert.x EB Stub] Enabled: connecting '#{url}'") if debugEnabled
       # Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
       # we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
       eventBus = null
       connect = ->
-        eventBus = new EventBus_ url, undefined, sockjsOptions
+        eventBus = new EventBusOriginal url, undefined, sockjsOptions
         eventBus.onopen = ->
-          console.debug("[VertX EventBus] Connected") if debugEnabled
-          stub.onopen() if typeof stub.onopen is 'function'
+          console.debug("[Vert.x EB Stub] Connected") if debugEnabled
+          EventBusStub.onopen() if typeof EventBusStub.onopen is 'function'
           return #void
         eventBus.onclose = ->
-          console.debug("[VertX EventBus] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
-          stub.onclose() if typeof stub.onclose is 'function'
+          console.debug("[Vert.x EB Stub] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
+          EventBusStub.onclose() if typeof EventBusStub.onclose is 'function'
           $timeout(connect, sockjsReconnectInterval) if reconnectEnabled
           return #void
         return #void
       connect()
-      stub =
+
+      EventBusStub =
         reconnect: ->
           eventBus.close()
-        close: -> eventBus.close()
-        login: (username, password, replyHandler) -> eventBus.login(username, password, replyHandler)
-        send: (address, message, replyHandler) -> eventBus.send(address, message, replyHandler)
-        publish: (address, message) -> eventBus.publish(address, message)
+        close: ->
+          eventBus.close()
+        login: (username, password, replyHandler) ->
+          eventBus.login(username, password, replyHandler)
+        send: (address, message, replyHandler) ->
+          eventBus.send(address, message, replyHandler)
+        publish: (address, message) ->
+          eventBus.publish(address, message)
         registerHandler: (address, handler) ->
           eventBus.registerHandler(address, handler)
           ### and return the deregister callback ###
           deconstructor = ->
-            stub.unregisterHandler(address, handler)
+            EventBusStub.unregisterHandler(address, handler)
             return #void
-          deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.registerHandler (deconstructor)"
+          deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.registerHandler (deconstructor)"
           return deconstructor
-        unregisterHandler: (address, handler) -> eventBus.unregisterHandler(address, handler)
-        readyState: -> eventBus.readyState()
+        unregisterHandler: (address, handler) ->
+          eventBus.unregisterHandler(address, handler)
+        readyState: ->
+          eventBus.readyState()
         ### expose current used internal instance of actual EventBus ###
-        EventBus: EventBus_
-        getOptions: -> angular.extend({}, options)
-      stub.reconnect.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.reconnect"
-      stub.close.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.close"
-      stub.login.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.login"
-      stub.send.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.send"
-      stub.publish.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.publish"
-      stub.registerHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.registerHandler"
-      stub.unregisterHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.unregisterHandler"
-      stub.readyState.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.readyState"
-      stub.getOptions.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusWrapper.getOptions"
+        EventBus: EventBusOriginal
+        getOptions: ->
+          angular.extend({}, options)
+
+      EventBusStub.reconnect.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.reconnect"
+      EventBusStub.close.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.close"
+      EventBusStub.login.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.login"
+      EventBusStub.send.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.send"
+      EventBusStub.publish.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.publish"
+      EventBusStub.registerHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.registerHandler"
+      EventBusStub.unregisterHandler.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.unregisterHandler"
+      EventBusStub.readyState.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.readyState"
+      EventBusStub.getOptions.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.getOptions"
+
     else
-      console.debug("[VertX EventBus] Disabled") if debugEnabled
-    return stub
-  @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: initializer"
+      console.debug("[Vert.x EB Stub] Disabled") if debugEnabled
+
+    return EventBusStub
+
+  @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: Factory.get"
 
   return #void
 )
