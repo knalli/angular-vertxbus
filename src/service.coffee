@@ -198,6 +198,7 @@ angular.module('knalli.angular-vertxbus')
         deconstructor = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
+          return #void
         deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.registerHandler (deconstructor)"
         deconstructors.put(callback, deconstructor)
         vertxEventBus.registerHandler address, deconstructors.get(callback)
