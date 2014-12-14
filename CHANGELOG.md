@@ -1,3 +1,15 @@
+<a name="0.10.0"></a>
+## 0.10.0 (2014-12-14)
+
+No functional modifications.
+
+* update internal dependencies and tooling (CoffeeScript 1.8)
+* improve debugging using more fn.displayName
+
+#### Package
+
+* provide support range AngularJS 1.2 - 1.3
+
 <a name="v0.9.0"></a>
 ## v0.9.0 (2014-11-23)
 
