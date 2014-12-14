@@ -170,9 +170,7 @@ vertxEventBusService.addListener('address', funcHolder.handler);
 
 Note: Check that dependencies are be installed (`npm install`).
 
-The *unit tests* are available with `npm test`. It performs tests under the current primary target version of AngularJS and other scoped versions as well. Under the hood, this calls `grunt test` for the primary target and for each scope.
-
-Testing only the primary target AngularJS version, simply invoke `grunt test`.
+The *unit tests* are available with `npm test` which is actually a shortcut for `grunt test`. It performs tests under the current primary target version of AngularJS. Use `npm run-script test-scopes` for testing other scoped versions as well.
 
 ### E2E tests (manually)
 
