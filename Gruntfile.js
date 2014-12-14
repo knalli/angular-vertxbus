@@ -146,7 +146,10 @@ module.exports = function (grunt) {
         dest: 'CHANGELOG.md'
       }
     },
-    ngmin: {
+    ngAnnotate: {
+      options: {
+        singleQuotes: true
+      },
       src: {
         src: '<%= concat.src.dest %>',
         dest: '<%= concat.src.dest %>'
@@ -165,6 +168,6 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['coffee', 'jshint', 'karma:unit']);
   grunt.registerTask('install-test', ['bower-install-simple']);
   grunt.registerTask('test-server', ['karma:server']);
-  grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngmin', 'uglify']);
+  grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngAnnotate', 'uglify']);
   grunt.registerTask('release', ['changelog', 'build']);
 };

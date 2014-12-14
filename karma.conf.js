@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 
-var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope;
+var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDefaultScope;
 
 (function(undefined){
   AVAILABLE_SCOPES = fs.readdirSync('./test_scopes').filter(function (filename) {
@@ -25,6 +25,9 @@ var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope;
       prefix = 'test_scopes/' + scope + '/';
     }
     return prefix + 'bower_components/' + path;
+  },
+  isDefaultScope = function (scope) {
+    return !isValidScope(scope);
   };
 })();
 
@@ -60,7 +63,15 @@ module.exports = function(config) {
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit'
-    reporters: ['progress'],
+    reporters: isDefaultScope(scope) ? ['progress', 'coverage'] : ['progress'],
+
+    preprocessors: isDefaultScope(scope) ? { 'temp/src/*.js': ['coverage'] } : undefined,
+
+    coverageReporter: isDefaultScope(scope) ? {
+      dir: 'build/coverage',
+      subdir: 'report',
+      type: 'lcov'
+    } : undefined,
 
     // web server port
     port: 9876,
@@ -92,7 +103,6 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
-
 
     // If browser does not capture in given timeout [ms], kill it
     captureTimeout: 60000,

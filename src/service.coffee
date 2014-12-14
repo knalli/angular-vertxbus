@@ -29,7 +29,13 @@ angular.module('knalli.angular-vertxbus')
     loginBlockForSession: false #NYI
     skipUnauthorizeds: true #NYI
 
-  class MessageQueueHolder
+  ###
+    Simple queue implementation
+
+    FIFO: #push() + #first()
+    LIFO: #push() + #last()
+  ###
+  class Queue
     constructor: (@maxSize = 10) ->
       @items = []
     push: (item) ->
@@ -42,12 +48,19 @@ angular.module('knalli.angular-vertxbus')
     first: -> @items.shift(0)
     size: -> @items.length
 
+  ###
+    Simple Map implementation
+
+    This implementation allows usage of non serializable keys for values.
+  ###
   class SimpleMap
     keys: null
     values: null
     constructor: ->
       @keys = []
       @values = []
+    # Stores the value under the key.
+    # Chainable
     put: (key, value) ->
       idx = @_indexForKey key
       if idx > -1
@@ -56,6 +69,33 @@ angular.module('knalli.angular-vertxbus')
         @keys.push key
         @values.push value
       return this
+    # Returns value for key, otherwise undefined.
+    get: (key) ->
+      idx = @_indexForKey key
+      if idx > -1
+        return @values[idx]
+      return
+    # Returns true if the key exists.
+    containsKey: (key) ->
+      idx = @_indexForKey key
+      return idx > -1
+    # Returns true if the value exists.
+    containsValue: (value) ->
+      idx = @_indexForValue value
+      return idx > -1
+    # Removes the key and its value.
+    remove: (key) ->
+      idx = @_indexForKey key
+      if idx > -1
+        @keys[idx] = undefined
+        @values[idx] = undefined
+      return
+    # Clears all keys and values.
+    clear: ->
+      @keys = []
+      @values = []
+      return this
+    # Returns index of key, otherwise -1.
     _indexForKey: (key) ->
       for k, i in @keys when key is k
         return i
@@ -64,27 +104,6 @@ angular.module('knalli.angular-vertxbus')
       for v, i in @values when value is v
         return i
       return -1
-    containsKey: (key) ->
-      idx = @_indexForKey key
-      return idx > -1
-    containsValue: (value) ->
-      idx = @_indexForValue value
-      return idx > -1
-    get: (key) ->
-      idx = @_indexForKey key
-      if idx > -1
-        return @values[idx]
-      return undefined
-    remove: (key) ->
-      idx = @_indexForKey key
-      if idx > -1
-        @keys[idx] = undefined
-        @values[idx] = undefined
-      return undefined
-    clear: ->
-      @keys = []
-      @values = []
-      return this
 
   options = angular.extend({}, DEFAULT_OPTIONS)
 
@@ -92,19 +111,19 @@ angular.module('knalli.angular-vertxbus')
   @requireLogin = (value = options.loginRequired) ->
     options.loginRequired = value
     return this
-  @requireLogin.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: requireLogin"
+  @requireLogin.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.requireLogin"
 
   # private: NYI
   @blockForSession = (value = options.loginBlockForSession) ->
     options.loginBlockForSession = value
     return this
-  @blockForSession.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: blockForSession"
+  @blockForSession.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.blockForSession"
 
   # private: NYI
   @skipUnauthorizeds = (value = options.skipUnauthorizeds) ->
     options.skipUnauthorizeds = value
     return this
-  @skipUnauthorizeds.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: skipUnauthorizeds"
+  @skipUnauthorizeds.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.skipUnauthorizeds"
 
   @$get = ($rootScope, $q, $interval, $timeout, vertxEventBus) ->
     # Extract options (with defaults)
@@ -116,9 +135,10 @@ angular.module('knalli.angular-vertxbus')
     connectionState = vertxEventBus?.EventBus?.CLOSED
     validSession = false
     loginPromise = null
-    messageQueueHolder = new MessageQueueHolder(messageBuffer)
-
-    fnWrapperMap = new SimpleMap # handlers are wrapped, so we have to keep track
+    # internal store of buffered messages
+    messageQueue = new Queue(messageBuffer)
+    # internal map of deconstructors
+    deconstructors = new SimpleMap()
 
     if enabled and vertxEventBus
       vertxEventBus.onopen = ->
@@ -129,9 +149,9 @@ angular.module('knalli.angular-vertxbus')
             util.registerHandler(address, callback)
         $rootScope.$digest()
         # consume message queue?
-        if messageBuffer and messageQueueHolder.size()
-          while messageQueueHolder.size()
-            fn = messageQueueHolder.first()
+        if messageBuffer and messageQueue.size()
+          while messageQueue.size()
+            fn = messageQueue.first()
             fn() if typeof fn is 'function'
           $rootScope.$digest()
         return #void
@@ -145,7 +165,7 @@ angular.module('knalli.angular-vertxbus')
         fn()
         return true
       else if messageBuffer
-        messageQueueHolder.push(fn)
+        messageQueue.push(fn)
         return true
       return false
     ensureOpenConnection.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: ensureOpenConnection"
@@ -161,7 +181,7 @@ angular.module('knalli.angular-vertxbus')
             return true
           else
             # ignore this message
-            console.debug("[VertX EB Service] Message was not sent because login is required") if debugEnabled
+            console.debug("[Vert.x EB Service] Message was not sent because login is required") if debugEnabled
             return false
         wrapFn.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: ensureOpenAuthConnection function wrapper"
         ensureOpenConnection wrapFn
@@ -173,20 +193,21 @@ angular.module('knalli.angular-vertxbus')
       # Register a callback handler for the specified address match.
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
-        console.debug("[VertX EB Service] Register handler for #{address}") if debugEnabled
-        return fnWrapperMap.get(callback) if fnWrapperMap.containsKey(callback) # already known
+        console.debug("[Vert.x EB Service] Register handler for #{address}") if debugEnabled
+        return deconstructors.get(callback) if deconstructors.containsKey(callback) # already known
         deconstructor = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
+          return #void
         deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.registerHandler (deconstructor)"
-        fnWrapperMap.put(callback, deconstructor)
-        vertxEventBus.registerHandler address, fnWrapperMap.get(callback)
+        deconstructors.put(callback, deconstructor)
+        vertxEventBus.registerHandler address, deconstructors.get(callback)
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
-        console.debug("[VertX EB Service] Unregister handler for #{address}") if debugEnabled
-        vertxEventBus.unregisterHandler address, fnWrapperMap.get(callback)
-        fnWrapperMap.remove(callback)
+        console.debug("[Vert.x EB Service] Unregister handler for #{address}") if debugEnabled
+        vertxEventBus.unregisterHandler address, deconstructors.get(callback)
+        deconstructors.remove(callback)
         return #void
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
@@ -249,13 +270,15 @@ angular.module('knalli.angular-vertxbus')
         if connectionState is vertxEventBus.EventBus.OPEN
           unregisterFn = util.registerHandler(address, callback)
         ### and return the deregister callback ###
-        return ->
+        deconstructor = ->
           unregisterFn() if unregisterFn
           # Remove from internal map
           if wrapped.handlers[address]
             index = wrapped.handlers[address].indexOf(callback)
             wrapped.handlers[address].splice(index, 1) if index > -1
           return #void
+        deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.registerHandler (deconstructor)"
+        return deconstructor
       # Stub for util.unregisterHandler (see registerHandler)
       unregisterHandler : (address, callback) ->
         # Remove from internal map
@@ -281,7 +304,8 @@ angular.module('knalli.angular-vertxbus')
         else
           connectionState = 3 # CLOSED
         return connectionState
-      isValidSession: -> validSession
+      isValidSession: ->
+        validSession
       login : (username, password) ->
         util.login(username, password)
         .then (reply) ->
@@ -315,11 +339,12 @@ angular.module('knalli.angular-vertxbus')
       emit : wrapped.publish
       readyState : wrapped.getConnectionState
       isEnabled : -> enabled
-      getBufferCount: -> messageQueueHolder.size()
+      getBufferCount: -> messageQueue.size()
       isValidSession : -> validSession
       login : wrapped.login
     )
-  @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: initializer"
+
+  @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: Factory.get"
 
   return #void
 )

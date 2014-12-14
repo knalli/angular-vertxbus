@@ -4,6 +4,7 @@ components
 bower_components
 temp
 *.iml
+/build
 
 # Integration stuff
 /test/e2e/vertx/app/mods/io.vertx~mod-auth-mgr~2.0.0-final
