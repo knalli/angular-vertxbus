@@ -20,11 +20,12 @@
     "url": "git://github.com/knalli/angular-vertxbus"
   },
   "dependencies": {
-    "angular": "~1.2.0",
+    "angular": ">=1.2 <=1.4",
     "sockjs-client": "~0.3.4",
     "vertxbus.js": "http://cdnjs.cloudflare.com/ajax/libs/vertx/2.0.0/vertxbus.js"
   },
   "devDependencies": {
-    "angular-mocks": "~1.2.3"
+    "angular": "~1.2.27",
+    "angular-mocks": "~1.2.27"
   }
 }
