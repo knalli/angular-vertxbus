@@ -5,6 +5,7 @@
   "version": "0.10.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "main": "./dist/angular-vertxbus.js",
+  "keywords": ["angular", "vertx", "facade", "websocket"],
   "ignore": [
     ".editorconfig",
     ".jshintrc",

@@ -3,6 +3,7 @@
   "description": "AngularJS facade and service acting as a Vert.x SockJS client",
   "version": "master",
   "main": "dist/angular-vertxbus.js",
+  "keywords": ["angular", "vertx", "facade", "websocket"],
   "repository": "knalli/angular-vertxbus",
   "scripts": [
     "dist/angular-vertxbus.js"
