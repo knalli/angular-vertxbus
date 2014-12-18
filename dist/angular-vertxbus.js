@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.10.0 - 2014-12-14
+/*! angular-vertxbus - v0.11.0 - 2014-12-18
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2014 ; Licensed  */
 (function() {
@@ -139,7 +139,7 @@
       Furthermore, the stub supports theses extra APIs:
       - recconnect()
      */
-    this.$get = ['$timeout', function($timeout) {
+    this.$get = ['$timeout', '$log', function($timeout, $log) {
       var EventBusOriginal, EventBusStub, connect, debugEnabled, enabled, eventBus, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, url, urlPath, urlServer, _ref;
       _ref = angular.extend({}, DEFAULT_OPTIONS, options), enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions;
       EventBusStub = null;
@@ -147,14 +147,14 @@
       if (enabled && EventBusOriginal) {
         url = "" + urlServer + urlPath;
         if (debugEnabled) {
-          console.debug("[Vert.x EB Stub] Enabled: connecting '" + url + "'");
+          $log.debug("[Vert.x EB Stub] Enabled: connecting '" + url + "'");
         }
         eventBus = null;
         connect = function() {
           eventBus = new EventBusOriginal(url, void 0, sockjsOptions);
           eventBus.onopen = function() {
             if (debugEnabled) {
-              console.debug("[Vert.x EB Stub] Connected");
+              $log.debug("[Vert.x EB Stub] Connected");
             }
             if (typeof EventBusStub.onopen === 'function') {
               EventBusStub.onopen();
@@ -162,7 +162,7 @@
           };
           eventBus.onclose = function() {
             if (debugEnabled) {
-              console.debug("[Vert.x EB Stub] Reconnect in " + sockjsReconnectInterval + "ms");
+              $log.debug("[Vert.x EB Stub] Reconnect in " + sockjsReconnectInterval + "ms");
             }
             if (typeof EventBusStub.onclose === 'function') {
               EventBusStub.onclose();
@@ -224,7 +224,7 @@
         EventBusStub.getOptions.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.getOptions";
       } else {
         if (debugEnabled) {
-          console.debug("[Vert.x EB Stub] Disabled");
+          $log.debug("[Vert.x EB Stub] Disabled");
         }
       }
       return EventBusStub;
@@ -419,7 +419,7 @@
       return this;
     };
     this.skipUnauthorizeds.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": provider.skipUnauthorizeds";
-    this.$get = ['$rootScope', '$q', '$interval', '$timeout', 'vertxEventBus', function($rootScope, $q, $interval, $timeout, vertxEventBus) {
+    this.$get = ['$rootScope', '$q', '$interval', '$timeout', 'vertxEventBus', '$log', function($rootScope, $q, $interval, $timeout, vertxEventBus, $log) {
       var connectionIntervalCheck, connectionState, debugEnabled, deconstructors, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
       _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
       connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
@@ -480,7 +480,7 @@
               return true;
             } else {
               if (debugEnabled) {
-                console.debug("[Vert.x EB Service] Message was not sent because login is required");
+                $log.debug("[Vert.x EB Service] Message was not sent because login is required");
               }
               return false;
             }
@@ -497,7 +497,7 @@
             return;
           }
           if (debugEnabled) {
-            console.debug("[Vert.x EB Service] Register handler for " + address);
+            $log.debug("[Vert.x EB Service] Register handler for " + address);
           }
           if (deconstructors.containsKey(callback)) {
             return deconstructors.get(callback);
@@ -515,7 +515,7 @@
             return;
           }
           if (debugEnabled) {
-            console.debug("[Vert.x EB Service] Unregister handler for " + address);
+            $log.debug("[Vert.x EB Service] Unregister handler for " + address);
           }
           vertxEventBus.unregisterHandler(address, deconstructors.get(callback));
           deconstructors.remove(callback);
@@ -611,6 +611,9 @@
                 wrapped.handlers[address].splice(index, 1);
               }
             }
+            if (wrapped.handlers[address].length < 1) {
+              wrapped.handlers[address] = void 0;
+            }
           };
           deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.registerHandler (deconstructor)";
           return deconstructor;
@@ -622,6 +625,9 @@
             if (index > -1) {
               wrapped.handlers[address].splice(index, 1);
             }
+          }
+          if (wrapped.handlers[address].length < 1) {
+            wrapped.handlers[address] = void 0;
           }
           if (connectionState === vertxEventBus.EventBus.OPEN) {
             return util.unregisterHandler(address, callback);

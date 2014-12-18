@@ -1,3 +1,13 @@
+<a name="0.11.0"></a>
+## 0.11.0 (2014-12-18)
+
+
+#### Features
+
+* replace console w/ $log ([3c9be73c](http://github.com/knalli/angular-vertxbus/commit/3c9be73c7d41f22b4b46a0dbf17880063bddf7a9))
+* **service:** improve memory usage, remove empty arrays of handlers ([4b680026](http://github.com/knalli/angular-vertxbus/commit/4b68002622ac7390584596a4ef0ef1e34088a9b5))
+
+
 <a name="0.10.0"></a>
 ## 0.10.0 (2014-12-14)
 
