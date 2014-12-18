@@ -14,7 +14,6 @@ class SockJS
   constructor: (@url, @whitelist, @options, mockOptions) ->
     SockJS.mockInstances.push this
     SockJS.currentMockInstance = this
-    console.debug "[MOCK] SockJS Constructur(#{url})"
     fn = =>
         @onopen() if typeof @onopen is 'function'
         return
@@ -23,8 +22,12 @@ class SockJS
     else
       window.setTimeout fn, 1
 
+  log: ->
+    log = SockJS.currentMockInstance?.$log or window.console
+    log.debug.apply(this, arguments)
+
   close: (mockOptions)->
-    console.debug "[MOCK] SockJS.close()"
+    @log "[MOCK] SockJS.close()"
     fn = =>
         @onclose() if typeof @onclose is 'function'
         return
@@ -42,7 +45,7 @@ class SockJS
       data = @_unwrapFromEvent(message)
     catch e
       return
-    console.debug "[MOCK] SockJS.send(#{message})"
+    @log "[MOCK] SockJS.send(#{message})"
     if data.address is 'vertx.basicauthmanager.login'
       reply = if @nextLoginState
                 @_buildLoginReplyAsSuccess(data.body.username, data.body.password)
