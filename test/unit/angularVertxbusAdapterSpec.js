@@ -1,5 +1,5 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
-/* global console: false, module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
+/* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
 describe('knalli.angular-vertxbus', function () {
 
@@ -20,17 +20,19 @@ describe('knalli.angular-vertxbus', function () {
 
   describe('vertxEventBus', function () {
 
-    var vertxEventBus, $timeout, $rootScope;
+    var vertxEventBus, $timeout, $rootScope, $log;
 
     beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
       // Override (improve test running time)
       vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_) {
+    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
     }));
 
     it('should be an object', function () {
@@ -88,11 +90,11 @@ describe('knalli.angular-vertxbus', function () {
         var okClose = false, okOpen = false;
         setTimeout(function () {
           vertxEventBus.onclose = function () {
-            console.debug('[TEST] onclose() called');
+            $log.debug('[TEST] onclose() called');
             okClose = true;
           };
           vertxEventBus.onopen = function () {
-            console.debug('[TEST] onopen() called');
+            $log.debug('[TEST] onopen() called');
             okOpen = true;
           };
           vertxEventBus.reconnect();
@@ -486,23 +488,25 @@ describe('knalli.angular-vertxbus', function () {
     });
 
     describe('should not send message', function () {
-      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, result;
+      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
         vertxEventBusProvider.useMessageBuffer(0);
         vertxEventBusServiceProvider.requireLogin(true);
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_) {
+      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
         $rootScope = _$rootScope_;
         $timeout = _$timeout_;
+        $log = _$log_;
+        SockJS.currentMockInstance.$log = $log;
         vertxEventBus.readyState = function () {
           return vertxEventBus.EventBus.OPEN;
         };
         vertxEventBus.send = function (address, message, replyHandler) {
-          console.debug('XY', address, message, replyHandler);
+          $log.debug('XY', address, message, replyHandler);
           result = true;
         };
       }));

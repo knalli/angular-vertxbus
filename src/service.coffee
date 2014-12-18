@@ -125,7 +125,7 @@ angular.module('knalli.angular-vertxbus')
     return this
   @skipUnauthorizeds.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.skipUnauthorizeds"
 
-  @$get = ($rootScope, $q, $interval, $timeout, vertxEventBus) ->
+  @$get = ($rootScope, $q, $interval, $timeout, vertxEventBus, $log) ->
     # Extract options (with defaults)
     { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
       sockjsStateInterval, sockjsReconnectInterval, sockjsOptions,
@@ -181,7 +181,7 @@ angular.module('knalli.angular-vertxbus')
             return true
           else
             # ignore this message
-            console.debug("[Vert.x EB Service] Message was not sent because login is required") if debugEnabled
+            $log.debug("[Vert.x EB Service] Message was not sent because login is required") if debugEnabled
             return false
         wrapFn.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: ensureOpenAuthConnection function wrapper"
         ensureOpenConnection wrapFn
@@ -193,7 +193,7 @@ angular.module('knalli.angular-vertxbus')
       # Register a callback handler for the specified address match.
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
-        console.debug("[Vert.x EB Service] Register handler for #{address}") if debugEnabled
+        $log.debug("[Vert.x EB Service] Register handler for #{address}") if debugEnabled
         return deconstructors.get(callback) if deconstructors.containsKey(callback) # already known
         deconstructor = (message, replyTo) ->
           callback(message, replyTo)
@@ -205,7 +205,7 @@ angular.module('knalli.angular-vertxbus')
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
-        console.debug("[Vert.x EB Service] Unregister handler for #{address}") if debugEnabled
+        $log.debug("[Vert.x EB Service] Unregister handler for #{address}") if debugEnabled
         vertxEventBus.unregisterHandler address, deconstructors.get(callback)
         deconstructors.remove(callback)
         return #void
@@ -276,6 +276,8 @@ angular.module('knalli.angular-vertxbus')
           if wrapped.handlers[address]
             index = wrapped.handlers[address].indexOf(callback)
             wrapped.handlers[address].splice(index, 1) if index > -1
+          if wrapped.handlers[address].length < 1
+            wrapped.handlers[address] = undefined
           return #void
         deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.registerHandler (deconstructor)"
         return deconstructor
@@ -285,6 +287,8 @@ angular.module('knalli.angular-vertxbus')
         if wrapped.handlers[address]
           index = wrapped.handlers[address].indexOf(callback)
           wrapped.handlers[address].splice(index, 1) if index > -1
+        if wrapped.handlers[address].length < 1
+          wrapped.handlers[address] = undefined
         # Remove from real instance
         if connectionState is vertxEventBus.EventBus.OPEN then util.unregisterHandler(address, callback)
       # Stub for util.send
