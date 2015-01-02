@@ -9,7 +9,7 @@
     "dist/angular-vertxbus.js"
   ],
   "dependencies": {
-    "components/angular.js": ">=1.2 <=1.4"
+    
   },
   "license": "MIT"
 }
