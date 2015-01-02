@@ -1,6 +1,6 @@
-/*! angular-vertxbus - v0.11.0 - 2014-12-18
+/*! angular-vertxbus - v0.11.0 - 2015-01-02
 * http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2014 ; Licensed  */
+* Copyright (c) 2015 ; Licensed  */
 (function() {
   var __hasProp = {}.hasOwnProperty;
 
@@ -521,27 +521,31 @@
           deconstructors.remove(callback);
         },
         send: function(address, message, timeout) {
-          var deferred, dispatched, next;
+          var deferred, dispatched, next, timeoutId;
           if (timeout == null) {
             timeout = 10000;
           }
           deferred = $q.defer();
+          if (deferred) {
+            timeoutId = $timeout((function() {
+              return deferred.reject();
+            }), timeout);
+          }
           next = function() {
-            vertxEventBus.send(address, message, function(reply) {
+            return vertxEventBus.send(address, message, function(reply) {
+              if (timeoutId) {
+                $timeout.cancel(timeoutId);
+              }
               if (deferred) {
                 return deferred.resolve(reply);
               }
             });
-            if (deferred) {
-              return $timeout((function() {
-                return deferred.reject();
-              }), timeout);
-            }
           };
           next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send (ensureOpenAuthConnection callback)";
           dispatched = ensureOpenAuthConnection(next);
           if (deferred && !dispatched) {
             deferred.reject();
+            $timeout.cancel(timeoutId);
           }
           return deferred != null ? deferred.promise : void 0;
         },
