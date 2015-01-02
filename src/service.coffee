@@ -215,14 +215,17 @@ angular.module('knalli.angular-vertxbus')
       # @param timeout an optional number for a timout after which the promise will be rejected
       send : (address, message, timeout = 10000) ->
         deferred = $q.defer()
+        # Register timeout for promise rejecting.
+        if deferred then timeoutId = $timeout (-> deferred.reject()), timeout
         next = ->
           vertxEventBus.send address, message, (reply) ->
+            if timeoutId then $timeout.cancel timeoutId
             if deferred then deferred.resolve reply
-          # Register timeout for promise rejecting.
-          if deferred then $timeout (-> deferred.reject()), timeout
         next.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.send (ensureOpenAuthConnection callback)"
         dispatched = ensureOpenAuthConnection next
-        if deferred and !dispatched then deferred.reject()
+        if deferred and !dispatched 
+          deferred.reject()
+          $timeout.cancel(timeoutId)
         return deferred?.promise
       # Publish a message to the specified address (using EventBus.publish).
       # @param address a required string for the targeting address in the bus
