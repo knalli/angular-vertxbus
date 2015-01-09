@@ -137,8 +137,8 @@ angular.module('knalli.angular-vertxbus')
     loginPromise = null
     # internal store of buffered messages
     messageQueue = new Queue(messageBuffer)
-    # internal map of deconstructors
-    deconstructors = new SimpleMap()
+    # internal map of callbacks
+    callbackMap = new SimpleMap()
 
     if enabled and vertxEventBus
       vertxEventBus.onopen = ->
@@ -194,19 +194,19 @@ angular.module('knalli.angular-vertxbus')
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
         $log.debug("[Vert.x EB Service] Register handler for #{address}") if debugEnabled
-        deconstructor = (message, replyTo) ->
+        callbackWrapper = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()
           return #void
-        deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.registerHandler (deconstructor)"
-        deconstructors.put(callback, deconstructor)
-        vertxEventBus.registerHandler address, deconstructors.get(callback)
+        callbackWrapper.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.registerHandler (callback wrapper)"
+        callbackMap.put(callback, callbackWrapper)
+        vertxEventBus.registerHandler address, callbackWrapper
       # Remove a callback handler for the specified address match.
       unregisterHandler : (address, callback) ->
         return unless typeof callback is 'function'
         $log.debug("[Vert.x EB Service] Unregister handler for #{address}") if debugEnabled
-        vertxEventBus.unregisterHandler address, deconstructors.get(callback)
-        deconstructors.remove(callback)
+        vertxEventBus.unregisterHandler address, callbackMap.get(callback)
+        callbackMap.remove(callback)
         return #void
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
