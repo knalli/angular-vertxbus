@@ -1,3 +1,12 @@
+<a name="0.11.1"></a>
+### 0.11.1 (2015-01-09)
+
+
+#### Bug Fixes
+
+* **service:** fix registering a callback again after disconnect ([483d2ee0](http://github.com/knalli/angular-vertxbus/commit/483d2ee062f8090c0682e8c678d35e7e4485e93b))
+
+
 <a name="0.11.0"></a>
 ## 0.11.0 (2014-12-18)
 

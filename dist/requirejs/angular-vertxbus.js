@@ -1,6 +1,6 @@
-/*! angular-vertxbus - v0.11.0 - 2014-12-18
+/*! angular-vertxbus - v0.11.1 - 2015-01-09
 * http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2014 ; Licensed  */
+* Copyright (c) 2015 ; Licensed  */
 define(['angular', 'vertxbus'], function(angular) {
 
 (function() {
@@ -422,13 +422,13 @@ define(['angular', 'vertxbus'], function(angular) {
     };
     this.skipUnauthorizeds.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": provider.skipUnauthorizeds";
     this.$get = ['$rootScope', '$q', '$interval', '$timeout', 'vertxEventBus', '$log', function($rootScope, $q, $interval, $timeout, vertxEventBus, $log) {
-      var connectionIntervalCheck, connectionState, debugEnabled, deconstructors, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
+      var callbackMap, connectionIntervalCheck, connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
       _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
       connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
       validSession = false;
       loginPromise = null;
       messageQueue = new Queue(messageBuffer);
-      deconstructors = new SimpleMap();
+      callbackMap = new SimpleMap();
       if (enabled && vertxEventBus) {
         vertxEventBus.onopen = function() {
           var address, callback, callbacks, fn, _i, _len, _ref2;
@@ -494,23 +494,20 @@ define(['angular', 'vertxbus'], function(angular) {
       ensureOpenAuthConnection.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenAuthConnection";
       util = {
         registerHandler: function(address, callback) {
-          var deconstructor;
+          var callbackWrapper;
           if (typeof callback !== 'function') {
             return;
           }
           if (debugEnabled) {
             $log.debug("[Vert.x EB Service] Register handler for " + address);
           }
-          if (deconstructors.containsKey(callback)) {
-            return deconstructors.get(callback);
-          }
-          deconstructor = function(message, replyTo) {
+          callbackWrapper = function(message, replyTo) {
             callback(message, replyTo);
             $rootScope.$digest();
           };
-          deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.registerHandler (deconstructor)";
-          deconstructors.put(callback, deconstructor);
-          return vertxEventBus.registerHandler(address, deconstructors.get(callback));
+          callbackWrapper.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.registerHandler (callback wrapper)";
+          callbackMap.put(callback, callbackWrapper);
+          return vertxEventBus.registerHandler(address, callbackWrapper);
         },
         unregisterHandler: function(address, callback) {
           if (typeof callback !== 'function') {
@@ -519,8 +516,8 @@ define(['angular', 'vertxbus'], function(angular) {
           if (debugEnabled) {
             $log.debug("[Vert.x EB Service] Unregister handler for " + address);
           }
-          vertxEventBus.unregisterHandler(address, deconstructors.get(callback));
-          deconstructors.remove(callback);
+          vertxEventBus.unregisterHandler(address, callbackMap.get(callback));
+          callbackMap.remove(callback);
         },
         send: function(address, message, timeout) {
           var deferred, dispatched, next;
