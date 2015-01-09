@@ -22,9 +22,9 @@ class SockJS
     else
       window.setTimeout fn, 1
 
-  log: ->
+  log: (args...)->
     log = SockJS.currentMockInstance?.$log or window.console
-    log.debug.apply(this, arguments)
+    log.debug(args...)
 
   close: (mockOptions)->
     @log "[MOCK] SockJS.close()"
