@@ -194,7 +194,6 @@ angular.module('knalli.angular-vertxbus')
       registerHandler : (address, callback) ->
         return unless typeof callback is 'function'
         $log.debug("[Vert.x EB Service] Register handler for #{address}") if debugEnabled
-        return deconstructors.get(callback) if deconstructors.containsKey(callback) # already known
         deconstructor = (message, replyTo) ->
           callback(message, replyTo)
           $rootScope.$digest()

@@ -590,6 +590,60 @@ describe('knalli.angular-vertxbus', function () {
 
     });
 
+    describe('reconnect', function () {
+      var $timeout, vertxEventBus, vertxEventBusService;
+      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+        $timeout = _$timeout_;
+        vertxEventBus = _vertxEventBus_;
+        vertxEventBusService = _vertxEventBusService_;
+        // Mock bus is closed
+        _vertxEventBus_.readyState = function () {
+          return _vertxEventBus_.EventBus.OPEN;
+        };
+        var sendCalls = 0;
+        _vertxEventBus_.send = function () {
+          // do nothing, let it timeout
+        };
+        // extend object
+        vertxEventBus.getSendCalls = function () {
+          return sendCalls;
+        };
+      }));
+      it('should be a function', function () {
+        expect(typeof vertxEventBus.reconnect).to.be('function');
+      });
+      // Reconnect should be switch the connectivity, onopen() and onclose()
+      // must be delegated transparently
+      it('should re-add handler after a reconnet', function (done) {
+        this.timeout(20000);
+        var okHandler = false;
+        var myHandler = function () {
+          //$log.debug('[TEST] onhandle() called');
+          okHandler = true;
+        };
+
+        setTimeout(function () {
+          vertxEventBusService.addListener('lalelu', myHandler);
+          vertxEventBus.reconnect();
+          setTimeout(function () {
+            setTimeout(function () {
+              SockJS.currentMockInstance.onmessage({
+                data: JSON.stringify({
+                  address: 'lalelu',
+                  body: {
+                    data: '1x'
+                  },
+                  replyAddress: undefined
+                })
+              });
+              expect(okHandler).to.be(true);
+              done();
+            }, 2100);
+            $timeout.flush();
+          }, 100);
+        }, 100);
+      });
+    });
 
     describe('after adding and removing a handler via "registerHandler"', function () {
 
