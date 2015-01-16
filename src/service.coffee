@@ -144,7 +144,7 @@ angular.module('knalli.angular-vertxbus')
       vertxEventBus.onopen = ->
         wrapped.getConnectionState(true)
         $rootScope.$broadcast "#{prefix}system.connected"
-        for own address, callbacks of wrapped.handlers
+        for own address, callbacks of wrapped.handlers when callbacks?.length
           for callback in callbacks
             util.registerHandler(address, callback)
         $rootScope.$digest()
