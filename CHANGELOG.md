@@ -1,3 +1,12 @@
+<a name="0.11.2"></a>
+### 0.11.2 (2015-01-16)
+
+
+#### Bug Fixes
+
+* **service:** fix possible npe on re-registration of handlers after reconnect ([2225a8ab](http://github.com/knalli/angular-vertxbus/commit/2225a8ab26320942a91902265e7687b189f20e65))
+
+
 <a name="0.11.1"></a>
 ### 0.11.1 (2015-01-09)
 

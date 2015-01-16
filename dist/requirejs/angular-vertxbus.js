@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.11.1 - 2015-01-09
+/*! angular-vertxbus - v0.11.2 - 2015-01-16
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 define(['angular', 'vertxbus'], function(angular) {
@@ -438,9 +438,11 @@ define(['angular', 'vertxbus'], function(angular) {
           for (address in _ref2) {
             if (!__hasProp.call(_ref2, address)) continue;
             callbacks = _ref2[address];
-            for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
-              callback = callbacks[_i];
-              util.registerHandler(address, callback);
+            if (callbacks != null ? callbacks.length : void 0) {
+              for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+                callback = callbacks[_i];
+                util.registerHandler(address, callback);
+              }
             }
           }
           $rootScope.$digest();
