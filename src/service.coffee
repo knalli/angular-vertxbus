@@ -139,11 +139,15 @@ angular.module('knalli.angular-vertxbus')
     messageQueue = new Queue(messageBuffer)
     # internal map of callbacks
     callbackMap = new SimpleMap()
+    # internal states
+    states = (connected: no)
 
     if enabled and vertxEventBus
       vertxEventBus.onopen = ->
         wrapped.getConnectionState(true)
-        $rootScope.$broadcast "#{prefix}system.connected"
+        unless states.connected
+          states.connected = yes
+          $rootScope.$broadcast "#{prefix}system.connected"
         for own address, callbacks of wrapped.handlers when callbacks?.length
           for callback in callbacks
             util.registerHandler(address, callback)
@@ -157,7 +161,9 @@ angular.module('knalli.angular-vertxbus')
         return #void
       vertxEventBus.onclose = ->
         wrapped.getConnectionState(true)
-        $rootScope.$broadcast "#{prefix}system.disconnected"
+        if states.connected
+          states.connected = no
+          $rootScope.$broadcast "#{prefix}system.disconnected"
       vertxEventBus.onclose.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: 'onclose' handler"
 
     ensureOpenConnection = (fn) ->
