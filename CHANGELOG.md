@@ -1,3 +1,14 @@
+<a name="1.0.0"></a>
+## 1.0.0 (2015-03-01)
+
+
+#### Bug Fixes
+
+* **protractor-$timeout:** use $interval service for reply timeouts so protractor tests can continue ([eed05bd9](http://github.com/knalli/angular-vertxbus/commit/eed05bd91a1aa5da2df00295653747147c9eb5d1))
+* **service:** avoid duplicate broadcast events for (dis)connected ([0f56411d](http://github.com/knalli/angular-vertxbus/commit/0f56411df70d754a7722427169f8150aef5e5d2b))
+* **wrapper:** avoid invalid host+port combination (CORS) ([e29def5d](http://github.com/knalli/angular-vertxbus/commit/e29def5dca9a476dcc829e7cdc68839d5711c59e), closes [#39](http://github.com/knalli/angular-vertxbus/issues/39))
+
+
 <a name="0.11.2"></a>
 ### 0.11.2 (2015-01-16)
 

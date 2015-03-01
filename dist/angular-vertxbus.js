@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v0.11.2 - 2015-01-16
+/*! angular-vertxbus - v1.0.0 - 2015-03-01
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 (function() {
@@ -31,7 +31,7 @@
       enabled: true,
       debugEnabled: false,
       prefix: 'vertx-eventbus.',
-      urlServer: "" + location.protocol + "//" + location.hostname + ":" + (location.port || 80),
+      urlServer: "" + location.protocol + "//" + location.hostname + (location.port ? ':' + location.port : ''),
       urlPath: '/eventbus',
       reconnectEnabled: true,
       sockjsStateInterval: 10000,
@@ -419,19 +419,25 @@
       return this;
     };
     this.skipUnauthorizeds.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": provider.skipUnauthorizeds";
-    this.$get = ['$rootScope', '$q', '$interval', '$timeout', 'vertxEventBus', '$log', function($rootScope, $q, $interval, $timeout, vertxEventBus, $log) {
-      var callbackMap, connectionIntervalCheck, connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
+    this.$get = ['$rootScope', '$q', '$interval', 'vertxEventBus', '$log', function($rootScope, $q, $interval, vertxEventBus, $log) {
+      var callbackMap, connectionIntervalCheck, connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, states, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
       _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
       connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
       validSession = false;
       loginPromise = null;
       messageQueue = new Queue(messageBuffer);
       callbackMap = new SimpleMap();
+      states = {
+        connected: false
+      };
       if (enabled && vertxEventBus) {
         vertxEventBus.onopen = function() {
           var address, callback, callbacks, fn, _i, _len, _ref2;
           wrapped.getConnectionState(true);
-          $rootScope.$broadcast("" + prefix + "system.connected");
+          if (!states.connected) {
+            states.connected = true;
+            $rootScope.$broadcast("" + prefix + "system.connected");
+          }
           _ref2 = wrapped.handlers;
           for (address in _ref2) {
             if (!__hasProp.call(_ref2, address)) continue;
@@ -456,7 +462,10 @@
         };
         vertxEventBus.onclose = function() {
           wrapped.getConnectionState(true);
-          return $rootScope.$broadcast("" + prefix + "system.disconnected");
+          if (states.connected) {
+            states.connected = false;
+            return $rootScope.$broadcast("" + prefix + "system.disconnected");
+          }
         };
         vertxEventBus.onclose.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": 'onclose' handler";
       }
@@ -532,9 +541,9 @@
               }
             });
             if (deferred) {
-              return $timeout((function() {
+              return $interval((function() {
                 return deferred.reject();
-              }), timeout);
+              }), timeout, 1);
             }
           };
           next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send (ensureOpenAuthConnection callback)";
@@ -574,9 +583,9 @@
           };
           next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.login (callback)";
           vertxEventBus.login(username, password, next);
-          $timeout((function() {
+          $interval((function() {
             return deferred.reject();
-          }), timeout);
+          }), timeout, 1);
           return deferred.promise;
         }
       };
