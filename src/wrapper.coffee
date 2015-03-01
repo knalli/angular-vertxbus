@@ -22,7 +22,7 @@ angular.module('knalli.angular-vertxbus')
     enabled: true
     debugEnabled: false
     prefix: 'vertx-eventbus.'
-    urlServer: "#{location.protocol}//#{location.hostname}:#{location.port or 80}"
+    urlServer: "#{location.protocol}//#{location.hostname}#{if location.port then ':' + location.port else ''}"
     urlPath: '/eventbus'
     reconnectEnabled: true
     sockjsStateInterval: 10000

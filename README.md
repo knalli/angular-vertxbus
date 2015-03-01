@@ -94,7 +94,7 @@ module.config(function(vertxEventBusProvider) {
 | useSockJsReconnectInterval | `10000` (ms)    | defines the wait time for a reconnect after a disconnect has been recognized |
 | useSockJsOptions           | `{}`            | optional SockJS options (technically `new SockJS(url, undefined, sockjsOptions)`) |
 
-* `location.protocol + '//' + location.hostname + ':' + (location.port or 80)`
+* `location.protocol + '//' + location.hostname + (if location.port then ':' + location.port else '')`
 
 ## Architecture details
 
