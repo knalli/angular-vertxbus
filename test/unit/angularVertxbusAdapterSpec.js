@@ -550,6 +550,12 @@ describe('knalli.angular-vertxbus', function () {
 
       describe('send() should call the error callback', function () {
 
+        var $interval;
+
+        beforeEach(inject(function (_$interval_) {
+          $interval = _$interval_; // angular.mock.$interval
+        }));
+
         it('via promise.then()', function (done) {
           var successCalled, errorCalled;
           setTimeout(function () {
@@ -560,7 +566,7 @@ describe('knalli.angular-vertxbus', function () {
               errorCalled = true;
             });
             setTimeout(function () {
-              $timeout.flush();
+              $interval.flush(20); // goto T+20
               expect(successCalled).to.be(undefined);
               expect(errorCalled).to.be(true);
               done();
@@ -578,7 +584,7 @@ describe('knalli.angular-vertxbus', function () {
               errorCalled = true;
             });
             setTimeout(function () {
-              $timeout.flush();
+              $interval.flush(20); // goto T+20
               expect(successCalled).to.be(undefined);
               expect(errorCalled).to.be(true);
               done();
