@@ -300,7 +300,7 @@ describe('knalli.angular-vertxbus', function () {
 
   describe('vertxEventBusService', function () {
 
-    describe(' with disabled message queue (default)', function () {
+    describe('with disabled message queue (default)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
@@ -336,7 +336,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 1});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.getBufferCount()).to.be(0);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(0);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -345,7 +345,7 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
-    describe(' with enabled message queue (size 3)', function () {
+    describe('with enabled message queue (size 3)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
@@ -381,7 +381,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 123});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.getBufferCount()).to.be(1);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(1);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -396,7 +396,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 4});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.getBufferCount()).to.be(3);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(3);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -420,7 +420,7 @@ describe('knalli.angular-vertxbus', function () {
 
             setTimeout(function () {
               expect(result).to.eql({reply: {data: 3}});
-              expect(vertxEventBusService.getBufferCount()).to.be(0);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(0);
               expect(vertxEventBus.getSendCalls()).to.be(3);
               done();
             }, 1000);
@@ -560,7 +560,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, true, 10).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, 10).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -620,7 +620,7 @@ describe('knalli.angular-vertxbus', function () {
       });
       // Reconnect should be switch the connectivity, onopen() and onclose()
       // must be delegated transparently
-      it('should re-add handler after a reconnet', function (done) {
+      it('should re-add handler after a reconnect', function (done) {
         this.timeout(20000);
         var okHandler = false;
         var myHandler = function () {
