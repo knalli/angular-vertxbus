@@ -48,11 +48,15 @@ module.exports = function(config) {
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
       'temp/test/unit/mock/sockjs.js',
       injectByScope(scope, 'vertxbus.js/index.js'),
-      'temp/**/*.js',
+      'temp/test/unit/mock/sockjs.js',
+      'src/lib/**/*.js',
+      'src/vertxbus-module.js',
+      'src/vertxbus-wrapper.js',
+      'src/vertxbus-service.js',
       'test/**/*Spec.js'
     ],
 
-    frameworks: ['mocha', 'expect'],
+    frameworks: ['browserify', 'mocha', 'expect'],
 
 
     // list of files to exclude
@@ -65,7 +69,24 @@ module.exports = function(config) {
     // possible values: 'dots', 'progress', 'junit'
     reporters: isDefaultScope(scope) ? ['progress', 'coverage'] : ['progress'],
 
-    preprocessors: isDefaultScope(scope) ? { 'temp/src/*.js': ['coverage'] } : undefined,
+    preprocessors: (function () {
+      var config = {
+        'src/**/*.js': [ 'browserify' ]
+      };
+
+      if (isDefaultScope(scope)) {
+        config['src/**/*.js'].push('coverage');
+      }
+
+      return config;
+    }()),
+
+    // browserify configuration
+    browserify: {
+      debug: true,
+      extensions: ['.js'],
+      transform: [ 'brfs', 'babelify' ]
+    },
 
     coverageReporter: isDefaultScope(scope) ? {
       dir: 'build/coverage',
