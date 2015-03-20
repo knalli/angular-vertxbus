@@ -11,6 +11,7 @@
     ".jshintrc",
     ".travis.yml",
     "karma.conf.js",
+    "/build-data-for-requirejs/",
     "/temp/",
     "/test/",
     "/test_scopes/",
