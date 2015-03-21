@@ -20,6 +20,8 @@ If you have a standard non AMD styled project, use `dist/angular-vertxbus.js` or
 
 In case of an AMD styled project, there is also a package available at `dist/requirejs/angular-vertxbus.js`. In addition, because of the lack of vertxbus package, there is a Vert.X Event Bus package at `dist/requirejs/vertxbus.js` which includes the version of the Event Bus defined in the `bower.json`.
 
+Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](https://cdnjs.com/libraries/angular-vertxbus).
+
 ## How to use
 
 You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
