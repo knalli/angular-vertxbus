@@ -187,4 +187,4 @@ The *end-to-end tests* start and utilize a full Vert.X node and a NodeJS based w
 
 ## License
 
-Copyright 2014 by Jan Philipp. Licensed under MIT.
+Copyright 2015 by Jan Philipp. Licensed under MIT.
