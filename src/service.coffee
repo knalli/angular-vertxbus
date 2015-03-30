@@ -125,7 +125,7 @@ angular.module('knalli.angular-vertxbus')
     return this
   @skipUnauthorizeds.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: provider.skipUnauthorizeds"
 
-  @$get = ($rootScope, $q, $interval, vertxEventBus, $log) ->
+  @$get = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log", ($rootScope, $q, $interval, vertxEventBus, $log) ->
     # Extract options (with defaults)
     { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
       sockjsStateInterval, sockjsReconnectInterval, sockjsOptions,
@@ -352,6 +352,7 @@ angular.module('knalli.angular-vertxbus')
       isValidSession : -> validSession
       login : wrapped.login
     )
+  ]
 
   @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: Factory.get"
 

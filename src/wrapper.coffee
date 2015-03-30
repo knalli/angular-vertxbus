@@ -100,7 +100,7 @@ angular.module('knalli.angular-vertxbus')
     Furthermore, the stub supports theses extra APIs:
     - recconnect()
   ###
-  @$get = ($timeout, $log) ->
+  @$get = ["$timeout", "$log", ($timeout, $log) ->
     # Extract options (with defaults)
     { enabled, debugEnabled, prefix, urlServer, urlPath, reconnectEnabled,
       sockjsStateInterval, sockjsReconnectInterval, sockjsOptions
@@ -184,6 +184,7 @@ angular.module('knalli.angular-vertxbus')
       $log.debug("[Vert.x EB Stub] Disabled") if debugEnabled
 
     return EventBusStub
+  ]
 
   @$get.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: Factory.get"
 
