@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v1.0.0 - 2015-03-01
+/*! angular-vertxbus - v1.0.0 - 2015-03-30
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 (function() {
@@ -139,96 +139,115 @@
       Furthermore, the stub supports theses extra APIs:
       - recconnect()
      */
-    this.$get = ['$timeout', '$log', function($timeout, $log) {
-      var EventBusOriginal, EventBusStub, connect, debugEnabled, enabled, eventBus, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, url, urlPath, urlServer, _ref;
-      _ref = angular.extend({}, DEFAULT_OPTIONS, options), enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions;
-      EventBusStub = null;
-      EventBusOriginal = typeof vertx !== "undefined" && vertx !== null ? vertx.EventBus : void 0;
-      if (enabled && EventBusOriginal) {
-        url = "" + urlServer + urlPath;
-        if (debugEnabled) {
-          $log.debug("[Vert.x EB Stub] Enabled: connecting '" + url + "'");
-        }
-        eventBus = null;
-        connect = function() {
-          eventBus = new EventBusOriginal(url, void 0, sockjsOptions);
-          eventBus.onopen = function() {
-            if (debugEnabled) {
-              $log.debug("[Vert.x EB Stub] Connected");
-            }
-            if (typeof EventBusStub.onopen === 'function') {
-              EventBusStub.onopen();
-            }
-          };
-          eventBus.onclose = function() {
-            if (debugEnabled) {
-              $log.debug("[Vert.x EB Stub] Reconnect in " + sockjsReconnectInterval + "ms");
-            }
-            if (typeof EventBusStub.onclose === 'function') {
-              EventBusStub.onclose();
-            }
-            if (reconnectEnabled) {
-              $timeout(connect, sockjsReconnectInterval);
-            }
-          };
-        };
-        connect();
-        EventBusStub = {
-          reconnect: function() {
-            return eventBus.close();
-          },
-          close: function() {
-            return eventBus.close();
-          },
-          login: function(username, password, replyHandler) {
-            return eventBus.login(username, password, replyHandler);
-          },
-          send: function(address, message, replyHandler) {
-            return eventBus.send(address, message, replyHandler);
-          },
-          publish: function(address, message) {
-            return eventBus.publish(address, message);
-          },
-          registerHandler: function(address, handler) {
-            var deconstructor;
-            eventBus.registerHandler(address, handler);
-
-            /* and return the deregister callback */
-            deconstructor = function() {
-              EventBusStub.unregisterHandler(address, handler);
-            };
-            deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.registerHandler (deconstructor)";
-            return deconstructor;
-          },
-          unregisterHandler: function(address, handler) {
-            return eventBus.unregisterHandler(address, handler);
-          },
-          readyState: function() {
-            return eventBus.readyState();
-          },
-
-          /* expose current used internal instance of actual EventBus */
-          EventBus: EventBusOriginal,
-          getOptions: function() {
-            return angular.extend({}, options);
+    this.$get = [
+      "$timeout", "$log", function($timeout, $log) {
+        var EventBusOriginal, EventBusStub, connect, debugEnabled, enabled, eventBus, prefix, reconnectEnabled, reconnectNowRequested, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, url, urlPath, urlServer, _ref;
+        _ref = angular.extend({}, DEFAULT_OPTIONS, options), enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions;
+        EventBusStub = null;
+        EventBusOriginal = typeof vertx !== "undefined" && vertx !== null ? vertx.EventBus : void 0;
+        if (enabled && EventBusOriginal) {
+          url = "" + urlServer + urlPath;
+          if (debugEnabled) {
+            $log.debug("[Vert.x EB Stub] Enabled: connecting '" + url + "'");
           }
-        };
-        EventBusStub.reconnect.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.reconnect";
-        EventBusStub.close.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.close";
-        EventBusStub.login.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.login";
-        EventBusStub.send.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.send";
-        EventBusStub.publish.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.publish";
-        EventBusStub.registerHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.registerHandler";
-        EventBusStub.unregisterHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.unregisterHandler";
-        EventBusStub.readyState.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.readyState";
-        EventBusStub.getOptions.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.getOptions";
-      } else {
-        if (debugEnabled) {
-          $log.debug("[Vert.x EB Stub] Disabled");
+          eventBus = null;
+          reconnectNowRequested = false;
+          connect = function() {
+            eventBus = new EventBusOriginal(url, void 0, sockjsOptions);
+            eventBus.onopen = function() {
+              if (debugEnabled) {
+                $log.debug("[Vert.x EB Stub] Connected");
+              }
+              if (typeof EventBusStub.onopen === 'function') {
+                EventBusStub.onopen();
+              }
+            };
+            eventBus.onclose = function() {
+              if (typeof EventBusStub.onclose === 'function') {
+                EventBusStub.onclose();
+              }
+              if (reconnectNowRequested) {
+                if (debugEnabled) {
+                  $log.debug("[Vert.x EB Stub] Reconnect immediately");
+                }
+                reconnectNowRequested = false;
+                connect();
+              } else {
+                if (debugEnabled) {
+                  $log.debug("[Vert.x EB Stub] Reconnect in " + sockjsReconnectInterval + "ms");
+                }
+                if (reconnectEnabled) {
+                  $timeout(connect, sockjsReconnectInterval);
+                }
+              }
+            };
+          };
+          connect();
+          EventBusStub = {
+            reconnect: function() {
+              return eventBus.close();
+            },
+            reconnectNow: function() {
+              if (eventBus.readyState() === EventBusOriginal.OPEN) {
+                reconnectNowRequested = true;
+                return eventBus.close();
+              } else {
+                return connect();
+              }
+            },
+            close: function() {
+              return eventBus.close();
+            },
+            login: function(username, password, replyHandler) {
+              return eventBus.login(username, password, replyHandler);
+            },
+            send: function(address, message, replyHandler) {
+              return eventBus.send(address, message, replyHandler);
+            },
+            publish: function(address, message) {
+              return eventBus.publish(address, message);
+            },
+            registerHandler: function(address, handler) {
+              var deconstructor;
+              eventBus.registerHandler(address, handler);
+
+              /* and return the deregister callback */
+              deconstructor = function() {
+                EventBusStub.unregisterHandler(address, handler);
+              };
+              deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.registerHandler (deconstructor)";
+              return deconstructor;
+            },
+            unregisterHandler: function(address, handler) {
+              return eventBus.unregisterHandler(address, handler);
+            },
+            readyState: function() {
+              return eventBus.readyState();
+            },
+
+            /* expose current used internal instance of actual EventBus */
+            EventBus: EventBusOriginal,
+            getOptions: function() {
+              return angular.extend({}, options);
+            }
+          };
+          EventBusStub.reconnect.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.reconnect";
+          EventBusStub.close.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.close";
+          EventBusStub.login.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.login";
+          EventBusStub.send.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.send";
+          EventBusStub.publish.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.publish";
+          EventBusStub.registerHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.registerHandler";
+          EventBusStub.unregisterHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.unregisterHandler";
+          EventBusStub.readyState.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.readyState";
+          EventBusStub.getOptions.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": EventBusStub.getOptions";
+        } else {
+          if (debugEnabled) {
+            $log.debug("[Vert.x EB Stub] Disabled");
+          }
         }
+        return EventBusStub;
       }
-      return EventBusStub;
-    }];
+    ];
     this.$get.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": Factory.get";
   });
 
@@ -419,200 +438,216 @@
       return this;
     };
     this.skipUnauthorizeds.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": provider.skipUnauthorizeds";
-    this.$get = ['$rootScope', '$q', '$interval', 'vertxEventBus', '$log', function($rootScope, $q, $interval, vertxEventBus, $log) {
-      var callbackMap, connectionIntervalCheck, connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, states, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
-      _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
-      connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
-      validSession = false;
-      loginPromise = null;
-      messageQueue = new Queue(messageBuffer);
-      callbackMap = new SimpleMap();
-      states = {
-        connected: false
-      };
-      if (enabled && vertxEventBus) {
-        vertxEventBus.onopen = function() {
-          var address, callback, callbacks, fn, _i, _len, _ref2;
-          wrapped.getConnectionState(true);
-          if (!states.connected) {
-            states.connected = true;
-            $rootScope.$broadcast("" + prefix + "system.connected");
-          }
-          _ref2 = wrapped.handlers;
-          for (address in _ref2) {
-            if (!__hasProp.call(_ref2, address)) continue;
-            callbacks = _ref2[address];
-            if (callbacks != null ? callbacks.length : void 0) {
-              for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
-                callback = callbacks[_i];
-                util.registerHandler(address, callback);
+    this.$get = [
+      "$rootScope", "$q", "$interval", "vertxEventBus", "$log", function($rootScope, $q, $interval, vertxEventBus, $log) {
+        var callbackMap, connectionIntervalCheck, connectionState, debugEnabled, enabled, ensureOpenAuthConnection, ensureOpenConnection, loginPromise, messageBuffer, messageQueue, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, states, urlPath, urlServer, util, validSession, wrapped, _ref, _ref1;
+        _ref = (vertxEventBus != null ? vertxEventBus.getOptions() : void 0) || {}, enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions, messageBuffer = _ref.messageBuffer;
+        connectionState = vertxEventBus != null ? (_ref1 = vertxEventBus.EventBus) != null ? _ref1.CLOSED : void 0 : void 0;
+        validSession = false;
+        loginPromise = null;
+        messageQueue = new Queue(messageBuffer);
+        callbackMap = new SimpleMap();
+        states = {
+          connected: false
+        };
+        if (enabled && vertxEventBus) {
+          vertxEventBus.onopen = function() {
+            var address, callback, callbacks, fn, _i, _len, _ref2;
+            wrapped.getConnectionState(true);
+            if (!states.connected) {
+              states.connected = true;
+              $rootScope.$broadcast("" + prefix + "system.connected");
+            }
+            _ref2 = wrapped.handlers;
+            for (address in _ref2) {
+              if (!__hasProp.call(_ref2, address)) continue;
+              callbacks = _ref2[address];
+              if (callbacks != null ? callbacks.length : void 0) {
+                for (_i = 0, _len = callbacks.length; _i < _len; _i++) {
+                  callback = callbacks[_i];
+                  util.registerHandler(address, callback);
+                }
               }
             }
+            $rootScope.$digest();
+            if (messageBuffer && messageQueue.size()) {
+              while (messageQueue.size()) {
+                fn = messageQueue.first();
+                if (typeof fn === 'function') {
+                  fn();
+                }
+              }
+              $rootScope.$digest();
+            }
+          };
+          vertxEventBus.onclose = function() {
+            wrapped.getConnectionState(true);
+            if (states.connected) {
+              states.connected = false;
+              return $rootScope.$broadcast("" + prefix + "system.disconnected");
+            }
+          };
+          vertxEventBus.onclose.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": 'onclose' handler";
+        }
+        ensureOpenConnection = function(fn) {
+          if (wrapped.getConnectionState() === vertxEventBus.EventBus.OPEN) {
+            fn();
+            return true;
+          } else if (messageBuffer) {
+            messageQueue.push(fn);
+            return true;
           }
-          $rootScope.$digest();
-          if (messageBuffer && messageQueue.size()) {
-            while (messageQueue.size()) {
-              fn = messageQueue.first();
-              if (typeof fn === 'function') {
+          return false;
+        };
+        ensureOpenConnection.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenConnection";
+        ensureOpenAuthConnection = function(fn) {
+          var wrapFn;
+          if (!options.loginRequired) {
+            return ensureOpenConnection(fn);
+          } else {
+            wrapFn = function() {
+              if (validSession) {
                 fn();
+                return true;
+              } else {
+                if (debugEnabled) {
+                  $log.debug("[Vert.x EB Service] Message was not sent because login is required");
+                }
+                return false;
               }
-            }
-            $rootScope.$digest();
+            };
+            wrapFn.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenAuthConnection function wrapper";
+            return ensureOpenConnection(wrapFn);
           }
         };
-        vertxEventBus.onclose = function() {
-          wrapped.getConnectionState(true);
-          if (states.connected) {
-            states.connected = false;
-            return $rootScope.$broadcast("" + prefix + "system.disconnected");
-          }
-        };
-        vertxEventBus.onclose.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": 'onclose' handler";
-      }
-      ensureOpenConnection = function(fn) {
-        if (wrapped.getConnectionState() === vertxEventBus.EventBus.OPEN) {
-          fn();
-          return true;
-        } else if (messageBuffer) {
-          messageQueue.push(fn);
-          return true;
-        }
-        return false;
-      };
-      ensureOpenConnection.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenConnection";
-      ensureOpenAuthConnection = function(fn) {
-        var wrapFn;
-        if (!options.loginRequired) {
-          return ensureOpenConnection(fn);
-        } else {
-          wrapFn = function() {
-            if (validSession) {
-              fn();
-              return true;
-            } else {
-              if (debugEnabled) {
-                $log.debug("[Vert.x EB Service] Message was not sent because login is required");
-              }
-              return false;
+        ensureOpenAuthConnection.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenAuthConnection";
+        util = {
+          registerHandler: function(address, callback) {
+            var callbackWrapper;
+            if (typeof callback !== 'function') {
+              return;
             }
-          };
-          wrapFn.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenAuthConnection function wrapper";
-          return ensureOpenConnection(wrapFn);
-        }
-      };
-      ensureOpenAuthConnection.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": ensureOpenAuthConnection";
-      util = {
-        registerHandler: function(address, callback) {
-          var callbackWrapper;
-          if (typeof callback !== 'function') {
-            return;
-          }
-          if (debugEnabled) {
-            $log.debug("[Vert.x EB Service] Register handler for " + address);
-          }
-          callbackWrapper = function(message, replyTo) {
-            callback(message, replyTo);
-            $rootScope.$digest();
-          };
-          callbackWrapper.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.registerHandler (callback wrapper)";
-          callbackMap.put(callback, callbackWrapper);
-          return vertxEventBus.registerHandler(address, callbackWrapper);
-        },
-        unregisterHandler: function(address, callback) {
-          if (typeof callback !== 'function') {
-            return;
-          }
-          if (debugEnabled) {
-            $log.debug("[Vert.x EB Service] Unregister handler for " + address);
-          }
-          vertxEventBus.unregisterHandler(address, callbackMap.get(callback));
-          callbackMap.remove(callback);
-        },
-        send: function(address, message, timeout) {
-          var deferred, dispatched, next;
-          if (timeout == null) {
-            timeout = 10000;
-          }
-          deferred = $q.defer();
-          next = function() {
-            vertxEventBus.send(address, message, function(reply) {
+            if (debugEnabled) {
+              $log.debug("[Vert.x EB Service] Register handler for " + address);
+            }
+            callbackWrapper = function(message, replyTo) {
+              callback(message, replyTo);
+              $rootScope.$digest();
+            };
+            callbackWrapper.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.registerHandler (callback wrapper)";
+            callbackMap.put(callback, callbackWrapper);
+            return vertxEventBus.registerHandler(address, callbackWrapper);
+          },
+          unregisterHandler: function(address, callback) {
+            if (typeof callback !== 'function') {
+              return;
+            }
+            if (debugEnabled) {
+              $log.debug("[Vert.x EB Service] Unregister handler for " + address);
+            }
+            vertxEventBus.unregisterHandler(address, callbackMap.get(callback));
+            callbackMap.remove(callback);
+          },
+          send: function(address, message, timeout) {
+            var deferred, dispatched, next;
+            if (timeout == null) {
+              timeout = 10000;
+            }
+            deferred = $q.defer();
+            next = function() {
+              vertxEventBus.send(address, message, function(reply) {
+                if (deferred) {
+                  return deferred.resolve(reply);
+                }
+              });
               if (deferred) {
-                return deferred.resolve(reply);
+                return $interval((function() {
+                  return deferred.reject();
+                }), timeout, 1);
               }
-            });
-            if (deferred) {
-              return $interval((function() {
-                return deferred.reject();
-              }), timeout, 1);
+            };
+            next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send (ensureOpenAuthConnection callback)";
+            dispatched = ensureOpenAuthConnection(next);
+            if (deferred && !dispatched) {
+              deferred.reject();
             }
-          };
-          next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send (ensureOpenAuthConnection callback)";
-          dispatched = ensureOpenAuthConnection(next);
-          if (deferred && !dispatched) {
-            deferred.reject();
-          }
-          return deferred != null ? deferred.promise : void 0;
-        },
-        publish: function(address, message) {
-          var dispatched, next;
-          next = function() {
-            return vertxEventBus.publish(address, message);
-          };
-          next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.publish (ensureOpenAuthConnection callback)";
-          dispatched = ensureOpenAuthConnection(next);
-          return dispatched;
-        },
-        login: function(username, password, timeout) {
-          var deferred, next;
-          if (timeout == null) {
-            timeout = 5000;
-          }
-          deferred = $q.defer();
-          next = function(reply) {
-            if ((reply != null ? reply.status : void 0) === 'ok') {
-              deferred.resolve(reply);
-              return $rootScope.$broadcast("" + prefix + "system.login.succeeded", {
-                status: reply != null ? reply.status : void 0
-              });
-            } else {
-              deferred.reject(reply);
-              return $rootScope.$broadcast("" + prefix + "system.login.failed", {
-                status: reply != null ? reply.status : void 0
-              });
+            return deferred != null ? deferred.promise : void 0;
+          },
+          publish: function(address, message) {
+            var dispatched, next;
+            next = function() {
+              return vertxEventBus.publish(address, message);
+            };
+            next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.publish (ensureOpenAuthConnection callback)";
+            dispatched = ensureOpenAuthConnection(next);
+            return dispatched;
+          },
+          login: function(username, password, timeout) {
+            var deferred, next;
+            if (timeout == null) {
+              timeout = 5000;
             }
-          };
-          next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.login (callback)";
-          vertxEventBus.login(username, password, next);
-          $interval((function() {
-            return deferred.reject();
-          }), timeout, 1);
-          return deferred.promise;
-        }
-      };
-      util.registerHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.registerHandler";
-      util.unregisterHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.unregisterHandler";
-      util.send.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send";
-      util.publish.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.publish";
-      util.login.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.login";
-      wrapped = {
-        handlers: {},
-        registerHandler: function(address, callback) {
-          var deconstructor, unregisterFn;
-          if (!wrapped.handlers[address]) {
-            wrapped.handlers[address] = [];
+            deferred = $q.defer();
+            next = function(reply) {
+              if ((reply != null ? reply.status : void 0) === 'ok') {
+                deferred.resolve(reply);
+                return $rootScope.$broadcast("" + prefix + "system.login.succeeded", {
+                  status: reply != null ? reply.status : void 0
+                });
+              } else {
+                deferred.reject(reply);
+                return $rootScope.$broadcast("" + prefix + "system.login.failed", {
+                  status: reply != null ? reply.status : void 0
+                });
+              }
+            };
+            next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.login (callback)";
+            vertxEventBus.login(username, password, next);
+            $interval((function() {
+              return deferred.reject();
+            }), timeout, 1);
+            return deferred.promise;
           }
-          wrapped.handlers[address].push(callback);
-          unregisterFn = null;
-          if (connectionState === vertxEventBus.EventBus.OPEN) {
-            unregisterFn = util.registerHandler(address, callback);
-          }
+        };
+        util.registerHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.registerHandler";
+        util.unregisterHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.unregisterHandler";
+        util.send.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send";
+        util.publish.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.publish";
+        util.login.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.login";
+        wrapped = {
+          handlers: {},
+          registerHandler: function(address, callback) {
+            var deconstructor, unregisterFn;
+            if (!wrapped.handlers[address]) {
+              wrapped.handlers[address] = [];
+            }
+            wrapped.handlers[address].push(callback);
+            unregisterFn = null;
+            if (connectionState === vertxEventBus.EventBus.OPEN) {
+              unregisterFn = util.registerHandler(address, callback);
+            }
 
-          /* and return the deregister callback */
-          deconstructor = function() {
+            /* and return the deregister callback */
+            deconstructor = function() {
+              var index;
+              if (unregisterFn) {
+                unregisterFn();
+              }
+              if (wrapped.handlers[address]) {
+                index = wrapped.handlers[address].indexOf(callback);
+                if (index > -1) {
+                  wrapped.handlers[address].splice(index, 1);
+                }
+              }
+              if (wrapped.handlers[address].length < 1) {
+                wrapped.handlers[address] = void 0;
+              }
+            };
+            deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.registerHandler (deconstructor)";
+            return deconstructor;
+          },
+          unregisterHandler: function(address, callback) {
             var index;
-            if (unregisterFn) {
-              unregisterFn();
-            }
             if (wrapped.handlers[address]) {
               index = wrapped.handlers[address].indexOf(callback);
               if (index > -1) {
@@ -622,96 +657,82 @@
             if (wrapped.handlers[address].length < 1) {
               wrapped.handlers[address] = void 0;
             }
-          };
-          deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.registerHandler (deconstructor)";
-          return deconstructor;
-        },
-        unregisterHandler: function(address, callback) {
-          var index;
-          if (wrapped.handlers[address]) {
-            index = wrapped.handlers[address].indexOf(callback);
-            if (index > -1) {
-              wrapped.handlers[address].splice(index, 1);
+            if (connectionState === vertxEventBus.EventBus.OPEN) {
+              return util.unregisterHandler(address, callback);
             }
-          }
-          if (wrapped.handlers[address].length < 1) {
-            wrapped.handlers[address] = void 0;
-          }
-          if (connectionState === vertxEventBus.EventBus.OPEN) {
-            return util.unregisterHandler(address, callback);
-          }
-        },
-        send: function(address, message, timeout) {
-          if (timeout == null) {
-            timeout = 10000;
-          }
-          return util.send(address, message, timeout);
-        },
-        publish: function(address, message) {
-          return util.publish(address, message);
-        },
-        getConnectionState: function(immediate) {
-          if (vertxEventBus != null ? vertxEventBus.EventBus : void 0) {
-            if (enabled) {
-              if (immediate) {
-                connectionState = vertxEventBus.readyState();
+          },
+          send: function(address, message, timeout) {
+            if (timeout == null) {
+              timeout = 10000;
+            }
+            return util.send(address, message, timeout);
+          },
+          publish: function(address, message) {
+            return util.publish(address, message);
+          },
+          getConnectionState: function(immediate) {
+            if (vertxEventBus != null ? vertxEventBus.EventBus : void 0) {
+              if (enabled) {
+                if (immediate) {
+                  connectionState = vertxEventBus.readyState();
+                }
+              } else {
+                connectionState = vertxEventBus.EventBus.CLOSED;
               }
             } else {
-              connectionState = vertxEventBus.EventBus.CLOSED;
+              connectionState = 3;
             }
-          } else {
-            connectionState = 3;
+            return connectionState;
+          },
+          isValidSession: function() {
+            return validSession;
+          },
+          login: function(username, password) {
+            return util.login(username, password).then(function(reply) {
+              validSession = true;
+              return reply;
+            })["catch"](function(reply) {
+              validSession = false;
+              return reply;
+            });
           }
-          return connectionState;
-        },
-        isValidSession: function() {
-          return validSession;
-        },
-        login: function(username, password) {
-          return util.login(username, password).then(function(reply) {
-            validSession = true;
-            return reply;
-          })["catch"](function(reply) {
-            validSession = false;
-            return reply;
-          });
-        }
-      };
-      wrapped.registerHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.registerHandler";
-      wrapped.unregisterHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.unregisterHandler";
-      wrapped.send.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.send";
-      wrapped.publish.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.publish";
-      wrapped.getConnectionState.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.getConnectionState";
-      wrapped.isValidSession.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.isValidSession";
-      wrapped.login.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.login";
-      connectionIntervalCheck = function() {
-        return wrapped.getConnectionState(true);
-      };
-      connectionIntervalCheck.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": periodic connection check";
-      $interval(connectionIntervalCheck, sockjsStateInterval);
+        };
+        wrapped.registerHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.registerHandler";
+        wrapped.unregisterHandler.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.unregisterHandler";
+        wrapped.send.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.send";
+        wrapped.publish.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.publish";
+        wrapped.getConnectionState.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.getConnectionState";
+        wrapped.isValidSession.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.isValidSession";
+        wrapped.login.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.login";
+        connectionIntervalCheck = function() {
+          return wrapped.getConnectionState(true);
+        };
+        connectionIntervalCheck.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": periodic connection check";
+        $interval(connectionIntervalCheck, sockjsStateInterval);
 
-      /* building and exposing the actual service API */
-      return {
-        on: wrapped.registerHandler,
-        addListener: wrapped.registerHandler,
-        un: wrapped.unregisterHandler,
-        removeListener: wrapped.unregisterHandler,
-        send: wrapped.send,
-        publish: wrapped.publish,
-        emit: wrapped.publish,
-        readyState: wrapped.getConnectionState,
-        isEnabled: function() {
-          return enabled;
-        },
-        getBufferCount: function() {
-          return messageQueue.size();
-        },
-        isValidSession: function() {
-          return validSession;
-        },
-        login: wrapped.login
-      };
-    }];
+        /* building and exposing the actual service API */
+        return {
+          on: wrapped.registerHandler,
+          addListener: wrapped.registerHandler,
+          un: wrapped.unregisterHandler,
+          removeListener: wrapped.unregisterHandler,
+          send: wrapped.send,
+          publish: wrapped.publish,
+          emit: wrapped.publish,
+          readyState: wrapped.getConnectionState,
+          isEnabled: function() {
+            return enabled;
+          },
+          getBufferCount: function() {
+            return messageQueue.size();
+          },
+          isValidSession: function() {
+            return validSession;
+          },
+          login: wrapped.login
+        };
+      }
+    ];
     this.$get.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": Factory.get";
   });
 
