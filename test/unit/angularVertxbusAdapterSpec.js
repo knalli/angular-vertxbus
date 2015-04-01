@@ -5,6 +5,10 @@ describe('knalli.angular-vertxbus', function () {
 
   beforeEach(module('knalli.angular-vertxbus'));
 
+  beforeEach(module('knalli.angular-vertxbus', function($provide) {
+    $provide.value('$log', window.console);
+  }));
+
   it('should have vertxEventBus', function () {
     inject(function (vertxEventBus) {
       expect(vertxEventBus).not.to.be(undefined);
@@ -109,6 +113,61 @@ describe('knalli.angular-vertxbus', function () {
             $timeout.flush();
           }, 100);
         }, 100);
+      });
+    });
+
+    describe('reconnectNow()', function () {
+      it('should be a function', function () {
+        expect(typeof vertxEventBus.reconnectNow).to.be('function');
+      });
+      it('should call the onopen function if not previously connected', function (done) {
+          this.timeout(20000);
+          var onopenCount = 0;
+          vertxEventBus.onopen = function () {
+            $log.debug('onopen');
+            onopenCount++;
+          };
+          var oncloseCount = 0;
+          vertxEventBus.onclose = function () {
+            $log.debug('onclose');
+            oncloseCount++;
+          };
+          setTimeout(function () {
+            expect(onopenCount).to.be(1);
+            $log.debug('reconnecting..');
+            vertxEventBus.close();
+            vertxEventBus.reconnectNow();
+            setTimeout(function () {
+              $log.debug('check..');
+              expect(oncloseCount).to.be(1);
+              expect(onopenCount).to.be(2);
+              done();
+            }, 1200);
+          }, 200);
+      });
+      it('should call the onclose and onopen function if previously connected', function (done) {
+        this.timeout(20000);
+        var onopenCount = 0;
+        vertxEventBus.onopen = function () {
+          $log.debug('onopen');
+          onopenCount++;
+        };
+        var oncloseCount = 0;
+        vertxEventBus.onclose = function () {
+          $log.debug('onclose');
+          oncloseCount++;
+        };
+        setTimeout(function () {
+          expect(onopenCount, 'onopenCount').to.be(1);
+          $log.debug('reconnecting..');
+          vertxEventBus.reconnectNow();
+          setTimeout(function () {
+            $log.debug('check..');
+            expect(oncloseCount, 'oncloseCount').to.be(1);
+            expect(onopenCount, 'onopenCount').to.be(2);
+            done();
+          }, 1200);
+        }, 200);
       });
     });
 
