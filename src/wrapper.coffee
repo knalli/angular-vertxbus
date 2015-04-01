@@ -115,6 +115,8 @@ angular.module('knalli.angular-vertxbus')
       # Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
       # we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
       eventBus = null
+      disconnectTimeoutEnabled = yes
+
       connect = ->
         eventBus = new EventBusOriginal url, undefined, sockjsOptions
         eventBus.onopen = ->
@@ -122,16 +124,26 @@ angular.module('knalli.angular-vertxbus')
           EventBusStub.onopen() if typeof EventBusStub.onopen is 'function'
           return #void
         eventBus.onclose = ->
-          $log.debug("[Vert.x EB Stub] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
           EventBusStub.onclose() if typeof EventBusStub.onclose is 'function'
-          $timeout(connect, sockjsReconnectInterval) if reconnectEnabled
+          unless disconnectTimeoutEnabled
+            $log.debug("[Vert.x EB Stub] Reconnect immediately") if debugEnabled
+            disconnectTimeoutEnabled = yes
+            connect()
+          else
+            if reconnectEnabled
+              $log.debug("[Vert.x EB Stub] Reconnect in #{sockjsReconnectInterval}ms") if debugEnabled
+              $timeout(connect, sockjsReconnectInterval)
           return #void
         return #void
       connect()
 
       EventBusStub =
-        reconnect: ->
-          eventBus.close()
+        reconnect: (immediately = no) ->
+          if eventBus.readyState() is EventBusStub.EventBus.OPEN
+            disconnectTimeoutEnabled = no if immediately
+            eventBus.close()
+          else
+            connect()
         close: ->
           eventBus.close()
         login: (username, password, replyHandler) ->
