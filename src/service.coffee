@@ -217,14 +217,18 @@ angular.module('knalli.angular-vertxbus')
       # Send a message to the specified address (using EventBus.send).
       # @param address a required string for the targeting address in the bus
       # @param message a required piece of message data
-      # @param timeout an optional number for a timout after which the promise will be rejected
-      send : (address, message, timeout = 10000) ->
+      # @param timeout an optional number for a timeout after which the promise will be rejected
+      # @param expectReply boolean specifying whether a replyHandler should be created or not
+      send : (address, message, timeout = 10000, expectReply = yes) ->
         deferred = $q.defer()
         next = ->
-          vertxEventBus.send address, message, (reply) ->
-            if deferred then deferred.resolve reply
-          # Register timeout for promise rejecting.
-          if deferred then $interval (-> deferred.reject()), timeout, 1
+          if expectReply
+            vertxEventBus.send(address, message, (reply) -> deferred.resolve(reply))
+            # Register timeout for promise rejecting.
+            $interval (-> deferred.reject()), timeout, 1
+          else
+            vertxEventBus.send(address, message)
+            deferred.resolve()
         next.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: util.send (ensureOpenAuthConnection callback)"
         dispatched = ensureOpenAuthConnection next
         if deferred and !dispatched then deferred.reject()
@@ -297,8 +301,8 @@ angular.module('knalli.angular-vertxbus')
         # Remove from real instance
         if connectionState is vertxEventBus.EventBus.OPEN then util.unregisterHandler(address, callback)
       # Stub for util.send
-      send : (address, message, timeout = 10000) ->
-        util.send(address, message, timeout)
+      send : (address, message, timeout = 10000, expectReply = yes) ->
+        util.send(address, message, timeout, expectReply)
       # Stub for util.publish
       publish : (address, message) ->
         util.publish(address, message)
