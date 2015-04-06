@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v1.0.0 - 2015-03-01
+/*! angular-vertxbus - v1.1.0 - 2015-04-06
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 (function() {
@@ -140,7 +140,7 @@
       - recconnect()
      */
     this.$get = ['$timeout', '$log', function($timeout, $log) {
-      var EventBusOriginal, EventBusStub, connect, debugEnabled, enabled, eventBus, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, url, urlPath, urlServer, _ref;
+      var EventBusOriginal, EventBusStub, connect, debugEnabled, disconnectTimeoutEnabled, enabled, eventBus, prefix, reconnectEnabled, sockjsOptions, sockjsReconnectInterval, sockjsStateInterval, url, urlPath, urlServer, _ref;
       _ref = angular.extend({}, DEFAULT_OPTIONS, options), enabled = _ref.enabled, debugEnabled = _ref.debugEnabled, prefix = _ref.prefix, urlServer = _ref.urlServer, urlPath = _ref.urlPath, reconnectEnabled = _ref.reconnectEnabled, sockjsStateInterval = _ref.sockjsStateInterval, sockjsReconnectInterval = _ref.sockjsReconnectInterval, sockjsOptions = _ref.sockjsOptions;
       EventBusStub = null;
       EventBusOriginal = typeof vertx !== "undefined" && vertx !== null ? vertx.EventBus : void 0;
@@ -150,6 +150,7 @@
           $log.debug("[Vert.x EB Stub] Enabled: connecting '" + url + "'");
         }
         eventBus = null;
+        disconnectTimeoutEnabled = true;
         connect = function() {
           eventBus = new EventBusOriginal(url, void 0, sockjsOptions);
           eventBus.onopen = function() {
@@ -161,21 +162,39 @@
             }
           };
           eventBus.onclose = function() {
-            if (debugEnabled) {
-              $log.debug("[Vert.x EB Stub] Reconnect in " + sockjsReconnectInterval + "ms");
-            }
             if (typeof EventBusStub.onclose === 'function') {
               EventBusStub.onclose();
             }
-            if (reconnectEnabled) {
-              $timeout(connect, sockjsReconnectInterval);
+            if (!disconnectTimeoutEnabled) {
+              if (debugEnabled) {
+                $log.debug("[Vert.x EB Stub] Reconnect immediately");
+              }
+              disconnectTimeoutEnabled = true;
+              connect();
+            } else {
+              if (reconnectEnabled) {
+                if (debugEnabled) {
+                  $log.debug("[Vert.x EB Stub] Reconnect in " + sockjsReconnectInterval + "ms");
+                }
+                $timeout(connect, sockjsReconnectInterval);
+              }
             }
           };
         };
         connect();
         EventBusStub = {
-          reconnect: function() {
-            return eventBus.close();
+          reconnect: function(immediately) {
+            if (immediately == null) {
+              immediately = false;
+            }
+            if (eventBus.readyState() === EventBusStub.EventBus.OPEN) {
+              if (immediately) {
+                disconnectTimeoutEnabled = false;
+              }
+              return eventBus.close();
+            } else {
+              return connect();
+            }
           },
           close: function() {
             return eventBus.close();
@@ -528,22 +547,26 @@
           vertxEventBus.unregisterHandler(address, callbackMap.get(callback));
           callbackMap.remove(callback);
         },
-        send: function(address, message, timeout) {
+        send: function(address, message, timeout, expectReply) {
           var deferred, dispatched, next;
           if (timeout == null) {
             timeout = 10000;
           }
+          if (expectReply == null) {
+            expectReply = true;
+          }
           deferred = $q.defer();
           next = function() {
-            vertxEventBus.send(address, message, function(reply) {
-              if (deferred) {
+            if (expectReply) {
+              vertxEventBus.send(address, message, function(reply) {
                 return deferred.resolve(reply);
-              }
-            });
-            if (deferred) {
+              });
               return $interval((function() {
                 return deferred.reject();
               }), timeout, 1);
+            } else {
+              vertxEventBus.send(address, message);
+              return deferred.resolve();
             }
           };
           next.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": util.send (ensureOpenAuthConnection callback)";
@@ -641,11 +664,14 @@
             return util.unregisterHandler(address, callback);
           }
         },
-        send: function(address, message, timeout) {
+        send: function(address, message, timeout, expectReply) {
           if (timeout == null) {
             timeout = 10000;
           }
-          return util.send(address, message, timeout);
+          if (expectReply == null) {
+            expectReply = true;
+          }
+          return util.send(address, message, timeout, expectReply);
         },
         publish: function(address, message) {
           return util.publish(address, message);

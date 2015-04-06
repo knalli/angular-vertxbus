@@ -1,3 +1,13 @@
+<a name="1.1.0"></a>
+## 1.1.0 (2015-04-06)
+
+
+#### Features
+
+* **service:** add 4th arg `service.send()` for replyless sends ([849eb3a1](http://github.com/knalli/angular-vertxbus/commit/849eb3a13b24eacba4d74e92504e77fa73d31515))
+* **wrapper:** add `wrapper.reconnect(true)` allowing a reconnect asap ([bd0cc4a3](http://github.com/knalli/angular-vertxbus/commit/bd0cc4a3dbd8e4cc47c041fe8a6aefd368cd0087))
+
+
 <a name="1.0.0"></a>
 ## 1.0.0 (2015-03-01)
 
