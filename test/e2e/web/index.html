@@ -13,6 +13,10 @@
       <input type="password" ng-model="register.password"/>
       <input type="submit" value="Login" >
       <input type="button" value="Demo: Valid user login" ng-click="login('valid', register.password)">
+      <br><br>
+      <input type="button" value="Register for TimeService" ng-click="registerTimeService()">
+      <input type="button" value="Deregister for TimeService" ng-click="deregisterTimeService()" ng-disabled="!timeServiceActive">
+      <input type="text" size="50" disabled ng-model="currentDateTime">
     </form>
   </div>
 

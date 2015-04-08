@@ -23,7 +23,9 @@ var webServerConf = {
 
   // This defines which messages from the server we will let through to the client
   outbound_permitted: [
-    {}
+    {
+      address: 'what-time-is-it'
+    }
   ]
 };
 

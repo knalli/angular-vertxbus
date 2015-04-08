@@ -29,3 +29,9 @@ eb.registerHandler('com.knallisworld.persistor', function(message, callback) {
   }
   console.log(JSON.stringify(message));
 });
+
+vertx.setPeriodic(1000, function(timerID) {
+  eb.publish('what-time-is-it', {
+    time: new Date().getTime()
+  });
+});
