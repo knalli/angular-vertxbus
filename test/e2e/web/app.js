@@ -27,5 +27,19 @@
         $scope.reply = reply;
       });
     };
+
+    var holder = {};
+    $scope.timeServiceActive = false;
+    $scope.registerTimeService = function () {
+      holder.timeServiceDeconstructor = vertxEventBusService.on('what-time-is-it', function (data) {
+        $scope.currentDateTime = new Date(data.time);
+      });
+      $scope.timeServiceActive = true;
+    };
+    $scope.deregisterTimeService = function () {
+      holder.timeServiceDeconstructor();
+      holder.timeServiceDeconstructor = undefined;
+      $scope.timeServiceActive = false;
+    };
   });
 }());
