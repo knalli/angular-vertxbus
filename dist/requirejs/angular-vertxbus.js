@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v1.1.0 - 2015-04-06
+/*! angular-vertxbus - v1.1.1 - 2015-04-09
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 define(['angular', 'vertxbus'], function(angular) {
@@ -222,7 +222,9 @@ define(['angular', 'vertxbus'], function(angular) {
             return deconstructor;
           },
           unregisterHandler: function(address, handler) {
-            return eventBus.unregisterHandler(address, handler);
+            if (eventBus.readyState() === EventBusStub.EventBus.OPEN) {
+              return eventBus.unregisterHandler(address, handler);
+            }
           },
           readyState: function() {
             return eventBus.readyState();

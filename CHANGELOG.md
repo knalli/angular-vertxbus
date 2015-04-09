@@ -1,3 +1,12 @@
+<a name="1.1.1"></a>
+### 1.1.1 (2015-04-09)
+
+
+#### Bug Fixes
+
+* **wrapper:** ensure eventbus is online when removing a handler ([a3dd555a](http://github.com/knalli/angular-vertxbus/commit/a3dd555afb3760defd690530c3578f39a134ec0c), closes [#48](http://github.com/knalli/angular-vertxbus/issues/48))
+
+
 <a name="1.1.0"></a>
 ## 1.1.0 (2015-04-06)
 
