@@ -161,7 +161,9 @@ angular.module('knalli.angular-vertxbus')
           deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: EventBusStub.registerHandler (deconstructor)"
           return deconstructor
         unregisterHandler: (address, handler) ->
-          eventBus.unregisterHandler(address, handler)
+          # the handler is only valid when connected
+          if eventBus.readyState() is EventBusStub.EventBus.OPEN
+            eventBus.unregisterHandler(address, handler)
         readyState: ->
           eventBus.readyState()
         ### expose current used internal instance of actual EventBus ###
