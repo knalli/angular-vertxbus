@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v1.1.1 - 2015-04-09
+/*! angular-vertxbus - v1.1.2 - 2015-04-13
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 define(['angular', 'vertxbus'], function(angular) {
@@ -639,15 +639,16 @@ define(['angular', 'vertxbus'], function(angular) {
             var index;
             if (unregisterFn) {
               unregisterFn();
+              unregisterFn = void 0;
             }
             if (wrapped.handlers[address]) {
               index = wrapped.handlers[address].indexOf(callback);
               if (index > -1) {
                 wrapped.handlers[address].splice(index, 1);
               }
-            }
-            if (wrapped.handlers[address].length < 1) {
-              wrapped.handlers[address] = void 0;
+              if (wrapped.handlers[address].length < 1) {
+                wrapped.handlers[address] = void 0;
+              }
             }
           };
           deconstructor.displayName = "" + CONSTANTS.MODULE + "/" + CONSTANTS.COMPONENT + ": wrapped.registerHandler (deconstructor)";

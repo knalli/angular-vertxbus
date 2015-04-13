@@ -1,3 +1,14 @@
+<a name="1.1.2"></a>
+### 1.1.2 (2015-04-13)
+
+
+#### Bug Fixes
+
+* **service:**
+  * fix possible internal npe on de-register ([913ac743](http://github.com/knalli/angular-vertxbus/commit/913ac743835508525d06a5d956ef5cc7928f2bf8))
+  * fix edge case when deconstructor invoked multiple times ([74200873](http://github.com/knalli/angular-vertxbus/commit/7420087342067af665b468206ca5e7e254d585c1))
+
+
 <a name="1.1.1"></a>
 ### 1.1.1 (2015-04-09)
 
