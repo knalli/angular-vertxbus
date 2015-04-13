@@ -280,13 +280,14 @@ angular.module('knalli.angular-vertxbus')
           unregisterFn = util.registerHandler(address, callback)
         ### and return the deregister callback ###
         deconstructor = ->
-          unregisterFn() if unregisterFn
+          if unregisterFn
+            unregisterFn()
+            unregisterFn = undefined
           # Remove from internal map
           if wrapped.handlers[address]
             index = wrapped.handlers[address].indexOf(callback)
             wrapped.handlers[address].splice(index, 1) if index > -1
-          if wrapped.handlers[address].length < 1
-            wrapped.handlers[address] = undefined
+            wrapped.handlers[address] = undefined if wrapped.handlers[address].length < 1
           return #void
         deconstructor.displayName = "#{CONSTANTS.MODULE}/#{CONSTANTS.COMPONENT}: wrapped.registerHandler (deconstructor)"
         return deconstructor
