@@ -172,7 +172,7 @@ vertxEventBusService.addListener('address', funcHolder.handler);
 
 Note: Check that dependencies are be installed (`npm install`).
 
-The *unit tests* are available with `npm test` which is actually a shortcut for `grunt test`. It performs tests under the current primary target version of AngularJS. Use `npm run-script test-scopes` for testing other scoped versions as well.
+The *unit tests* are available with `npm test` which is actually a shortcut for `grunt test`. It performs tests under the current primary target version of AngularJS. Use `npm run test-scopes` for testing other scoped versions as well.
 
 ### E2E tests (manually)
 
@@ -180,9 +180,9 @@ Note: Check that dependencies are be installed (`npm install`).
 
 The *end-to-end tests* start and utilize a full Vert.X node and a NodeJS based web server.
 
-1. `npm run-script install-it-vertx-server` downloads and installs a Vert.X locally.
-2. `npm run-script start-it-vertx-server` starts Vert.X on port `8080`.
-3. `npm run-script start-it-web-server` starts a web server on port `3000`.
+1. `npm run install-it-vertx-server` downloads and installs a Vert.X locally.
+2. `npm run start-it-vertx-server` starts Vert.X on port `8080`.
+3. `npm run start-it-web-server` starts a web server on port `3000`.
 4. Open http://localhost:3000/ in your browser.
 
 ## License
