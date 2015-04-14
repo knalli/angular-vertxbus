@@ -277,7 +277,8 @@ angular.module('knalli.angular-vertxbus')
         wrapped.handlers[address].push callback
         unregisterFn = null
         if connectionState is vertxEventBus.EventBus.OPEN
-          unregisterFn = util.registerHandler(address, callback)
+          util.registerHandler(address, callback)
+          unregisterFn = -> util.unregisterHandler(address, callback)
         ### and return the deregister callback ###
         deconstructor = ->
           if unregisterFn
