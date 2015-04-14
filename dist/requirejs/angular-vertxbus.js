@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v1.1.2 - 2015-04-13
+/*! angular-vertxbus - v1.1.3 - 2015-04-14
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 define(['angular', 'vertxbus'], function(angular) {
@@ -631,7 +631,10 @@ define(['angular', 'vertxbus'], function(angular) {
           wrapped.handlers[address].push(callback);
           unregisterFn = null;
           if (connectionState === vertxEventBus.EventBus.OPEN) {
-            unregisterFn = util.registerHandler(address, callback);
+            util.registerHandler(address, callback);
+            unregisterFn = function() {
+              return util.unregisterHandler(address, callback);
+            };
           }
 
           /* and return the deregister callback */

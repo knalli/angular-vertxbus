@@ -1,3 +1,12 @@
+<a name="1.1.3"></a>
+### 1.1.3 (2015-04-14)
+
+
+#### Bug Fixes
+
+* **service:** after a reconnect the deconstructor does not work anymore ([5ebbfc48](http://github.com/knalli/angular-vertxbus/commit/5ebbfc487ca34bd769ce84e741f093ff2f75b0c0))
+
+
 <a name="1.1.2"></a>
 ### 1.1.2 (2015-04-13)
 
