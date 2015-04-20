@@ -99,7 +99,11 @@ class InterfaceService {
   }
 
   isEnabled() {
-    return this.enabled;
+    return this.delegate.enabled;
+  }
+
+  isConnected() {
+    return this.delegate.connected;
   }
 
   login(username, password, timeout) {

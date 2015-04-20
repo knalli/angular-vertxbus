@@ -8,6 +8,14 @@ class BaseDelegate {
     return false;
   }
 
+  get enabled() {
+    return false;
+  }
+
+  get connected() {
+    return false;
+  }
+
   set validSession(validSession) {}
 
 }

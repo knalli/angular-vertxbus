@@ -244,6 +244,10 @@ class LiveDelegate extends BaseDelegate {
     this.states.connected = (connected === true);
   }
 
+  get enabled() {
+    return this.options.enabled;
+  }
+
   get messageQueueLength() {
     return this.messageQueue.size();
   }
