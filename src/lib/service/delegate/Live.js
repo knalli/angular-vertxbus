@@ -151,16 +151,21 @@ class LiveDelegate extends BaseDelegate {
    * @param {string} address - targeting address in the bus
    * @param {object} message - payload
    * @param {number} [timeout=10000] - timeout (in ms) after which the promise will be rejected
+   * @param {boolean} [expectReply=true] - if false, the promise will be resolved directly and
+   *                                       no replyHandler will be created
    * @returns {promise}
    */
-  send(address, message, timeout = 10000) {
+  send(address, message, timeout = 10000, expectReply = true) {
     let deferred = this.$q.defer();
     let next = () => {
-      this.eventBus.send(address, message, (reply) => {
-        deferred.resolve(reply);
-      });
-      // Register timeout for promise rejecting
-      this.$interval((() => deferred.reject()), timeout, 1);
+      if (expectReply) {
+        this.eventBus.send(address, message, (reply) => deferred.resolve(reply));
+        // Register timeout for promise rejecting
+        this.$interval((() => deferred.reject()), timeout, 1);
+      } else {
+        this.eventBus.send(address, message);
+        deferred.resolve();
+      }
     };
     next.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.send (ensureOpenAuthConnection callback)`;
     if (!this.ensureOpenAuthConnection(next)) {

@@ -80,8 +80,8 @@ class InterfaceService {
     return this.unregisterHandler(address, callback);
   }
 
-  send(address, message, timeout = 10000) {
-    return this.delegate.send(address, message, timeout);
+  send(address, message, timeout = 10000, expectReply = true) {
+    return this.delegate.send(address, message, timeout, expectReply);
   }
 
   publish(address, message) {
