@@ -94,16 +94,17 @@ class InterfaceService {
   getConnectionState() {
     return this.delegate.getConnectionState();
   }
+
   readyState() {
     return this.getConnectionState();
   }
 
   isEnabled() {
-    return this.delegate.enabled;
+    return this.delegate.isEnabled();
   }
 
   isConnected() {
-    return this.delegate.connected;
+    return this.delegate.isConnected();
   }
 
   login(username, password, timeout) {

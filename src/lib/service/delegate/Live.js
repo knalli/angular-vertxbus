@@ -54,16 +54,16 @@ class LiveDelegate extends BaseDelegate {
     this.eventBus.onopen = () => this.onEventbusOpen();
     this.eventBus.onclose = () => this.onEventbusClose();
 
-    // Update the current connection state periodially.
+    // Update the current connection state periodically.
     let connectionIntervalCheck = () => this.getConnectionState(true);
-    connectionIntervalCheck.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: periodic connection check`;
+    connectionIntervalCheck.displayName = `connectionIntervalCheck`;
     this.$interval((() => connectionIntervalCheck()), this.options.sockjsStateInterval);
   }
 
   onEventbusOpen() {
     this.getConnectionState(true);
-    if (!this.connected) {
-      this.connected = true;
+    if (!this.states.connected) {
+      this.states.connected = true;
       this.$rootScope.$broadcast(`${this.options.prefix}system.connected`);
     }
     this.afterEventbusConnected();
@@ -82,8 +82,8 @@ class LiveDelegate extends BaseDelegate {
 
   onEventbusClose() {
     this.getConnectionState(true);
-    if (this.connected) {
-      this.connected = false;
+    if (this.states.connected) {
+      this.states.connected = false;
       this.$rootScope.$broadcast(`${this.options.prefix}system.disconnected`);
     }
   }
@@ -194,11 +194,11 @@ class LiveDelegate extends BaseDelegate {
     let deferred = this.$q.defer();
     let next = (reply) => {
       if (reply && reply.status === 'ok') {
-        this.validSession = true;
+        this.states.validSession = true;
         deferred.resolve(reply);
         this.$rootScope.$broadcast(`${this.options.prefix}system.login.succeeded`, {status: reply.status});
       } else {
-        this.validSession = false;
+        this.states.validSession = false;
         deferred.reject(reply);
         this.$rootScope.$broadcast(`${this.options.prefix}system.login.failed`, {status: reply.status});
       }
@@ -226,7 +226,7 @@ class LiveDelegate extends BaseDelegate {
       this.ensureOpenConnection(fn);
     } else {
       let wrapFn = () => {
-        if (this.validSession) {
+        if (this.states.validSession) {
           fn();
           return true;
         } else {
@@ -257,25 +257,19 @@ class LiveDelegate extends BaseDelegate {
     return this.getConnectionState() === this.eventBus.EventBus.OPEN;
   }
 
-  get validSession() {
+  isValidSession() {
     return this.states.validSession;
   }
-  set validSession(validSession) {
-    this.states.validSession = (validSession === true);
-  }
 
-  get connected() {
+  isConnected() {
     return this.states.connected;
   }
-  set connected(connected) {
-    this.states.connected = (connected === true);
-  }
 
-  get enabled() {
+  isEnabled() {
     return this.options.enabled;
   }
 
-  get messageQueueLength() {
+  getMessageQueueLength() {
     return this.messageQueue.size();
   }
 }

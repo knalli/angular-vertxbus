@@ -336,7 +336,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 1});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.delegate.messageQueueLength).to.be(0);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(0);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -381,7 +381,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 123});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.delegate.messageQueueLength).to.be(1);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(1);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -396,7 +396,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 4});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.delegate.messageQueueLength).to.be(3);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(3);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -420,7 +420,7 @@ describe('knalli.angular-vertxbus', function () {
 
             setTimeout(function () {
               expect(result).to.eql({reply: {data: 3}});
-              expect(vertxEventBusService.delegate.messageQueueLength).to.be(0);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(0);
               expect(vertxEventBus.getSendCalls()).to.be(3);
               done();
             }, 1000);
