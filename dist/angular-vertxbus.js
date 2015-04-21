@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v2.0.0-beta.1 - 2015-04-20
+/*! angular-vertxbus - v2.0.0-beta.1 - 2015-04-21
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -10,7 +10,6 @@ Object.defineProperty(exports, '__esModule', {
 var moduleName = 'knalli.angular-vertxbus';
 
 exports.moduleName = moduleName;
-
 
 },{}],2:[function(require,module,exports){
 'use strict';
@@ -29,7 +28,6 @@ require('./vertxbus-service');
 
 exports['default'] = _moduleName.moduleName;
 module.exports = exports['default'];
-
 
 },{"./config":1,"./vertxbus-module":12,"./vertxbus-service":13,"./vertxbus-wrapper":14}],3:[function(require,module,exports){
 "use strict";
@@ -94,7 +92,6 @@ var Queue = (function () {
 
 exports["default"] = Queue;
 module.exports = exports["default"];
-
 
 },{}],4:[function(require,module,exports){
 "use strict";
@@ -210,7 +207,6 @@ var SimpleMap = (function () {
 exports["default"] = SimpleMap;
 module.exports = exports["default"];
 
-
 },{}],5:[function(require,module,exports){
 "use strict";
 
@@ -263,12 +259,16 @@ var InterfaceService = (function () {
       this.handlers[address].push(callback);
       var unregisterFn = null;
       if (this.delegate.isConnectionOpen()) {
-        unregisterFn = this.delegate.registerHandler(address, callback);
+        this.delegate.registerHandler(address, callback);
+        unregisterFn = function () {
+          return _this2.delegate.unregisterHandler(address, callback);
+        };
       }
       // and return the deregister callback
       var deconstructor = function deconstructor() {
         if (unregisterFn) {
           unregisterFn();
+          unregisterFn = undefined;
         }
         // Remove from internal map
         if (_this2.handlers[address]) {
@@ -276,9 +276,9 @@ var InterfaceService = (function () {
           if (index > -1) {
             _this2.handlers[address].splice(index, 1);
           }
-        }
-        if (_this2.handlers[address].length < 1) {
-          _this2.handlers[address] = undefined;
+          if (_this2.handlers[address].length < 1) {
+            _this2.handlers[address] = undefined;
+          }
         }
       };
       deconstructor.displayName = "" + this.CONSTANTS.MODULE + "/" + this.CONSTANTS.COMPONENT + ": registerHandler (deconstructor)";
@@ -326,8 +326,9 @@ var InterfaceService = (function () {
     key: "send",
     value: function send(address, message) {
       var timeout = arguments[2] === undefined ? 10000 : arguments[2];
+      var expectReply = arguments[3] === undefined ? true : arguments[3];
 
-      return this.delegate.send(address, message, timeout);
+      return this.delegate.send(address, message, timeout, expectReply);
     }
   }, {
     key: "publish",
@@ -352,12 +353,12 @@ var InterfaceService = (function () {
   }, {
     key: "isEnabled",
     value: function isEnabled() {
-      return this.delegate.enabled;
+      return this.delegate.isEnabled();
     }
   }, {
     key: "isConnected",
     value: function isConnected() {
-      return this.delegate.connected;
+      return this.delegate.isConnected();
     }
   }, {
     key: "login",
@@ -371,7 +372,6 @@ var InterfaceService = (function () {
 
 exports["default"] = InterfaceService;
 module.exports = exports["default"];
-
 
 },{}],6:[function(require,module,exports){
 "use strict";
@@ -390,26 +390,36 @@ var BaseDelegate = (function () {
   }
 
   _createClass(BaseDelegate, [{
+    key: "getConnectionState",
+    value: function getConnectionState() {
+      return 3; // CLOSED
+    }
+  }, {
     key: "isConnectionOpen",
     value: function isConnectionOpen() {
       return false;
     }
   }, {
-    key: "validSession",
-    get: function () {
-      return false;
-    },
-    set: function (validSession) {}
-  }, {
-    key: "enabled",
-    get: function () {
+    key: "isValidSession",
+    value: function isValidSession() {
       return false;
     }
   }, {
-    key: "connected",
-    get: function () {
+    key: "isEnabled",
+    value: function isEnabled() {
       return false;
     }
+  }, {
+    key: "isConnected",
+    value: function isConnected() {
+      return false;
+    }
+  }, {
+    key: "send",
+    value: function send() {}
+  }, {
+    key: "publish",
+    value: function publish() {}
   }]);
 
   return BaseDelegate;
@@ -417,7 +427,6 @@ var BaseDelegate = (function () {
 
 exports["default"] = BaseDelegate;
 module.exports = exports["default"];
-
 
 },{}],7:[function(require,module,exports){
 'use strict';
@@ -512,11 +521,11 @@ var LiveDelegate = (function (_BaseDelegate) {
         return _this.onEventbusClose();
       };
 
-      // Update the current connection state periodially.
+      // Update the current connection state periodically.
       var connectionIntervalCheck = function connectionIntervalCheck() {
         return _this.getConnectionState(true);
       };
-      connectionIntervalCheck.displayName = '' + this.CONSTANTS.MODULE + '/' + this.CONSTANTS.COMPONENT + ': periodic connection check';
+      connectionIntervalCheck.displayName = 'connectionIntervalCheck';
       this.$interval(function () {
         return connectionIntervalCheck();
       }, this.options.sockjsStateInterval);
@@ -525,8 +534,8 @@ var LiveDelegate = (function (_BaseDelegate) {
     key: 'onEventbusOpen',
     value: function onEventbusOpen() {
       this.getConnectionState(true);
-      if (!this.connected) {
-        this.connected = true;
+      if (!this.states.connected) {
+        this.states.connected = true;
         this.$rootScope.$broadcast('' + this.options.prefix + 'system.connected');
       }
       this.afterEventbusConnected();
@@ -546,8 +555,8 @@ var LiveDelegate = (function (_BaseDelegate) {
     key: 'onEventbusClose',
     value: function onEventbusClose() {
       this.getConnectionState(true);
-      if (this.connected) {
-        this.connected = false;
+      if (this.states.connected) {
+        this.states.connected = false;
         this.$rootScope.$broadcast('' + this.options.prefix + 'system.disconnected');
       }
     }
@@ -570,7 +579,19 @@ var LiveDelegate = (function (_BaseDelegate) {
   }, {
     key: 'registerHandler',
 
-    // Register a callback handler for the specified address match.
+    /**
+     * On message callback
+     * @callback Eventbus~onMessageCallback
+     * @param {object} message
+     * @param {string} replyTo
+     */
+
+    /**
+     * Register a callback handler for the specified address match.
+     * @param {string} address
+     * @param {Eventbus~onMessageCallback} callback
+     * @returns {function=}
+     */
     value: function registerHandler(address, callback) {
       var _this2 = this;
 
@@ -591,7 +612,11 @@ var LiveDelegate = (function (_BaseDelegate) {
   }, {
     key: 'unregisterHandler',
 
-    // Remove a callback handler for the specified address match.
+    /**
+     * Remove a callback handler for the specified address match.
+     * @param {string} address
+     * @param {Eventbus~onMessageCallback} callback
+     */
     value: function unregisterHandler(address, callback) {
       if (!angular.isFunction(callback)) {
         return;
@@ -605,24 +630,35 @@ var LiveDelegate = (function (_BaseDelegate) {
   }, {
     key: 'send',
 
-    // Send a message to the specified address (using EventBus.send).
-    // @param address a required string for the targeting address in the bus
-    // @param message a required piece of message data
-    // @param timeout an optional number for a timout after which the promise will be rejected
+    /**
+     * Send a message to the specified address (using EventBus.send).
+     * @param {string} address - targeting address in the bus
+     * @param {object} message - payload
+     * @param {number} [timeout=10000] - timeout (in ms) after which the promise will be rejected
+     * @param {boolean} [expectReply=true] - if false, the promise will be resolved directly and
+     *                                       no replyHandler will be created
+     * @returns {promise}
+     */
     value: function send(address, message) {
       var _this3 = this;
 
       var timeout = arguments[2] === undefined ? 10000 : arguments[2];
+      var expectReply = arguments[3] === undefined ? true : arguments[3];
 
       var deferred = this.$q.defer();
       var next = function next() {
-        _this3.eventBus.send(address, message, function (reply) {
-          deferred.resolve(reply);
-        });
-        // Register timeout for promise rejecting
-        _this3.$interval(function () {
-          return deferred.reject();
-        }, timeout, 1);
+        if (expectReply) {
+          _this3.eventBus.send(address, message, function (reply) {
+            return deferred.resolve(reply);
+          });
+          // Register timeout for promise rejecting
+          _this3.$interval(function () {
+            return deferred.reject();
+          }, timeout, 1);
+        } else {
+          _this3.eventBus.send(address, message);
+          deferred.resolve();
+        }
       };
       next.displayName = '' + this.CONSTANTS.MODULE + '/' + this.CONSTANTS.COMPONENT + ': util.send (ensureOpenAuthConnection callback)';
       if (!this.ensureOpenAuthConnection(next)) {
@@ -633,9 +669,12 @@ var LiveDelegate = (function (_BaseDelegate) {
   }, {
     key: 'publish',
 
-    // Publish a message to the specified address (using EventBus.publish).
-    // @param address a required string for the targeting address in the bus
-    // @param message a required piece of message data
+    /**
+     * Publish a message to the specified address (using EventBus.publish).
+     * @param {string} address - targeting address in the bus
+     * @param {object} message - payload
+     * @returns {boolean} true when explicitly put in queue for sending
+     */
     value: function publish(address, message) {
       var _this4 = this;
 
@@ -648,10 +687,13 @@ var LiveDelegate = (function (_BaseDelegate) {
   }, {
     key: 'login',
 
-    // Send a login message
-    // @param username
-    // @param password
-    // @param timeout
+    /**
+     * Send a login message
+     * @param {string} [options.username] username
+     * @param {string} [options.password] password
+     * @param {number} [timeout=5000]
+     * @returns {promise}
+     */
     value: function login() {
       var _this5 = this;
 
@@ -662,11 +704,11 @@ var LiveDelegate = (function (_BaseDelegate) {
       var deferred = this.$q.defer();
       var next = function next(reply) {
         if (reply && reply.status === 'ok') {
-          _this5.validSession = true;
+          _this5.states.validSession = true;
           deferred.resolve(reply);
           _this5.$rootScope.$broadcast('' + _this5.options.prefix + 'system.login.succeeded', { status: reply.status });
         } else {
-          _this5.validSession = false;
+          _this5.states.validSession = false;
           deferred.reject(reply);
           _this5.$rootScope.$broadcast('' + _this5.options.prefix + 'system.login.failed', { status: reply.status });
         }
@@ -700,7 +742,7 @@ var LiveDelegate = (function (_BaseDelegate) {
         this.ensureOpenConnection(fn);
       } else {
         var wrapFn = function wrapFn() {
-          if (_this6.validSession) {
+          if (_this6.states.validSession) {
             fn();
             return true;
           } else {
@@ -733,29 +775,23 @@ var LiveDelegate = (function (_BaseDelegate) {
       return this.getConnectionState() === this.eventBus.EventBus.OPEN;
     }
   }, {
-    key: 'validSession',
-    get: function () {
+    key: 'isValidSession',
+    value: function isValidSession() {
       return this.states.validSession;
-    },
-    set: function (validSession) {
-      this.states.validSession = validSession === true;
     }
   }, {
-    key: 'connected',
-    get: function () {
+    key: 'isConnected',
+    value: function isConnected() {
       return this.states.connected;
-    },
-    set: function (connected) {
-      this.states.connected = connected === true;
     }
   }, {
-    key: 'enabled',
-    get: function () {
+    key: 'isEnabled',
+    value: function isEnabled() {
       return this.options.enabled;
     }
   }, {
-    key: 'messageQueueLength',
-    get: function () {
+    key: 'getMessageQueueLength',
+    value: function getMessageQueueLength() {
       return this.messageQueue.size();
     }
   }]);
@@ -765,7 +801,6 @@ var LiveDelegate = (function (_BaseDelegate) {
 
 exports['default'] = LiveDelegate;
 module.exports = exports['default'];
-
 
 },{"./../../helpers/Queue":3,"./../../helpers/SimpleMap":4,"./Base":6}],8:[function(require,module,exports){
 'use strict';
@@ -800,7 +835,6 @@ var NoopDelegate = (function (_BaseDelegate) {
 
 exports['default'] = NoopDelegate;
 module.exports = exports['default'];
-
 
 },{"./Base":6}],9:[function(require,module,exports){
 "use strict";
@@ -868,7 +902,6 @@ var BaseWrapper = (function () {
 exports["default"] = BaseWrapper;
 module.exports = exports["default"];
 
-
 },{}],10:[function(require,module,exports){
 "use strict";
 
@@ -923,6 +956,7 @@ var EventbusWrapper = (function (_BaseWrapper) {
       sockjsOptions: sockjsOptions,
       messageBuffer: messageBuffer
     };
+    this.disconnectTimeoutEnabled = true;
     // asap create connection
     this.connect();
   }
@@ -949,6 +983,7 @@ var EventbusWrapper = (function (_BaseWrapper) {
           _this.onopen();
         }
       };
+      // instance onClose handler
       this.instance.onclose = function () {
         if (_this.options.debugEnabled) {
           _this.$log.debug("[Vert.x EB Stub] Reconnect in " + _this.options.sockjsReconnectInterval + "ms");
@@ -957,7 +992,19 @@ var EventbusWrapper = (function (_BaseWrapper) {
           _this.onclose();
         }
         _this.instance = undefined;
-        if (_this.options.reconnectEnabled) {
+
+        if (!_this.disconnectTimeoutEnabled) {
+          // reconnect required asap
+          if (_this.options.debugEnabled) {
+            _this.$log.debug("[Vert.x EB Stub] Reconnect immediately");
+          }
+          _this.disconnectTimeoutEnabled = true;
+          _this.connect();
+        } else if (_this.options.reconnectEnabled) {
+          // automatical reconnect after timeout
+          if (_this.options.debugEnabled) {
+            _this.$log.debug("[Vert.x EB Stub] Reconnect in " + _this.options.sockjsReconnectInterval + "ms");
+          }
           _this.$timeout(function () {
             return _this.connect();
           }, _this.options.sockjsReconnectInterval);
@@ -967,8 +1014,15 @@ var EventbusWrapper = (function (_BaseWrapper) {
   }, {
     key: "reconnect",
     value: function reconnect() {
-      if (this.instance) {
-        return this.instance.close();
+      var immediately = arguments[0] === undefined ? false : arguments[0];
+
+      if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
+        if (immediately) {
+          this.disconnectTimeoutEnabled = false;
+        }
+        this.instance.close();
+      } else {
+        this.connect();
       }
     }
   }, {
@@ -1017,7 +1071,7 @@ var EventbusWrapper = (function (_BaseWrapper) {
   }, {
     key: "unregisterHandler",
     value: function unregisterHandler(address, handler) {
-      if (this.instance) {
+      if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
         return this.instance.unregisterHandler(address, handler);
       }
     }
@@ -1043,7 +1097,6 @@ var EventbusWrapper = (function (_BaseWrapper) {
 
 exports["default"] = EventbusWrapper;
 module.exports = exports["default"];
-
 
 },{"./Base":9}],11:[function(require,module,exports){
 'use strict';
@@ -1079,14 +1132,12 @@ var NoopWrapper = (function (_BaseWrapper) {
 exports['default'] = NoopWrapper;
 module.exports = exports['default'];
 
-
 },{"./Base":9}],12:[function(require,module,exports){
 'use strict';
 
 var _moduleName = require('./config');
 
 angular.module(_moduleName.moduleName, ['ng']);
-
 
 },{"./config":1}],13:[function(require,module,exports){
 'use strict';
@@ -1107,6 +1158,26 @@ var _InterfaceService = require('./lib/service/InterfaceService');
 
 var _InterfaceService2 = _interopRequireWildcard(_InterfaceService);
 
+/**
+ * @description
+ * A service utilizing an underlaying Vert.x Event Bus
+ *
+ * The advanced features of this service are:
+ *  - broadcasting the connection changes (vertx-eventbus.system.connected, vertx-eventbus.system.disconnected) on $rootScope
+ *  - registering all handlers again when a reconnect had been required
+ *  - supporting a promise when using send()
+ *  - adding aliases on (registerHandler), un (unregisterHandler) and emit (publish)
+ *
+ * Basic usage:
+ * module.controller('MyController', function('vertxEventService') {
+ *   vertxEventService.on('my.address', function(message) {
+ *     console.log("JSON Message received: ", message)
+ *   });
+ *   vertxEventService.publish('my.other.address', {type: 'foo', data: 'bar'});
+ * });
+ *
+ * Note the additional configuration of the module itself.
+ */
 angular.module(_moduleName.moduleName).provider('vertxEventBusService', function () {
   var _this = this;
 
@@ -1139,7 +1210,6 @@ angular.module(_moduleName.moduleName).provider('vertxEventBusService', function
   }]; // $get
 });
 
-
 },{"./config":1,"./lib/service/InterfaceService":5,"./lib/service/delegate/Live":7,"./lib/service/delegate/Noop":8}],14:[function(require,module,exports){
 'use strict';
 
@@ -1155,6 +1225,22 @@ var _NoopWrapper = require('./lib/wrapper/Noop');
 
 var _NoopWrapper2 = _interopRequireWildcard(_NoopWrapper);
 
+/**
+ * An AngularJS wrapper for projects using the VertX Event Bus
+ *
+ * @param {boolean} [enabled=true] -  if false, the usage of the Event Bus will
+ *                                    be disabled (actually, no vertx.EventBus will be created)
+ * @param {boolean} [debugEnabled=false] - if true, some additional debug loggings will be displayed
+ * @param {string} [prefix='vertx-eventbus.'] -
+ *                                    a prefix used for the global broadcasts
+ * @param {string} [urlServer=location.protocol + '//' + location.hostname + ':' + (location.port || 80)] -
+ *                                    full URL to the server (change it if the server is not the origin)
+ * @param {string} [urlPath='/eventbus'] - path to the event bus
+ * @param {boolean} [reconnectEnabled=true] - if false, the disconnect will be recognized but no further actions
+ * @param {number} [sockjsStateInterval=10000] - defines the check interval (in ms) of the underlayling SockJS connection
+ * @param {number} [sockjsReconnectInterval=10000] - defines the wait time (in ms) for a reconnect after a disconnect has been recognized
+ * @param {object} [sockjsOptions={}] - optional SockJS options (new SockJS(url, undefined, options))
+ */
 angular.module(_moduleName.moduleName).provider('vertxEventBus', function () {
   var _this = this;
 
@@ -1265,21 +1351,30 @@ angular.module(_moduleName.moduleName).provider('vertxEventBus', function () {
   };
   this.useMessageBuffer.displayName = '' + CONSTANTS.MODULE + '/' + CONSTANTS.COMPONENT + ': provider.useMessageBuffer';
 
-  /*
-    A stub representing the Vert.x EventBus (core functionality)
-     Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a new instance of the bus have to be created.
-    This stub ensures only one object holding the current active instance of the bus.
-     The stub supports theses VertX Event Bus APIs:
-    - close()
-    - login(username, password, replyHandler)
-    - send(address, message, handler)
-    - publish(address, message)
-    - registerHandler(adress, handler)
-    - unregisterHandler(address, handler)
-    - readyState()
-     Furthermore, the stub supports theses extra APIs:
-    - reconnect()
-  */
+  /**
+   *
+   * @description
+   * A stub representing the Vert.x EventBus (core functionality)
+   *
+   * Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a
+   * new instance of the bus have to be created.
+   * This stub ensures only one object holding the current active instance of the bus.
+   *
+   * The stub supports theses Vert.x Event Bus APIs:
+   *  - close()
+   *  - login(username, password, replyHandler)
+   *  - send(address, message, handler)
+   *  - publish(address, message)
+   *  - registerHandler(adress, handler)
+   *  - unregisterHandler(address, handler)
+   *  - readyState()
+   *
+   * Furthermore, the stub supports theses extra APIs:
+   *  - reconnect()
+   *
+   * @param $timeout
+   * @param $log
+   */
   this.$get = ["$timeout", "$log", function ($timeout, $log) {
 
     // Current options (merged defaults with application-wide settings)
@@ -1299,6 +1394,4 @@ angular.module(_moduleName.moduleName).provider('vertxEventBus', function () {
   }]; // $get
 });
 
-
-},{"./config":1,"./lib/wrapper/Eventbus":10,"./lib/wrapper/Noop":11}]},{},[2])
-//# sourceMappingURL=angular-vertxbus.js.map
+},{"./config":1,"./lib/wrapper/Eventbus":10,"./lib/wrapper/Noop":11}]},{},[2]);

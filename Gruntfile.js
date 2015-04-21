@@ -102,7 +102,7 @@ module.exports = function (grunt) {
         options: {
           browserifyOptions: {
             fullPaths: false,
-            debug: true
+            debug: false // TODO enable sourcemaps
           },
           transform: ['babelify', require('browserify-ngannotate')],
           banner : '<%= meta.banner %>',
@@ -125,7 +125,7 @@ module.exports = function (grunt) {
     uglify : {
       options : {
         preserveComments : 'some',
-        sourceMap: true,
+        sourceMap: false, // TODO enable sourcemaps
         sourceMapIn: 'dist/angular-vertxbus.js.map'
       },
       dist : {
@@ -170,7 +170,7 @@ module.exports = function (grunt) {
     'jshint',
     'karma:unit',
     'browserify',
-    'extract_sourcemap',
+    // 'extract_sourcemap',// TODO enable sourcemaps
     'uglify'
   ]);
   grunt.registerTask('release', [
