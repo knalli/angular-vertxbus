@@ -1,22 +1,28 @@
 class BaseDelegate {
 
+  getConnectionState() {
+    return 3; // CLOSED
+  }
+
   isConnectionOpen() {
     return false;
   }
 
-  get validSession() {
+  isValidSession() {
     return false;
   }
 
-  get enabled() {
+  isEnabled() {
     return false;
   }
 
-  get connected() {
+  isConnected() {
     return false;
   }
 
-  set validSession(validSession) {}
+  send() {}
+
+  publish() {}
 
 }
 
