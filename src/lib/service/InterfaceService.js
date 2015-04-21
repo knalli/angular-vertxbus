@@ -35,6 +35,7 @@ class InterfaceService {
     var deconstructor = () => {
       if (unregisterFn) {
         unregisterFn();
+        unregisterFn = undefined;
       }
       // Remove from internal map
       if (this.handlers[address]) {
