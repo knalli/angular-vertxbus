@@ -29,7 +29,8 @@ class InterfaceService {
     this.handlers[address].push(callback);
     var unregisterFn = null;
     if (this.delegate.isConnectionOpen()) {
-      unregisterFn = this.delegate.registerHandler(address, callback);
+      this.delegate.registerHandler(address, callback);
+      unregisterFn = () => this.delegate.unregisterHandler(address, callback);
     }
     // and return the deregister callback
     var deconstructor = () => {
