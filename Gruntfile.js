@@ -61,18 +61,6 @@ module.exports = function (grunt) {
         }
       }
     },
-    coffee : {
-      test : {
-        options : {
-          bare : true
-        },
-        expand : true,
-        cwd : 'test/',
-        src : ['unit/**/*.coffee'],
-        dest : 'temp/test/',
-        ext : '.js'
-      }
-    },
     babel : {
       options : {
         sourceMap : false
@@ -104,10 +92,6 @@ module.exports = function (grunt) {
       }
     },
     watch : {
-      'test' : {
-        files : ['test/**/*.coffee'],
-        tasks : ['coffee:test']
-      },
       scripts : {
         files : ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
         tasks : ['karma:unit']
@@ -163,7 +147,6 @@ module.exports = function (grunt) {
   // Compile and test (use "build" for dist/*)
   grunt.registerTask('default', [
     'clean',
-    'coffee',
     'jshint',
     'karma:unit'
   ]);
@@ -171,7 +154,6 @@ module.exports = function (grunt) {
   // Testing
   grunt.registerTask('test', [
     'clean',
-    'coffee',
     'jshint',
     'karma:unit'
   ]);
@@ -185,7 +167,6 @@ module.exports = function (grunt) {
   // Building & releasing
   grunt.registerTask('build', [
     'clean',
-    'coffee',
     'jshint',
     'karma:unit',
     'browserify',

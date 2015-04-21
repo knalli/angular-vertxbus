@@ -46,9 +46,8 @@ module.exports = function(config) {
     files: [
       injectByScope(scope, 'angular/angular.js'),
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
-      'temp/test/unit/mock/sockjs.js',
+      'test/unit/mock/sockjs.js',
       injectByScope(scope, 'vertxbus.js/index.js'),
-      'temp/test/unit/mock/sockjs.js',
       'src/lib/**/*.js',
       'src/vertxbus-module.js',
       'src/vertxbus-wrapper.js',
@@ -71,7 +70,8 @@ module.exports = function(config) {
 
     preprocessors: (function () {
       var config = {
-        'src/**/*.js': [ 'browserify' ]
+        'src/**/*.js': [ 'browserify' ],
+        'test/unit/mock/sockjs.js': [ 'browserify' ]
       };
 
       if (isDefaultScope(scope)) {
