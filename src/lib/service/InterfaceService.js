@@ -43,9 +43,9 @@ class InterfaceService {
         if (index > -1) {
           this.handlers[address].splice(index, 1);
         }
-      }
-      if (this.handlers[address].length < 1) {
-        this.handlers[address] = undefined;
+        if (this.handlers[address].length < 1) {
+          this.handlers[address] = undefined;
+        }
       }
     };
     deconstructor.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: registerHandler (deconstructor)`;
