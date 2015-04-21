@@ -128,7 +128,7 @@ class EventbusWrapper extends BaseWrapper {
   }
 
   unregisterHandler(address, handler) {
-    if (this.instance) {
+    if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
       return this.instance.unregisterHandler(address, handler);
     }
   }
