@@ -4,6 +4,26 @@ import LiveDelegate from './lib/service/delegate/Live';
 import NoopDelegate from './lib/service/delegate/Noop';
 import InterfaceService from './lib/service/InterfaceService';
 
+/**
+ * @description
+ * A service utilizing an underlaying Vertx Event Bus
+ *
+ * The advanced features of this service are:
+ *  - broadcasting the connection changes (vertx-eventbus.system.connected, vertx-eventbus.system.disconnected) on $rootScope
+ *  - registering all handlers again when a reconnect had been required
+ *  - supporting a promise when using send()
+ *  - adding aliases on (registerHandler), un (unregisterHandler) and emit (publish)
+ *
+ * Basic usage:
+ * module.controller('MyController', function('vertxEventService') {
+ *   vertxEventService.on('my.address', function(message) {
+ *     console.log("JSON Message received: ", message)
+ *   });
+ *   vertxEventService.publish('my.other.address', {type: 'foo', data: 'bar'});
+ * });
+ *
+ * Note the additional configuration of the module itself.
+ */
 angular.module(moduleName)
 .provider('vertxEventBusService', function () {
 

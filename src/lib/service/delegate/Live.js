@@ -102,7 +102,19 @@ class LiveDelegate extends BaseDelegate {
     }
   }
 
-  // Register a callback handler for the specified address match.
+  /**
+   * On message callback
+   * @callback Eventbus~onMessageCallback
+   * @param {object} message
+   * @param {string} replyTo
+   */
+
+  /**
+   * Register a callback handler for the specified address match.
+   * @param {string} address
+   * @param {Eventbus~onMessageCallback} callback
+   * @returns {function=}
+   */
   registerHandler(address, callback) {
     if (!angular.isFunction(callback)) {
       return;
@@ -119,7 +131,11 @@ class LiveDelegate extends BaseDelegate {
     return this.eventBus.registerHandler(address, callbackWrapper);
   }
 
-  // Remove a callback handler for the specified address match.
+  /**
+   * Remove a callback handler for the specified address match.
+   * @param {string} address
+   * @param {Eventbus~onMessageCallback} callback
+   */
   unregisterHandler(address, callback) {
     if (!angular.isFunction(callback)) {
       return;
@@ -130,10 +146,13 @@ class LiveDelegate extends BaseDelegate {
     this.eventBus.unregisterHandler(address, this.callbackMap.get(callback));
     this.callbackMap.remove(callback);
   }
-  // Send a message to the specified address (using EventBus.send).
-  // @param address a required string for the targeting address in the bus
-  // @param message a required piece of message data
-  // @param timeout an optional number for a timout after which the promise will be rejected
+  /**
+   * Send a message to the specified address (using EventBus.send).
+   * @param {string} address - targeting address in the bus
+   * @param {object} message - payload
+   * @param {number} [timeout=10000] - timeout (in ms) after which the promise will be rejected
+   * @returns {promise}
+   */
   send(address, message, timeout = 10000) {
     let deferred = this.$q.defer();
     let next = () => {
@@ -149,9 +168,13 @@ class LiveDelegate extends BaseDelegate {
     }
     return deferred.promise;
   }
-  // Publish a message to the specified address (using EventBus.publish).
-  // @param address a required string for the targeting address in the bus
-  // @param message a required piece of message data
+
+  /**
+   * Publish a message to the specified address (using EventBus.publish).
+   * @param {string} address - targeting address in the bus
+   * @param {object} message - payload
+   * @returns {boolean} true when explicitly put in queue for sending
+   */
   publish(address, message) {
     let next = () => {
       this.eventBus.publish(address, message);
@@ -159,10 +182,14 @@ class LiveDelegate extends BaseDelegate {
     next.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.publish (ensureOpenAuthConnection callback)`;
     return this.ensureOpenAuthConnection(next);
   }
-  // Send a login message
-  // @param username
-  // @param password
-  // @param timeout
+
+  /**
+   * Send a login message
+   * @param {string} [options.username] username
+   * @param {string} [options.password] password
+   * @param {number} [timeout=5000]
+   * @returns {promise}
+   */
   login(username = this.options.username, password = this.options.password, timeout = 5000) {
     let deferred = this.$q.defer();
     let next = (reply) => {

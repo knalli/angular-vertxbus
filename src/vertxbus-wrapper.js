@@ -3,6 +3,22 @@ import {moduleName} from './config';
 import EventbusWrapper from './lib/wrapper/Eventbus';
 import NoopWrapper from './lib/wrapper/Noop';
 
+/**
+ * An AngularJS wrapper for projects using the VertX Event Bus
+ *
+ * @param {boolean} [enabled=true] -  if false, the usage of the Event Bus will
+ *                                    be disabled (actually, no vertx.EventBus will be created)
+ * @param {boolean} [debugEnabled=false] - if true, some additional debug loggings will be displayed
+ * @param {string} [prefix='vertx-eventbus.'] -
+ *                                    a prefix used for the global broadcasts
+ * @param {string} [urlServer=location.protocol + '//' + location.hostname + ':' + (location.port || 80)] -
+ *                                    full URL to the server (change it if the server is not the origin)
+ * @param {string} [urlPath='/eventbus'] - path to the event bus
+ * @param {boolean} [reconnectEnabled=true] - if false, the disconnect will be recognized but no further actions
+ * @param {number} [sockjsStateInterval=10000] - defines the check interval (in ms) of the underlayling SockJS connection
+ * @param {number} [sockjsReconnectInterval=10000] - defines the wait time (in ms) for a reconnect after a disconnect has been recognized
+ * @param {object} [sockjsOptions={}] - optional SockJS options (new SockJS(url, undefined, options))
+ */
 angular.module(moduleName)
 .provider('vertxEventBus', function () {
 
@@ -89,24 +105,30 @@ angular.module(moduleName)
   };
   this.useMessageBuffer.displayName = `${CONSTANTS.MODULE}/${CONSTANTS.COMPONENT}: provider.useMessageBuffer`;
 
-  /*
-    A stub representing the Vert.x EventBus (core functionality)
-
-    Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a new instance of the bus have to be created.
-    This stub ensures only one object holding the current active instance of the bus.
-
-    The stub supports theses VertX Event Bus APIs:
-    - close()
-    - login(username, password, replyHandler)
-    - send(address, message, handler)
-    - publish(address, message)
-    - registerHandler(adress, handler)
-    - unregisterHandler(address, handler)
-    - readyState()
-
-    Furthermore, the stub supports theses extra APIs:
-    - reconnect()
-  */
+  /**
+   *
+   * @description
+   * A stub representing the Vert.x EventBus (core functionality)
+   *
+   * Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a
+   * new instance of the bus have to be created.
+   * This stub ensures only one object holding the current active instance of the bus.
+   *
+   * The stub supports theses Vert.x Event Bus APIs:
+   *  - close()
+   *  - login(username, password, replyHandler)
+   *  - send(address, message, handler)
+   *  - publish(address, message)
+   *  - registerHandler(adress, handler)
+   *  - unregisterHandler(address, handler)
+   *  - readyState()
+   *
+   * Furthermore, the stub supports theses extra APIs:
+   *  - reconnect()
+   *
+   * @param $timeout
+   * @param $log
+   */
   this.$get = ($timeout, $log) => {
 
     // Current options (merged defaults with application-wide settings)
