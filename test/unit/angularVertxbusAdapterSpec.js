@@ -5,6 +5,10 @@ describe('knalli.angular-vertxbus', function () {
 
   beforeEach(module('knalli.angular-vertxbus'));
 
+  beforeEach(module('knalli.angular-vertxbus', function($provide) {
+    $provide.value('$log', window.console);
+  }));
+
   it('should have vertxEventBus', function () {
     inject(function (vertxEventBus) {
       expect(vertxEventBus).not.to.be(undefined);
@@ -112,6 +116,29 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
+    describe('reconnect(true)', function () {
+      it('should call the onclose and onopen function if previously connected', function (done) {
+        this.timeout(20000);
+        var onopenCount = 0;
+        vertxEventBus.onopen = function () {
+          onopenCount++;
+        };
+        var oncloseCount = 0;
+        vertxEventBus.onclose = function () {
+          oncloseCount++;
+        };
+        setTimeout(function () {
+          expect(onopenCount, 'onopenCount').to.be(1);
+          vertxEventBus.reconnect(true);
+          setTimeout(function () {
+            expect(oncloseCount).to.be(1);
+            expect(onopenCount).to.be(2);
+            done();
+          }, 1200);
+        }, 200);
+      });
+    });
+
     describe('after adding a handler via "registerHandler"', function () {
       it('should be called', function (done) {
         var abcCalled, xyzCalled;
@@ -200,6 +227,50 @@ describe('knalli.angular-vertxbus', function () {
 
   });
 
+  describe('vertxEventBus without reconnect', function () {
+
+    var vertxEventBus, $timeout, $rootScope, $log;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+      // Override (improve test running time)
+      vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000).useReconnect(false);
+    }));
+
+    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+      vertxEventBus = _vertxEventBus_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
+    }));
+
+    it('should call the onopen function if not previously connected', function (done) {
+      this.timeout(20000);
+      var onopenCount = 0;
+      vertxEventBus.onopen = function () {
+        $log.debug('onopen');
+        onopenCount++;
+      };
+      var oncloseCount = 0;
+      vertxEventBus.onclose = function () {
+        $log.debug('onclose');
+        oncloseCount++;
+      };
+      setTimeout(function () {
+        expect(onopenCount).to.be(1);
+        $log.debug('reconnecting..');
+        vertxEventBus.close();
+        vertxEventBus.reconnect(true);
+        setTimeout(function () {
+          $log.debug('check..');
+          expect(oncloseCount).to.be(1);
+          expect(onopenCount).to.be(2);
+          done();
+        }, 1200);
+      }, 200);
+    });
+
+  });
 
   describe('vertxEventBusService', function () {
 

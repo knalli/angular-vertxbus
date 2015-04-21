@@ -32,6 +32,7 @@ class EventbusWrapper extends BaseWrapper {
       sockjsOptions,
       messageBuffer
     };
+    this.disconnectTimeoutEnabled = true;
     // asap create connection
     this.connect();
   }
@@ -52,6 +53,7 @@ class EventbusWrapper extends BaseWrapper {
         this.onopen();
       }
     };
+    // instance onClose handler
     this.instance.onclose = () => {
       if (this.options.debugEnabled) {
         this.$log.debug(`[Vert.x EB Stub] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
@@ -60,15 +62,32 @@ class EventbusWrapper extends BaseWrapper {
         this.onclose();
       }
       this.instance = undefined;
-      if (this.options.reconnectEnabled) {
+
+      if (!this.disconnectTimeoutEnabled) {
+        // reconnect required asap
+        if (this.options.debugEnabled) {
+          this.$log.debug("[Vert.x EB Stub] Reconnect immediately");
+        }
+        this.disconnectTimeoutEnabled = true;
+        this.connect();
+      } else if (this.options.reconnectEnabled) {
+        // automatical reconnect after timeout
+        if (this.options.debugEnabled) {
+          this.$log.debug(`[Vert.x EB Stub] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
+        }
         this.$timeout((() => this.connect()), this.options.sockjsReconnectInterval);
       }
     };
   }
 
-  reconnect() {
-    if (this.instance) {
-      return this.instance.close();
+  reconnect(immediately = false) {
+    if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
+      if (immediately) {
+        this.disconnectTimeoutEnabled = false;
+      }
+      this.instance.close();
+    } else {
+      this.connect();
     }
   }
 
