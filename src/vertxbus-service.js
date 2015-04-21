@@ -6,7 +6,7 @@ import InterfaceService from './lib/service/InterfaceService';
 
 /**
  * @description
- * A service utilizing an underlaying Vertx Event Bus
+ * A service utilizing an underlaying Vert.x Event Bus
  *
  * The advanced features of this service are:
  *  - broadcasting the connection changes (vertx-eventbus.system.connected, vertx-eventbus.system.disconnected) on $rootScope
