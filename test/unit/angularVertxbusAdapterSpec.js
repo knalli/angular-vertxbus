@@ -594,20 +594,24 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
-    describe('when the service is not connected', function () {
-      var vertxEventBus, vertxEventBusService, $timeout;
+    describe('when the service is not connected correctly (stallec connection)', function () {
+      var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
         vertxEventBusProvider.useMessageBuffer(0);
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+      beforeEach(inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+        $rootScope = _$rootScope_;
         $timeout = _$timeout_;
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
-        // Mock bus is closed
+        // Mock bus is opened (said to be)
         _vertxEventBus_.readyState = function () {
           return _vertxEventBus_.EventBus.OPEN;
+        };
+        _vertxEventBusService_.getConnectionState = function () {
+          return true;
         };
         var sendCalls = 0;
         _vertxEventBus_.send = function () {
@@ -636,10 +640,30 @@ describe('knalli.angular-vertxbus', function () {
             }, function () {
               errorCalled = true;
             });
+            $rootScope.$apply();
             setTimeout(function () {
               $interval.flush(20); // goto T+20
               expect(successCalled).to.be(undefined);
               expect(errorCalled).to.be(true);
+              done();
+            }, 300);
+          }, 200);
+        });
+
+        it('via promise.then() without expecting reply', function (done) {
+          var successCalled, errorCalled;
+          setTimeout(function () {
+            // very short timeout: 10
+            vertxEventBusService.send('xyz', {data: 1}, 10, false).then(function () {
+              successCalled = true;
+            }, function () {
+              errorCalled = true;
+            });
+            $rootScope.$apply();
+            setTimeout(function () {
+              $interval.flush(20); // goto T+20
+              expect(successCalled).to.be(true);
+              expect(errorCalled).to.be(undefined);
               done();
             }, 300);
           }, 200);
@@ -654,6 +678,7 @@ describe('knalli.angular-vertxbus', function () {
             })['catch'](function () {
               errorCalled = true;
             });
+            $rootScope.$apply();
             setTimeout(function () {
               $interval.flush(20); // goto T+20
               expect(successCalled).to.be(undefined);
