@@ -15,9 +15,7 @@ class InterfaceService {
     for (let address in this.handlers) {
       let callbacks = this.handlers[address];
       if (callbacks && callbacks.length) {
-        // Explicit not using For Of because of Symbol requirement (not possible on older envs, i.e. PhantomJS)
-        for (let callbackIdx in callbacks) {
-          let callback = callbacks[callbackIdx];
+        for (let callback of callbacks) {
           this.delegate.registerHandler(address, callback);
         }
       }

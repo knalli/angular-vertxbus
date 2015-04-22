@@ -94,9 +94,7 @@ class LiveDelegate extends BaseDelegate {
   }
 
   afterEventbusConnected() {
-    for (let observerIdx in this.observers) {
-      // Explicit not using For Of because of Symbol requirement (not possible on older envs, i.e. PhantomJS)
-      let observer = this.observers[observerIdx];
+    for (let observer of this.observers) {
       if (angular.isFunction(observer.afterEventbusConnected)) {
         observer.afterEventbusConnected();
       }

@@ -44,6 +44,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/karma-babel-preprocessor/node_modules/babel-core/browser-polyfill.js',
       injectByScope(scope, 'angular/angular.js'),
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
       'test/unit/mock/sockjs.js',
