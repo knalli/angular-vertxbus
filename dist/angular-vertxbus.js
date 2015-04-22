@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v2.0.0-beta.2 - 2015-04-21
+/*! angular-vertxbus - v2.0.0-beta.3 - 2015-04-22
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -648,16 +648,23 @@ var LiveDelegate = (function (_BaseDelegate) {
       var deferred = this.$q.defer();
       var next = function next() {
         if (expectReply) {
-          _this3.eventBus.send(address, message, function (reply) {
-            return deferred.resolve(reply);
-          });
-          // Register timeout for promise rejecting
-          _this3.$interval(function () {
-            return deferred.reject();
-          }, timeout, 1);
+          (function () {
+            // Register timeout for promise rejecting
+            var timer = _this3.$interval(function () {
+              if (_this3.options.debugEnabled) {
+                _this3.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
+              }
+              deferred.reject();
+            }, timeout, 1);
+            // Send message
+            _this3.eventBus.send(address, message, function (reply) {
+              _this3.$interval.cancel(timer); // because it's resolved
+              deferred.resolve(reply);
+            });
+          })();
         } else {
           _this3.eventBus.send(address, message);
-          deferred.resolve();
+          deferred.resolve(); // we don't care
         }
       };
       next.displayName = '' + this.CONSTANTS.MODULE + '/' + this.CONSTANTS.COMPONENT + ': util.send (ensureOpenAuthConnection callback)';
@@ -673,16 +680,13 @@ var LiveDelegate = (function (_BaseDelegate) {
      * Publish a message to the specified address (using EventBus.publish).
      * @param {string} address - targeting address in the bus
      * @param {object} message - payload
-     * @returns {boolean} true when explicitly put in queue for sending
      */
     value: function publish(address, message) {
       var _this4 = this;
 
-      var next = function next() {
-        _this4.eventBus.publish(address, message);
-      };
-      next.displayName = '' + this.CONSTANTS.MODULE + '/' + this.CONSTANTS.COMPONENT + ': util.publish (ensureOpenAuthConnection callback)';
-      return this.ensureOpenAuthConnection(next);
+      return this.ensureOpenAuthConnection(function () {
+        return _this4.eventBus.publish(address, message);
+      });
     }
   }, {
     key: 'login',
@@ -739,7 +743,7 @@ var LiveDelegate = (function (_BaseDelegate) {
 
       if (!this.options.loginRequired) {
         // easy: no login required
-        this.ensureOpenConnection(fn);
+        return this.ensureOpenConnection(fn);
       } else {
         var wrapFn = function wrapFn() {
           if (_this6.states.validSession) {
@@ -754,7 +758,7 @@ var LiveDelegate = (function (_BaseDelegate) {
           }
         };
         wrapFn.displayName = '' + this.CONSTANTS.MODULE + '/' + this.CONSTANTS.COMPONENT + ': ensureOpenAuthConnection function wrapper';
-        this.ensureOpenConnection(wrapFn);
+        return this.ensureOpenConnection(wrapFn);
       }
     }
   }, {
