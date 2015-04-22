@@ -1,3 +1,57 @@
+<a name="2.0.0-beta.4"></a>
+### 2.0.0-beta.4 (2015-04-22)
+
+
+#### Bug Fixes (already 1.1.x)
+
+* **service:**
+  * after a reconnect the deconstructor does not work anymore ([5ebbfc48](http://github.com/knalli/angular-vertxbus/commit/5ebbfc487ca34bd769ce84e741f093ff2f75b0c0))
+  * fix possible internal npe on de-register ([913ac743](http://github.com/knalli/angular-vertxbus/commit/913ac743835508525d06a5d956ef5cc7928f2bf8))
+  * fix edge case when deconstructor invoked multiple times ([74200873](http://github.com/knalli/angular-vertxbus/commit/7420087342067af665b468206ca5e7e254d585c1))
+* **wrapper:** ensure eventbus is online when removing a handler ([a3dd555a](http://github.com/knalli/angular-vertxbus/commit/a3dd555afb3760defd690530c3578f39a134ec0c), closes [#48](http://github.com/knalli/angular-vertxbus/issues/48))
+
+
+#### Features
+
+* **service:**
+  * change signature of <service>.send() #51 ([7534034d](http://github.com/knalli/angular-vertxbus/commit/7534034d24b5e994c4d3f9f7ac3a4d75ef6ebe1a))
+  * add 4th arg `service.send()` for replyless sends ([849eb3a1](http://github.com/knalli/angular-vertxbus/commit/849eb3a13b24eacba4d74e92504e77fa73d31515))
+* **wrapper:** add `wrapper.reconnect(true)` allowing a reconnect asap ([bd0cc4a3](http://github.com/knalli/angular-vertxbus/commit/bd0cc4a3dbd8e4cc47c041fe8a6aefd368cd0087))
+
+
+#### Breaking Changes
+
+* The arguments of vertxEventBusService.send() have
+been restructured.
+
+Instead of `send(address, message, timeout, expectReply)` it is now
+`send(address, message, {timeout, expectReply})`.
+
+Reasons for this improvement of api:
+1. Both `address` and `message` are required, but the other ones are only
+optional.
+2. Long arguments are not a good api design
+3. Using default timeout does not require an `undefined` argument or
+even a missplaced `null` or `0`.
+ ([7534034d](http://github.com/knalli/angular-vertxbus/commit/7534034d24b5e994c4d3f9f7ac3a4d75ef6ebe1a))
+
+
+* new baseline ES5 + polyfill for older browsers
+
+Due switching to BabelJS, the base requirement is an "ES5" environment.
+Referring https://babeljs.io/docs/usage/caveats/, you should have es5-shim in
+mind in case of supporting such old browsers.
+
+* removal of UMD wrapper
+
+Due ditching UMD and the RequireJS artifact (in pre v2, found in `dist/requirejs/`),
+probably you will have to declare `vertxbus` yourself. I.e. using RequireJs this will
+require an additional dependency for these. As soon as vertxbus & SockJS (since 1.0.0 beta
+they are already) will switch from being only injected globally, this module will add support
+again. So long, this is more likely the way to deal with both worlds (the artifact have to be
+compatible w/o any module loader).
+
+
 <a name="1.1.3"></a>
 ### 1.1.3 (2015-04-14)
 
