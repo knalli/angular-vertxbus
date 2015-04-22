@@ -58,6 +58,9 @@ class SockJS {
         ? this._buildLoginReplyAsSuccess(data.body.username, data.body.password)
         : this._buildLoginReplyAsFail(data.body.username, data.body.password);
       this.onmessage(this._wrapToEvent(data.replyAddress, reply));
+    } else if (data.replyAddress) {
+      this.log(`[MOCK] Sending reply to ${data.replyAddress}`);
+      this.onmessage(this._wrapToEvent(data.replyAddress, data.mockReply || {data: 'reply'}));
     }
   }
 
