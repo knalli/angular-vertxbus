@@ -227,7 +227,6 @@ describe('knalli.angular-vertxbus', function () {
 
   });
 
-
   describe('vertxEventBus without reconnect', function () {
 
     var vertxEventBus, $timeout, $rootScope, $log;
@@ -372,7 +371,7 @@ describe('knalli.angular-vertxbus', function () {
 
   describe('vertxEventBusService', function () {
 
-    describe(' with disabled message queue (default)', function () {
+    describe('with disabled message queue (default)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
@@ -408,7 +407,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 1});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.getBufferCount()).to.be(0);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(0);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -417,7 +416,7 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
-    describe(' with enabled message queue (size 3)', function () {
+    describe('with enabled message queue (size 3)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
@@ -453,7 +452,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 123});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.getBufferCount()).to.be(1);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(1);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -468,7 +467,7 @@ describe('knalli.angular-vertxbus', function () {
             vertxEventBusService.send('xyz', {data: 4});
             setTimeout(function () {
               expect(result).to.be(undefined);
-              expect(vertxEventBusService.getBufferCount()).to.be(3);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(3);
               expect(vertxEventBus.getSendCalls()).to.be(0);
               done();
             }, 1000);
@@ -492,7 +491,7 @@ describe('knalli.angular-vertxbus', function () {
 
             setTimeout(function () {
               expect(result).to.eql({reply: {data: 3}});
-              expect(vertxEventBusService.getBufferCount()).to.be(0);
+              expect(vertxEventBusService.delegate.getMessageQueueLength()).to.be(0);
               expect(vertxEventBus.getSendCalls()).to.be(3);
               done();
             }, 1000);
@@ -595,11 +594,11 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
-    describe('when the service is not connected correctly (stallec connection)', function () {
+    describe('when the service is not connected correctly (stalled connection)', function () {
       var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+        vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
       }));
 
       beforeEach(inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
@@ -636,7 +635,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, 10).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, {timeout: 10}).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -655,7 +654,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, 10, false).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, {timeout: 10, expectReply: false}).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -674,7 +673,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, 10).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, {timeout: 10}).then(function () {
               successCalled = true;
             })['catch'](function () {
               errorCalled = true;
@@ -717,7 +716,7 @@ describe('knalli.angular-vertxbus', function () {
       });
       // Reconnect should be switch the connectivity, onopen() and onclose()
       // must be delegated transparently
-      it('should re-add handler after a reconnet', function (done) {
+      it('should re-add handler after a reconnect', function (done) {
         this.timeout(20000);
         var okHandler = false;
         var myHandler = function () {
@@ -829,6 +828,109 @@ describe('knalli.angular-vertxbus', function () {
         expect(abcCalled).to.be(undefined);
         expect(xyzCalled).to.be(undefined);
         done();
+      }, 200);
+    });
+
+  });
+
+  describe('vertxEventBusService (bus online) send()', function () {
+
+    var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+      vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+    }));
+
+    beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
+      vertxEventBus = _vertxEventBus_;
+      vertxEventBusService = _vertxEventBusService_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
+    }));
+
+    it('should return a promise which will be resolved (success)', function (done) {
+      setTimeout(function () {
+        var results = {
+          'then' : 0,
+          'catch' : 0,
+          'finally' : 0
+        };
+        var promise = vertxEventBusService.send('xyz', {data : 123});
+        expect(promise).to.not.be(undefined);
+        // looks like a promise?
+        expect(typeof promise).to.be('object');
+        expect(typeof promise.then).to.be('function');
+        expect(typeof promise.catch).to.be('function');
+        expect(typeof promise.finally).to.be('function');
+        promise.then(function () {
+          results.then++;
+        });
+        promise.catch(function () {
+          results.catch++;
+        });
+        promise.finally(function () {
+          results.finally++;
+        });
+        $rootScope.$apply();
+        setTimeout(function () {
+          expect(results.then).to.be(1);
+          expect(results.catch).to.be(0);
+          expect(results.finally).to.be(1);
+          done();
+        }, 500);
+      }, 200);
+    });
+
+  });
+
+  describe('vertxEventBusService (bus offline) send()', function () {
+
+    var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+      vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+    }));
+
+    beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
+      vertxEventBus = _vertxEventBus_;
+      vertxEventBusService = _vertxEventBusService_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
+
+      vertxEventBus.readyState = function () {
+        return 3;
+      };
+    }));
+
+    it('should return a promise which will be rejected (fail)', function (done) {
+      setTimeout(function () {
+        var results = {
+          'then': 0,
+          'catch': 0,
+          'finally': 0
+        };
+        var promise = vertxEventBusService.send('xyz', {data: 123});
+        expect(promise).to.not.be(undefined);
+        // looks like a promise?
+        expect(typeof promise).to.be('object');
+        expect(typeof promise.then).to.be('function');
+        expect(typeof promise.catch).to.be('function');
+        expect(typeof promise.finally).to.be('function');
+        promise.then(function () { results.then++; });
+        promise.catch(function () { results.catch++; });
+        promise.finally(function () { results.finally++; });
+        $rootScope.$apply();
+        setTimeout(function () {
+          window.console.log(results);
+          expect(results.then).to.be(0);
+          expect(results.catch).to.be(1);
+          expect(results.finally).to.be(1);
+          done();
+        }, 500);
       }, 200);
     });
 
