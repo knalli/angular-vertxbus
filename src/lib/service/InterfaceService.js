@@ -1,8 +1,9 @@
+import {moduleName} from '../../config.js';
+
 class InterfaceService {
 
-  constructor(delegate, CONSTANTS) {
+  constructor(delegate) {
     this.delegate = delegate;
-    this.CONSTANTS = CONSTANTS;
     this.handlers = [];
     this.delegate.observe({
       afterEventbusConnected: () => this.afterEventbusConnected()
@@ -49,7 +50,7 @@ class InterfaceService {
         }
       }
     };
-    deconstructor.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: registerHandler (deconstructor)`;
+    deconstructor.displayName = `${moduleName}.service.registerHandler.deconstructor`;
     return deconstructor;
   }
   on(address, callback) {

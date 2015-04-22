@@ -27,11 +27,6 @@ import InterfaceService from './lib/service/InterfaceService';
 angular.module(moduleName)
 .provider('vertxEventBusService', function () {
 
-  const CONSTANTS = {
-    MODULE: 'angular-vertxbus',
-    COMPONENT: 'service'
-  };
-
   const DEFAULT_OPTIONS = {
     loginRequired: false
   };
@@ -47,9 +42,9 @@ angular.module(moduleName)
   this.$get = ($rootScope, $q, $interval, vertxEventBus, $log) => {
     let instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
     if (instanceOptions.enabled) {
-      return new InterfaceService(new LiveDelegate($rootScope, $interval, $log, $q, vertxEventBus, CONSTANTS, instanceOptions), CONSTANTS);
+      return new InterfaceService(new LiveDelegate($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions));
     } else {
-      return new InterfaceService(new NoopDelegate(), CONSTANTS);
+      return new InterfaceService(new NoopDelegate());
     }
   }; // $get
 

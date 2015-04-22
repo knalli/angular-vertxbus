@@ -1,9 +1,11 @@
+import {moduleName} from '../../../config.js';
+
 import Queue from './../../helpers/Queue';
 import SimpleMap from './../../helpers/SimpleMap';
 import BaseDelegate from './Base';
 
 class LiveDelegate extends BaseDelegate {
-  constructor($rootScope, $interval, $log, $q, eventBus, CONSTANTS, {
+  constructor($rootScope, $interval, $log, $q, eventBus, {
     enabled,
     debugEnabled,
     prefix,
@@ -22,7 +24,6 @@ class LiveDelegate extends BaseDelegate {
     this.$log = $log;
     this.$q = $q;
     this.eventBus = eventBus;
-    this.CONSTANTS = CONSTANTS;
     this.options = {
       enabled,
       debugEnabled,
@@ -126,7 +127,7 @@ class LiveDelegate extends BaseDelegate {
       callback(message, replyTo);
       this.$rootScope.$digest();
     };
-    callbackWrapper.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.registerHandler (callback wrapper)`;
+    callbackWrapper.displayName = `${moduleName}.service.delegate.live.registerHandler.callbackWrapper`;
     this.callbackMap.put(callback, callbackWrapper);
     return this.eventBus.registerHandler(address, callbackWrapper);
   }
@@ -176,7 +177,7 @@ class LiveDelegate extends BaseDelegate {
         deferred.resolve(); // we don't care
       }
     };
-    next.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.send (ensureOpenAuthConnection callback)`;
+    next.displayName = `${moduleName}.service.delegate.live.send.next`;
     if (!this.ensureOpenAuthConnection(next)) {
       deferred.reject();
     }
@@ -212,7 +213,7 @@ class LiveDelegate extends BaseDelegate {
         this.$rootScope.$broadcast(`${this.options.prefix}system.login.failed`, {status: reply.status});
       }
     };
-    next.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.login (callback)`;
+    next.displayName = `${moduleName}.service.delegate.live.login.next`;
     this.eventBus.login(username, password, next);
     this.$interval((() => deferred.reject()), timeout, 1);
     return deferred.promise;
@@ -234,7 +235,7 @@ class LiveDelegate extends BaseDelegate {
       // easy: no login required
       return this.ensureOpenConnection(fn);
     } else {
-      let wrapFn = () => {
+      let fnWrapper = () => {
         if (this.states.validSession) {
           fn();
           return true;
@@ -246,8 +247,8 @@ class LiveDelegate extends BaseDelegate {
           return false;
         }
       };
-      wrapFn.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: ensureOpenAuthConnection function wrapper`;
-      return this.ensureOpenConnection(wrapFn);
+      fnWrapper.displayName = `${moduleName}.service.delegate.live.ensureOpenAuthConnection.fnWrapper`;
+      return this.ensureOpenConnection(fnWrapper);
     }
   }
 

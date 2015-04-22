@@ -1,8 +1,10 @@
+import {moduleName} from '../../config.js';
+
 import BaseWrapper from './Base';
 
 class EventbusWrapper extends BaseWrapper {
 
-  constructor(EventBus, $timeout, $log, CONSTANTS, {
+  constructor(EventBus, $timeout, $log, {
     enabled,
     debugEnabled,
     prefix,
@@ -19,7 +21,6 @@ class EventbusWrapper extends BaseWrapper {
     this.EventBus = EventBus;
     this.$timeout = $timeout;
     this.$log = $log;
-    this.CONSTANTS = CONSTANTS;
     this.options = {
       enabled,
       debugEnabled,
@@ -122,7 +123,7 @@ class EventbusWrapper extends BaseWrapper {
       let deconstructor = () => {
         this.unregisterHandler(address, handler);
       };
-      deconstructor.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: EventBusStub.registerHandler (deconstructor)`;
+      deconstructor.displayName = `${moduleName}.wrapper.eventbus.registerHandler.deconstructor`;
       return deconstructor;
     }
   }
