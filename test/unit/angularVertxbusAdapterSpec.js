@@ -594,11 +594,11 @@ describe('knalli.angular-vertxbus', function () {
       });
     });
 
-    describe('when the service is not connected correctly (stallec connection)', function () {
+    describe('when the service is not connected correctly (stalled connection)', function () {
       var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+        vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
       }));
 
       beforeEach(inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
@@ -828,6 +828,109 @@ describe('knalli.angular-vertxbus', function () {
         expect(abcCalled).to.be(undefined);
         expect(xyzCalled).to.be(undefined);
         done();
+      }, 200);
+    });
+
+  });
+
+  describe('vertxEventBusService (bus online) send()', function () {
+
+    var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+      vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+    }));
+
+    beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
+      vertxEventBus = _vertxEventBus_;
+      vertxEventBusService = _vertxEventBusService_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
+    }));
+
+    it('should return a promise which will be resolved (success)', function (done) {
+      setTimeout(function () {
+        var results = {
+          'then' : 0,
+          'catch' : 0,
+          'finally' : 0
+        };
+        var promise = vertxEventBusService.send('xyz', {data : 123});
+        expect(promise).to.not.be(undefined);
+        // looks like a promise?
+        expect(typeof promise).to.be('object');
+        expect(typeof promise.then).to.be('function');
+        expect(typeof promise.catch).to.be('function');
+        expect(typeof promise.finally).to.be('function');
+        promise.then(function () {
+          results.then++;
+        });
+        promise.catch(function () {
+          results.catch++;
+        });
+        promise.finally(function () {
+          results.finally++;
+        });
+        $rootScope.$apply();
+        setTimeout(function () {
+          expect(results.then).to.be(1);
+          expect(results.catch).to.be(0);
+          expect(results.finally).to.be(1);
+          done();
+        }, 500);
+      }, 200);
+    });
+
+  });
+
+  describe('vertxEventBusService (bus offline) send()', function () {
+
+    var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+      vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+    }));
+
+    beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
+      vertxEventBus = _vertxEventBus_;
+      vertxEventBusService = _vertxEventBusService_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
+
+      vertxEventBus.readyState = function () {
+        return 3;
+      };
+    }));
+
+    it('should return a promise which will be rejected (fail)', function (done) {
+      setTimeout(function () {
+        var results = {
+          'then': 0,
+          'catch': 0,
+          'finally': 0
+        };
+        var promise = vertxEventBusService.send('xyz', {data: 123});
+        expect(promise).to.not.be(undefined);
+        // looks like a promise?
+        expect(typeof promise).to.be('object');
+        expect(typeof promise.then).to.be('function');
+        expect(typeof promise.catch).to.be('function');
+        expect(typeof promise.finally).to.be('function');
+        promise.then(function () { results.then++; });
+        promise.catch(function () { results.catch++; });
+        promise.finally(function () { results.finally++; });
+        $rootScope.$apply();
+        setTimeout(function () {
+          window.console.log(results);
+          expect(results.then).to.be(0);
+          expect(results.catch).to.be(1);
+          expect(results.finally).to.be(1);
+          done();
+        }, 500);
       }, 200);
     });
 

@@ -159,12 +159,21 @@ class LiveDelegate extends BaseDelegate {
     let deferred = this.$q.defer();
     let next = () => {
       if (expectReply) {
-        this.eventBus.send(address, message, (reply) => deferred.resolve(reply));
         // Register timeout for promise rejecting
-        this.$interval((() => deferred.reject()), timeout, 1);
+        let timer = this.$interval((() => {
+          if (this.options.debugEnabled) {
+            this.$log.debug(`[Vert.x EB Service] send('${address}') timed out`);
+          }
+          deferred.reject();
+        }), timeout, 1);
+        // Send message
+        this.eventBus.send(address, message, (reply) => {
+          this.$interval.cancel(timer); // because it's resolved
+          deferred.resolve(reply);
+        });
       } else {
         this.eventBus.send(address, message);
-        deferred.resolve();
+        deferred.resolve(); // we don't care
       }
     };
     next.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.send (ensureOpenAuthConnection callback)`;
@@ -178,14 +187,9 @@ class LiveDelegate extends BaseDelegate {
    * Publish a message to the specified address (using EventBus.publish).
    * @param {string} address - targeting address in the bus
    * @param {object} message - payload
-   * @returns {boolean} true when explicitly put in queue for sending
    */
   publish(address, message) {
-    let next = () => {
-      this.eventBus.publish(address, message);
-    };
-    next.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: util.publish (ensureOpenAuthConnection callback)`;
-    return this.ensureOpenAuthConnection(next);
+    return this.ensureOpenAuthConnection(() => this.eventBus.publish(address, message));
   }
 
   /**
@@ -228,7 +232,7 @@ class LiveDelegate extends BaseDelegate {
   ensureOpenAuthConnection(fn) {
     if (!this.options.loginRequired) {
       // easy: no login required
-      this.ensureOpenConnection(fn);
+      return this.ensureOpenConnection(fn);
     } else {
       let wrapFn = () => {
         if (this.states.validSession) {
@@ -243,7 +247,7 @@ class LiveDelegate extends BaseDelegate {
         }
       };
       wrapFn.displayName = `${this.CONSTANTS.MODULE}/${this.CONSTANTS.COMPONENT}: ensureOpenAuthConnection function wrapper`;
-      this.ensureOpenConnection(wrapFn);
+      return this.ensureOpenConnection(wrapFn);
     }
   }
 
