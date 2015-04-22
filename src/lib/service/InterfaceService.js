@@ -88,8 +88,8 @@ class InterfaceService {
     if (!angular.isObject(options)) {
       this.$log.error(`${moduleName}: Signature of vertxEventBusService.send() has been changed!`);
       return this.send(address, message, {
-        timeout: arguments[2] != undefined ? arguments[2] : 10000,
-        expectReply: arguments[3] != undefined ? arguments[3] : true
+        timeout: arguments[2] !== undefined ? arguments[2] : 10000,
+        expectReply: arguments[3] !== undefined ? arguments[3] : true
       });
     }
 
