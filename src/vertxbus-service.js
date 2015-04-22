@@ -42,7 +42,10 @@ angular.module(moduleName)
   this.$get = ($rootScope, $q, $interval, vertxEventBus, $log) => {
     let instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
     if (instanceOptions.enabled) {
-      return new InterfaceService(new LiveDelegate($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions));
+      return new InterfaceService(
+        new LiveDelegate($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions),
+        $log
+      );
     } else {
       return new InterfaceService(new NoopDelegate());
     }

@@ -2,8 +2,9 @@ import {moduleName} from '../../config.js';
 
 class InterfaceService {
 
-  constructor(delegate) {
+  constructor(delegate, $log) {
     this.delegate = delegate;
+    this.$log = $log;
     this.handlers = [];
     this.delegate.observe({
       afterEventbusConnected: () => this.afterEventbusConnected()
@@ -83,8 +84,18 @@ class InterfaceService {
     return this.unregisterHandler(address, callback);
   }
 
-  send(address, message, timeout = 10000, expectReply = true) {
-    return this.delegate.send(address, message, timeout, expectReply);
+  send(address, message, options = {}) {
+
+    // FALLBACK: signature change since 2.0
+    if (!angular.isObject(options)) {
+      this.$log.error(`${moduleName}: Signature of vertxEventBusService.send() has been changed!`);
+      return this.send(address, message, {
+        timeout: arguments[2] != undefined ? arguments[2] : 10000,
+        expectReply: arguments[3] != undefined ? arguments[3] : true
+      });
+    }
+
+    return this.delegate.send(address, message, options.timeout, options.expectReply);
   }
 
   publish(address, message) {

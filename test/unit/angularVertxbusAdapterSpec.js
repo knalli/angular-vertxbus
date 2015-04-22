@@ -635,7 +635,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, 10).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, {timeout: 10}).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -654,7 +654,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, 10, false).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, {timeout: 10, expectReply: false}).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -673,7 +673,7 @@ describe('knalli.angular-vertxbus', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data: 1}, 10).then(function () {
+            vertxEventBusService.send('xyz', {data: 1}, {timeout: 10}).then(function () {
               successCalled = true;
             })['catch'](function () {
               errorCalled = true;
