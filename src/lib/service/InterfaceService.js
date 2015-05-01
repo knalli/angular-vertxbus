@@ -66,9 +66,9 @@ class InterfaceService {
       if (index > -1) {
         this.handlers[address].splice(index, 1);
       }
-    }
-    if (this.handlers[address].length < 1) {
-      this.handlers[address] = undefined;
+      if (this.handlers[address].length < 1) {
+        this.handlers[address] = undefined;
+      }
     }
     // Remove from real instance
     if (this.delegate.isConnectionOpen()) {
