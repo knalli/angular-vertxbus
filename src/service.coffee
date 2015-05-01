@@ -298,8 +298,7 @@ angular.module('knalli.angular-vertxbus')
         if wrapped.handlers[address]
           index = wrapped.handlers[address].indexOf(callback)
           wrapped.handlers[address].splice(index, 1) if index > -1
-        if wrapped.handlers[address].length < 1
-          wrapped.handlers[address] = undefined
+          wrapped.handlers[address] = undefined if wrapped.handlers[address].length < 1
         # Remove from real instance
         if connectionState is vertxEventBus.EventBus.OPEN then util.unregisterHandler(address, callback)
       # Stub for util.send
