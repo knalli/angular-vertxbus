@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v1.1.3 - 2015-04-14
+/*! angular-vertxbus - v1.1.4 - 2015-05-01
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 ; Licensed  */
 (function() {
@@ -662,9 +662,9 @@
             if (index > -1) {
               wrapped.handlers[address].splice(index, 1);
             }
-          }
-          if (wrapped.handlers[address].length < 1) {
-            wrapped.handlers[address] = void 0;
+            if (wrapped.handlers[address].length < 1) {
+              wrapped.handlers[address] = void 0;
+            }
           }
           if (connectionState === vertxEventBus.EventBus.OPEN) {
             return util.unregisterHandler(address, callback);

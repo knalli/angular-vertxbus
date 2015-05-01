@@ -1,3 +1,12 @@
+<a name="1.1.4"></a>
+### 1.1.4 (2015-05-01)
+
+
+#### Bug Fixes
+
+* **service:** fix possible internal npe on de-register (also as 913ac74) ([6aa86bc1](http://github.com/knalli/angular-vertxbus/commit/6aa86bc1c5c710a5ad5c6f8d3460aad00794fa0b))
+
+
 <a name="1.1.3"></a>
 ### 1.1.3 (2015-04-14)
 
