@@ -1,3 +1,12 @@
+<a name="2.0.0-beta.5"></a>
+### 2.0.0-beta.5 (2015-05-02)
+
+
+#### Bug Fixes
+
+* **service:** fix possible internal npe on de-register ([53e5cfb5](http://github.com/knalli/angular-vertxbus/commit/53e5cfb56f301c8693fc9ee69e007e362a4557f3))
+
+
 <a name="2.0.0-beta.4"></a>
 ### 2.0.0-beta.4 (2015-04-22)
 

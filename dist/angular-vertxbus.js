@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v2.0.0-beta.4 - 2015-04-22
+/*! angular-vertxbus - v2.0.0-beta.5 - 2015-05-02
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -32,13 +32,14 @@ module.exports = exports['default'];
 },{"./config":1,"./vertxbus-module":12,"./vertxbus-service":13,"./vertxbus-wrapper":14}],3:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 /*
  Simple queue implementation
 
@@ -96,13 +97,14 @@ module.exports = exports["default"];
 },{}],4:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 /*
  Simple Map implementation
 
@@ -210,13 +212,13 @@ module.exports = exports["default"];
 },{}],5:[function(require,module,exports){
 'use strict';
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _moduleName = require('../../config.js');
 
@@ -324,9 +326,9 @@ var InterfaceService = (function () {
         if (index > -1) {
           this.handlers[address].splice(index, 1);
         }
-      }
-      if (this.handlers[address].length < 1) {
-        this.handlers[address] = undefined;
+        if (this.handlers[address].length < 1) {
+          this.handlers[address] = undefined;
+        }
       }
       // Remove from real instance
       if (this.delegate.isConnectionOpen()) {
@@ -405,13 +407,13 @@ module.exports = exports['default'];
 },{"../../config.js":1}],6:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var BaseDelegate = (function () {
   function BaseDelegate() {
@@ -460,33 +462,35 @@ module.exports = exports["default"];
 },{}],7:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x6, _x7, _x8) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x6,
+    property = _x7,
+    receiver = _x8; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x6 = parent; _x7 = property; _x8 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
 
 var _moduleName = require('../../../config.js');
 
 var _Queue = require('./../../helpers/Queue');
 
-var _Queue2 = _interopRequireWildcard(_Queue);
+var _Queue2 = _interopRequireDefault(_Queue);
 
 var _SimpleMap = require('./../../helpers/SimpleMap');
 
-var _SimpleMap2 = _interopRequireWildcard(_SimpleMap);
+var _SimpleMap2 = _interopRequireDefault(_SimpleMap);
 
 var _BaseDelegate2 = require('./Base');
 
-var _BaseDelegate3 = _interopRequireWildcard(_BaseDelegate2);
+var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
 
 var LiveDelegate = (function (_BaseDelegate) {
   function LiveDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
@@ -542,18 +546,18 @@ var LiveDelegate = (function (_BaseDelegate) {
   _createClass(LiveDelegate, [{
     key: 'initialize',
     value: function initialize() {
-      var _this = this;
+      var _this2 = this;
 
       this.eventBus.onopen = function () {
-        return _this.onEventbusOpen();
+        return _this2.onEventbusOpen();
       };
       this.eventBus.onclose = function () {
-        return _this.onEventbusClose();
+        return _this2.onEventbusClose();
       };
 
       // Update the current connection state periodically.
       var connectionIntervalCheck = function connectionIntervalCheck() {
-        return _this.getConnectionState(true);
+        return _this2.getConnectionState(true);
       };
       connectionIntervalCheck.displayName = 'connectionIntervalCheck';
       this.$interval(function () {
@@ -642,7 +646,7 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @returns {function=}
      */
     value: function registerHandler(address, callback) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!angular.isFunction(callback)) {
         return;
@@ -652,7 +656,7 @@ var LiveDelegate = (function (_BaseDelegate) {
       }
       var callbackWrapper = function callbackWrapper(message, replyTo) {
         callback(message, replyTo);
-        _this2.$rootScope.$digest();
+        _this3.$rootScope.$digest();
       };
       callbackWrapper.displayName = '' + _moduleName.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
       this.callbackMap.put(callback, callbackWrapper);
@@ -689,7 +693,7 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @returns {promise}
      */
     value: function send(address, message) {
-      var _this3 = this;
+      var _this4 = this;
 
       var timeout = arguments[2] === undefined ? 10000 : arguments[2];
       var expectReply = arguments[3] === undefined ? true : arguments[3];
@@ -699,20 +703,20 @@ var LiveDelegate = (function (_BaseDelegate) {
         if (expectReply) {
           (function () {
             // Register timeout for promise rejecting
-            var timer = _this3.$interval(function () {
-              if (_this3.options.debugEnabled) {
-                _this3.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
+            var timer = _this4.$interval(function () {
+              if (_this4.options.debugEnabled) {
+                _this4.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
               }
               deferred.reject();
             }, timeout, 1);
             // Send message
-            _this3.eventBus.send(address, message, function (reply) {
-              _this3.$interval.cancel(timer); // because it's resolved
+            _this4.eventBus.send(address, message, function (reply) {
+              _this4.$interval.cancel(timer); // because it's resolved
               deferred.resolve(reply);
             });
           })();
         } else {
-          _this3.eventBus.send(address, message);
+          _this4.eventBus.send(address, message);
           deferred.resolve(); // we don't care
         }
       };
@@ -731,10 +735,10 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {object} message - payload
      */
     value: function publish(address, message) {
-      var _this4 = this;
+      var _this5 = this;
 
       return this.ensureOpenAuthConnection(function () {
-        return _this4.eventBus.publish(address, message);
+        return _this5.eventBus.publish(address, message);
       });
     }
   }, {
@@ -748,7 +752,7 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @returns {promise}
      */
     value: function login() {
-      var _this5 = this;
+      var _this6 = this;
 
       var username = arguments[0] === undefined ? this.options.username : arguments[0];
       var password = arguments[1] === undefined ? this.options.password : arguments[1];
@@ -757,13 +761,13 @@ var LiveDelegate = (function (_BaseDelegate) {
       var deferred = this.$q.defer();
       var next = function next(reply) {
         if (reply && reply.status === 'ok') {
-          _this5.states.validSession = true;
+          _this6.states.validSession = true;
           deferred.resolve(reply);
-          _this5.$rootScope.$broadcast('' + _this5.options.prefix + 'system.login.succeeded', { status: reply.status });
+          _this6.$rootScope.$broadcast('' + _this6.options.prefix + 'system.login.succeeded', { status: reply.status });
         } else {
-          _this5.states.validSession = false;
+          _this6.states.validSession = false;
           deferred.reject(reply);
-          _this5.$rootScope.$broadcast('' + _this5.options.prefix + 'system.login.failed', { status: reply.status });
+          _this6.$rootScope.$broadcast('' + _this6.options.prefix + 'system.login.failed', { status: reply.status });
         }
       };
       next.displayName = '' + _moduleName.moduleName + '.service.delegate.live.login.next';
@@ -788,20 +792,20 @@ var LiveDelegate = (function (_BaseDelegate) {
   }, {
     key: 'ensureOpenAuthConnection',
     value: function ensureOpenAuthConnection(fn) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (!this.options.loginRequired) {
         // easy: no login required
         return this.ensureOpenConnection(fn);
       } else {
         var fnWrapper = function fnWrapper() {
-          if (_this6.states.validSession) {
+          if (_this7.states.validSession) {
             fn();
             return true;
           } else {
             // ignore this message
-            if (_this6.options.debugEnabled) {
-              _this6.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
+            if (_this7.options.debugEnabled) {
+              _this7.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
             }
             return false;
           }
@@ -858,19 +862,19 @@ module.exports = exports['default'];
 },{"../../../config.js":1,"./../../helpers/Queue":3,"./../../helpers/SimpleMap":4,"./Base":6}],8:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
 var _BaseDelegate2 = require('./Base');
 
-var _BaseDelegate3 = _interopRequireWildcard(_BaseDelegate2);
+var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
 
 var NoopDelegate = (function (_BaseDelegate) {
   function NoopDelegate() {
@@ -892,13 +896,13 @@ module.exports = exports['default'];
 },{"./Base":6}],9:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var BaseWrapper = (function () {
   function BaseWrapper() {
@@ -958,25 +962,27 @@ module.exports = exports["default"];
 },{}],10:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x2,
+    property = _x3,
+    receiver = _x4; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
 
 var _moduleName = require('../../config.js');
 
 var _BaseWrapper2 = require('./Base');
 
-var _BaseWrapper3 = _interopRequireWildcard(_BaseWrapper2);
+var _BaseWrapper3 = _interopRequireDefault(_BaseWrapper2);
 
 var EventbusWrapper = (function (_BaseWrapper) {
   function EventbusWrapper(EventBus, $timeout, $log, _ref) {
@@ -1020,7 +1026,7 @@ var EventbusWrapper = (function (_BaseWrapper) {
   _createClass(EventbusWrapper, [{
     key: 'connect',
     value: function connect() {
-      var _this = this;
+      var _this2 = this;
 
       var url = '' + this.options.urlServer + '' + this.options.urlPath;
       if (this.options.debugEnabled) {
@@ -1030,38 +1036,38 @@ var EventbusWrapper = (function (_BaseWrapper) {
       // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
       this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
       this.instance.onopen = function () {
-        if (_this.options.debugEnabled) {
-          _this.$log.debug('[Vert.x EB Stub] Connected');
+        if (_this2.options.debugEnabled) {
+          _this2.$log.debug('[Vert.x EB Stub] Connected');
         }
-        if (angular.isFunction(_this.onopen)) {
-          _this.onopen();
+        if (angular.isFunction(_this2.onopen)) {
+          _this2.onopen();
         }
       };
       // instance onClose handler
       this.instance.onclose = function () {
-        if (_this.options.debugEnabled) {
-          _this.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this.options.sockjsReconnectInterval + 'ms');
+        if (_this2.options.debugEnabled) {
+          _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
         }
-        if (angular.isFunction(_this.onclose)) {
-          _this.onclose();
+        if (angular.isFunction(_this2.onclose)) {
+          _this2.onclose();
         }
-        _this.instance = undefined;
+        _this2.instance = undefined;
 
-        if (!_this.disconnectTimeoutEnabled) {
+        if (!_this2.disconnectTimeoutEnabled) {
           // reconnect required asap
-          if (_this.options.debugEnabled) {
-            _this.$log.debug('[Vert.x EB Stub] Reconnect immediately');
+          if (_this2.options.debugEnabled) {
+            _this2.$log.debug('[Vert.x EB Stub] Reconnect immediately');
           }
-          _this.disconnectTimeoutEnabled = true;
-          _this.connect();
-        } else if (_this.options.reconnectEnabled) {
+          _this2.disconnectTimeoutEnabled = true;
+          _this2.connect();
+        } else if (_this2.options.reconnectEnabled) {
           // automatical reconnect after timeout
-          if (_this.options.debugEnabled) {
-            _this.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this.options.sockjsReconnectInterval + 'ms');
+          if (_this2.options.debugEnabled) {
+            _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
           }
-          _this.$timeout(function () {
-            return _this.connect();
-          }, _this.options.sockjsReconnectInterval);
+          _this2.$timeout(function () {
+            return _this2.connect();
+          }, _this2.options.sockjsReconnectInterval);
         }
       };
     }
@@ -1110,13 +1116,13 @@ var EventbusWrapper = (function (_BaseWrapper) {
   }, {
     key: 'registerHandler',
     value: function registerHandler(address, handler) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.instance) {
         this.instance.registerHandler(address, handler);
         // and return the deregister callback
         var deconstructor = function deconstructor() {
-          _this2.unregisterHandler(address, handler);
+          _this3.unregisterHandler(address, handler);
         };
         deconstructor.displayName = '' + _moduleName.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
         return deconstructor;
@@ -1155,19 +1161,19 @@ module.exports = exports['default'];
 },{"../../config.js":1,"./Base":9}],11:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
 var _BaseWrapper2 = require('./Base');
 
-var _BaseWrapper3 = _interopRequireWildcard(_BaseWrapper2);
+var _BaseWrapper3 = _interopRequireDefault(_BaseWrapper2);
 
 var NoopWrapper = (function (_BaseWrapper) {
   function NoopWrapper() {
@@ -1196,21 +1202,21 @@ angular.module(_moduleName.moduleName, ['ng']);
 },{"./config":1}],13:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _moduleName = require('./config');
 
 var _LiveDelegate = require('./lib/service/delegate/Live');
 
-var _LiveDelegate2 = _interopRequireWildcard(_LiveDelegate);
+var _LiveDelegate2 = _interopRequireDefault(_LiveDelegate);
 
 var _NoopDelegate = require('./lib/service/delegate/Noop');
 
-var _NoopDelegate2 = _interopRequireWildcard(_NoopDelegate);
+var _NoopDelegate2 = _interopRequireDefault(_NoopDelegate);
 
 var _InterfaceService = require('./lib/service/InterfaceService');
 
-var _InterfaceService2 = _interopRequireWildcard(_InterfaceService);
+var _InterfaceService2 = _interopRequireDefault(_InterfaceService);
 
 /**
  * @description
@@ -1262,17 +1268,17 @@ angular.module(_moduleName.moduleName).provider('vertxEventBusService', function
 },{"./config":1,"./lib/service/InterfaceService":5,"./lib/service/delegate/Live":7,"./lib/service/delegate/Noop":8}],14:[function(require,module,exports){
 'use strict';
 
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
 
 var _moduleName = require('./config');
 
 var _EventbusWrapper = require('./lib/wrapper/Eventbus');
 
-var _EventbusWrapper2 = _interopRequireWildcard(_EventbusWrapper);
+var _EventbusWrapper2 = _interopRequireDefault(_EventbusWrapper);
 
 var _NoopWrapper = require('./lib/wrapper/Noop');
 
-var _NoopWrapper2 = _interopRequireWildcard(_NoopWrapper);
+var _NoopWrapper2 = _interopRequireDefault(_NoopWrapper);
 
 /**
  * An AngularJS wrapper for projects using the VertX Event Bus
