@@ -16,9 +16,7 @@ Client side library using VertX Event Bus as an Angular Service module
 
 Either download it manually or install it automatically with Bower: `bower install angular-vertxbus --save`
 
-If you have a standard non AMD styled project, use `dist/angular-vertxbus.js` or `dist/angular-vertxbus.min.js`.
-
-In case of an AMD styled project, there is also a package available at `dist/requirejs/angular-vertxbus.js`. In addition, because of the lack of vertxbus package, there is a Vert.X Event Bus package at `dist/requirejs/vertxbus.js` which includes the version of the Event Bus defined in the `bower.json`.
+Then only import `dist/angular-vertxbus.js` or `dist/angular-vertxbus.min.js`. The file itself comes with a CJS header.
 
 Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](https://cdnjs.com/libraries/angular-vertxbus).
 
@@ -27,15 +25,16 @@ Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](http
 You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
 
 ```javascript
-angular.module('your-component', ['knalli.angular-vertxbus']).controller('MyCtrl', function(vertxEventBus, vertxEventBusService){
+angular.module('app', ['knalli.angular-vertxbus'])
+  .controller('MyCtrl', function(vertxEventBus, vertxEventBusService) {
 
-  // using the EventBus directly
-  vertxEventBus.send('my.address', {data: 123});
+    // using the EventBus directly
+    vertxEventBus.send('my.address', {data: 123});
 
-  // using the service
-  vertxEventBusService.send('my.address', {data: 123})
+    // using the service
+    vertxEventBusService.send('my.address', {data: 123})
 
-});
+  });
 ```
 
 ### Consume messages
@@ -55,18 +54,22 @@ vertxEventBusService.publish('myaddress', {data: 123});
 ### Send a message
 
 ```javascript
-vertxEventBusService.send('myaddress', {data: 123}).then(function(reply){
-  console.log('A reply received: ', reply);
-}).catch(function(){
-  console.warn('No message');
-});
+vertxEventBusService.send('myaddress', {data: 123})
+  .then(function(reply) {
+    console.log('A reply received: ', reply);
+  })
+  .catch(function() {
+    console.warn('No message');
+  });
 
 // The "No reply message found" is controlled via a timeout (default 10000ms)
-vertxEventBusService.send('myaddress', {data: 123}, 3000).then(function(reply){
-  console.log('A reply received: ', reply);
-}).catch(function(){
-  console.warn('No message within 3 seconds');
-});
+vertxEventBusService.send('myaddress', {data: 123}, {timeout: 3000})
+  .then(function(reply) {
+    console.log('A reply received: ', reply);
+  })
+  .catch(function() {
+    console.warn('No message within 3 seconds');
+  });
 ```
 
 ## Advanced configuration
@@ -76,13 +79,13 @@ The module has some advanced configuration options. Perhaps you do not have to c
 Each module configuration option must be defined in the `run` phase, i.e.:
 
 ```javascript
-var module = angular.module('your-component', ['knalli.angular-vertxbus']);
-module.config(function(vertxEventBusProvider) {
-  vertxEventBusProvider
-  .enable()
-  .useReconnect()
-  .useUrlServer('http://live.example.org:8888');
-});
+angular.module('app', ['knalli.angular-vertxbus'])
+  .config(function(vertxEventBusProvider) {
+    vertxEventBusProvider
+      .enable()
+      .useReconnect()
+      .useUrlServer('http://live.example.org:8888');
+  });
 ```
 | Config Function            | Default         | Description         |
 | -------------------------- | --------------- | ------------------- |
@@ -134,7 +137,8 @@ In addition to this, when sending a message with an expected reply:
 
 ```javascript
 // Same as vertx.EventBus.send() but with a promise
-service.send('myaddress', data).then(function(replyMessage) {})
+service.send('myaddress', data)
+  .then(function(replyMessage) {})
 ```
 
 For each connect or disconnect, a global broadcast will be emitted (on `$rootScope` with `'vertx-eventbus.system.connected'`, `'vertx-eventbus.system.disconnected'`)
