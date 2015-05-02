@@ -325,7 +325,7 @@ class LiveDelegate extends BaseDelegate {
    * Unless an open connection was found, the callback will be queued in the message buffer (if available).
    *
    * @param {function} fn callback
-   * @returns {boolean} false if the callback could be performed or queued
+   * @returns {boolean} false if the callback cannot be performed or queued
    */
   ensureOpenConnection(fn) {
     if (this.isConnectionOpen()) {
@@ -352,7 +352,7 @@ class LiveDelegate extends BaseDelegate {
    * Unless a valid session exist (but required), the callback will be not invoked.
    *
    * @param {function} fn callback
-   * @returns {boolean} false if the callback could be performed or queued
+   * @returns {boolean} false if the callback cannot be performed or queued
    */
   ensureOpenAuthConnection(fn) {
     if (!this.options.loginRequired) {
