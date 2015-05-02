@@ -4,93 +4,159 @@ import EventbusWrapper from './lib/wrapper/Eventbus';
 import NoopWrapper from './lib/wrapper/Noop';
 
 /**
+ * @ngdoc service
+ * @module knalli.angular-vertxbus
+ * @name knalli.angular-vertxbus.vertxEventBusProvider
+ * @description
  * An AngularJS wrapper for projects using the VertX Event Bus
- *
- * @param {boolean} [enabled=true] -  if false, the usage of the Event Bus will
- *                                    be disabled (actually, no vertx.EventBus will be created)
- * @param {boolean} [debugEnabled=false] - if true, some additional debug loggings will be displayed
- * @param {string} [prefix='vertx-eventbus.'] -
- *                                    a prefix used for the global broadcasts
- * @param {string} [urlServer=location.protocol + '//' + location.hostname + ':' + (location.port || 80)] -
- *                                    full URL to the server (change it if the server is not the origin)
- * @param {string} [urlPath='/eventbus'] - path to the event bus
- * @param {boolean} [reconnectEnabled=true] - if false, the disconnect will be recognized but no further actions
- * @param {number} [sockjsStateInterval=10000] - defines the check interval (in ms) of the underlayling SockJS connection
- * @param {number} [sockjsReconnectInterval=10000] - defines the wait time (in ms) for a reconnect after a disconnect has been recognized
- * @param {object} [sockjsOptions={}] - optional SockJS options (new SockJS(url, undefined, options))
  */
+
+const DEFAULTS = {
+  enabled: true,
+  debugEnabled: false,
+  urlServer: `${location.protocol}//${location.hostname}` + ((() => {if (location.port) { return `:${location.port}`; }})() || ''),
+  urlPath: '/eventbus',
+  reconnectEnabled: true,
+  sockjsReconnectInterval: 10000,
+  sockjsOptions: {}
+};
+
 angular.module(moduleName)
 .provider('vertxEventBus', function () {
 
-  // default options for this module: TODO doc
-  const DEFAULT_OPTIONS = {
-    enabled: true,
-    debugEnabled: false,
-    prefix: 'vertx-eventbus.',
-    urlServer: `${location.protocol}//${location.hostname}` + ((() => {if (location.port) { return `:${location.port}`; }})() || ''),
-    urlPath: '/eventbus',
-    reconnectEnabled: true,
-    sockjsStateInterval: 10000,
-    sockjsReconnectInterval: 10000,
-    sockjsOptions: {},
-    messageBuffer: 0
-  };
-
   // options (globally, application-wide)
-  var options = angular.extend({}, DEFAULT_OPTIONS);
+  var options = angular.extend({}, DEFAULTS);
 
-  this.enable = (value = DEFAULT_OPTIONS.enabled) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#enable
+   *
+   * @description
+   * Enables or disables the service. This setup is immutable.
+   *
+   * @param {boolean} [value=true] service is enabled on startup
+   * @returns {object} this
+   */
+  this.enable = (value = DEFAULTS.enabled) => {
     options.enabled = (value === true);
     return this;
   };
 
-  this.useDebug = (value = DEFAULT_OPTIONS.debugEnabled) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#useDebug
+   *
+   * @description
+   * Enables a verbose mode in which certain events will be logged to `$log`.
+   *
+   * @param {boolean} [value=false] verbose mode (using `$log`)
+   * @returns {object} this
+   */
+  this.useDebug = (value = DEFAULTS.debugEnabled) => {
     options.debugEnabled = (value === true);
     return this;
   };
 
-  this.usePrefix = (value = DEFAULT_OPTIONS.prefix) => {
-    options.prefix = value;
-    return this;
-  };
-
-  this.useUrlServer = (value = DEFAULT_OPTIONS.urlServer) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#useUrlServer
+   *
+   * @description
+   * Overrides the url part "server" for connecting. The default is based on
+   * - `location.protocol`
+   * - `location.hostname`
+   * - `location.port`
+   *
+   * i.e. `http://domain.tld` or `http://domain.tld:port`
+   *
+   * @param {boolean} [value=$computed] server to connect (default based on `location.protocol`, `location.hostname` and `location.port`)
+   * @returns {object} this
+   */
+  this.useUrlServer = (value = DEFAULTS.urlServer) => {
     options.urlServer = value;
     return this;
   };
 
-  this.useUrlPath = (value = DEFAULT_OPTIONS.urlPath) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#useUrlPath
+   *
+   * @description
+   * Overrides the url part "path" for connection.
+   *
+   * @param {boolean} [value='/eventbus'] path to connect
+   * @returns {object} this
+   */
+  this.useUrlPath = (value = DEFAULTS.urlPath) => {
     options.urlPath = value;
     return this;
   };
 
-  this.useReconnect = (value = DEFAULT_OPTIONS.reconnectEnabled) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#useReconnect
+   *
+   * @description
+   * Enables or disables the automatic reconnect handling.
+   *
+   * @param {boolean} [value=true] if a disconnect was being noted, a reconnect will be enforced automatically
+   * @returns {object} this
+   */
+  this.useReconnect = (value = DEFAULTS.reconnectEnabled) => {
     options.reconnectEnabled = value;
     return this;
   };
 
-  this.useSockJsStateInterval = (value = DEFAULT_OPTIONS.sockjsStateInterval) => {
-    options.sockjsStateInterval = value;
-    return this;
-  };
-
-  this.useSockJsReconnectInterval = (value = DEFAULT_OPTIONS.sockjsReconnectInterval) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#useSockJsReconnectInterval
+   *
+   * @description
+   * Overrides the timeout for reconnecting after a disconnect was found.
+   *
+   * @param {boolean} [value=10000] time between a disconnect and the next try to reconnect (in ms)
+   * @returns {object} this
+   */
+  this.useSockJsReconnectInterval = (value = DEFAULTS.sockjsReconnectInterval) => {
     options.sockjsReconnectInterval = value;
     return this;
   };
 
-  this.useSockJsOptions = (value = DEFAULT_OPTIONS.sockjsOptions) => {
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#useSockJsOptions
+   *
+   * @description
+   * Sets additional params for the `SockJS` instance.
+   *
+   * Internally, it will be applied (as `options`) like `new SockJS(url, undefined, options)`.
+   *
+   * @param {boolean} [value={}]  optional params for raw SockJS options
+   * @returns {object} this
+   */
+  this.useSockJsOptions = (value = DEFAULTS.sockjsOptions) => {
     options.sockjsOptions = value;
     return this;
   };
 
-  this.useMessageBuffer = (value = DEFAULT_OPTIONS.messageBuffer) => {
-    options.messageBuffer = value;
-    return this;
-  };
-
   /**
-   *
+   * @ngdoc service
+   * @module knalli.angular-vertxbus
+   * @name knalli.angular-vertxbus.vertxEventBus
    * @description
    * A stub representing the Vert.x EventBus (core functionality)
    *
@@ -99,24 +165,24 @@ angular.module(moduleName)
    * This stub ensures only one object holding the current active instance of the bus.
    *
    * The stub supports theses Vert.x Event Bus APIs:
-   *  - close()
-   *  - login(username, password, replyHandler)
-   *  - send(address, message, handler)
-   *  - publish(address, message)
-   *  - registerHandler(adress, handler)
-   *  - unregisterHandler(address, handler)
-   *  - readyState()
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_close close()}
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_login login(username, password, replyHandler)}
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_send send(address, message, handler)}
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_publish publish(address, message)}
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_registerHandler registerHandler(adress, handler)}
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_unregisterHandler unregisterHandler(address, handler)}
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_readyState readyState()}
    *
    * Furthermore, the stub supports theses extra APIs:
-   *  - reconnect()
+   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_reconnect reconnect()}
    *
-   * @param $timeout
-   * @param $log
+   * @requires $timeout
+   * @requires $log
    */
   this.$get = ($timeout, $log) => {
 
     // Current options (merged defaults with application-wide settings)
-    let instanceOptions = angular.extend({}, DEFAULT_OPTIONS, options);
+    let instanceOptions = angular.extend({}, DEFAULTS, options);
 
     if (instanceOptions.enabled && vertx && vertx.EventBus) {
       if (instanceOptions.debugEnabled) {

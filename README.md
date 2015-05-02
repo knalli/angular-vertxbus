@@ -22,6 +22,12 @@ Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](http
 
 ## How to use
 
+### API
+
+An [Api Documentation](http://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus) is available.
+
+### Quick start
+
 You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
 
 ```javascript
@@ -87,19 +93,9 @@ angular.module('app', ['knalli.angular-vertxbus'])
       .useUrlServer('http://live.example.org:8888');
   });
 ```
-| Config Function            | Default         | Description         |
-| -------------------------- | --------------- | ------------------- |
-| enable(bool)               | `true`          | if false, the usage of the Event Bus will be disabled (actually, no `vertx.EventBus` will be created) |
-| useDebug(bool)             | `false`         | if true, some additional debug loggings will be displayed |
-| usePrefix(string)          | `'vertx-eventbus.'` | a prefix used for the global broadcasts |
-| useUrlServer(string)       | (same origin)\* | full URL to the server (must be changed if the target server is not the origin) |
-| useUrlPath(string)         | `'/eventbus'`   | path to the event bus |
-| useReconnect               | `true`          | if false, the disconnect will be recognized but no further actions |
-| useSockJsStateInterval     | `10000` (ms)    | defines the check interval of the underlayling SockJS connection |
-| useSockJsReconnectInterval | `10000` (ms)    | defines the wait time for a reconnect after a disconnect has been recognized |
-| useSockJsOptions           | `{}`            | optional SockJS options (technically `new SockJS(url, undefined, sockjsOptions)`) |
 
-* `location.protocol + '//' + location.hostname + (if location.port then ':' + location.port else '')`
+Please have a look at the API documentation for [vertxEventBusProvider](http://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus.vertxEventBusProvider)
+and [vertxEventBusServiceProvider](http://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus.vertxEventBusServiceProvider) for further options.
 
 ## Architecture details
 

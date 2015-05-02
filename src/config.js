@@ -1,3 +1,3 @@
-var moduleName = 'knalli.angular-vertxbus';
+const moduleName = 'knalli.angular-vertxbus';
 
 export {moduleName};

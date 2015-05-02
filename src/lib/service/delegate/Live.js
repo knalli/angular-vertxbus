@@ -4,17 +4,70 @@ import Queue from './../../helpers/Queue';
 import SimpleMap from './../../helpers/SimpleMap';
 import BaseDelegate from './Base';
 
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name disconnected
+ *
+ * @description
+ * After a connection was being terminated.
+ *
+ * Event name is `prefix + 'system.disconnected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name connected
+ *
+ * @description
+ * After a connection was being established
+ *
+ * Event name is `prefix + 'system.connected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name login-succeeded
+ *
+ * @description
+ * After a login has been validated successfully
+ *
+ * Event name is `prefix + 'system.login.succeeded'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ *
+ * @param {object} data data
+ * @param {boolean} data.status must be `'ok'`
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name login-failed
+ *
+ * @description
+ * After a login has been destroyed or was invalidated
+ *
+ * Event name is `prefix + 'system.login.failed'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ *
+ * @param {object} data data
+ * @param {boolean} data.status must be not`'ok'`
+ */
+
 class LiveDelegate extends BaseDelegate {
   constructor($rootScope, $interval, $log, $q, eventBus, {
     enabled,
     debugEnabled,
     prefix,
-    urlServer,
-    urlPath,
-    reconnectEnabled,
     sockjsStateInterval,
-    sockjsReconnectInterval,
-    sockjsOptions,
     messageBuffer,
     loginRequired
     }) {
@@ -28,12 +81,7 @@ class LiveDelegate extends BaseDelegate {
       enabled,
       debugEnabled,
       prefix,
-      urlServer,
-      urlPath,
-      reconnectEnabled,
       sockjsStateInterval,
-      sockjsReconnectInterval,
-      sockjsOptions,
       messageBuffer,
       loginRequired
     };
@@ -51,6 +99,7 @@ class LiveDelegate extends BaseDelegate {
     this.initialize();
   }
 
+  // internal
   initialize() {
     this.eventBus.onopen = () => this.onEventbusOpen();
     this.eventBus.onclose = () => this.onEventbusClose();
@@ -61,6 +110,7 @@ class LiveDelegate extends BaseDelegate {
     this.$interval((() => connectionIntervalCheck()), this.options.sockjsStateInterval);
   }
 
+  // internal
   onEventbusOpen() {
     this.getConnectionState(true);
     if (!this.states.connected) {
@@ -81,6 +131,7 @@ class LiveDelegate extends BaseDelegate {
     }
   }
 
+  // internal
   onEventbusClose() {
     this.getConnectionState(true);
     if (this.states.connected) {
@@ -89,10 +140,23 @@ class LiveDelegate extends BaseDelegate {
     }
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#observe
+   *
+   * @description
+   * Adds an observer
+   *
+   * @param {object} observer observer
+   * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
+   */
   observe(observer) {
     this.observers.push(observer);
   }
 
+  // internal
   afterEventbusConnected() {
     for (let observer of this.observers) {
       if (angular.isFunction(observer.afterEventbusConnected)) {
@@ -102,17 +166,17 @@ class LiveDelegate extends BaseDelegate {
   }
 
   /**
-   * On message callback
-   * @callback Eventbus~onMessageCallback
-   * @param {object} message
-   * @param {string} replyTo
-   */
-
-  /**
-   * Register a callback handler for the specified address match.
-   * @param {string} address
-   * @param {Eventbus~onMessageCallback} callback
-   * @returns {function=}
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#registerHandler
+   *
+   * @description
+   * Registers a callback handler for the specified address match.
+   *
+   * @param {string} address target address
+   * @param {function} callback handler with params `(message, replyTo)`
+   * @returns {function=} deconstructor
    */
   registerHandler(address, callback) {
     if (!angular.isFunction(callback)) {
@@ -131,9 +195,16 @@ class LiveDelegate extends BaseDelegate {
   }
 
   /**
-   * Remove a callback handler for the specified address match.
-   * @param {string} address
-   * @param {Eventbus~onMessageCallback} callback
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#unregisterHandler
+   *
+   * @description
+   * Removes a callback handler for the specified address match.
+   *
+   * @param {string} address target address
+   * @param {function} callback handler with params `(message, replyTo)`
    */
   unregisterHandler(address, callback) {
     if (!angular.isFunction(callback)) {
@@ -146,13 +217,20 @@ class LiveDelegate extends BaseDelegate {
     this.callbackMap.remove(callback);
   }
   /**
-   * Send a message to the specified address (using EventBus.send).
-   * @param {string} address - targeting address in the bus
-   * @param {object} message - payload
-   * @param {number} [timeout=10000] - timeout (in ms) after which the promise will be rejected
-   * @param {boolean} [expectReply=true] - if false, the promise will be resolved directly and
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#send
+   *
+   * @description
+   * Sends a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_send vertxEventBus.send()}).
+   *
+   * @param {string} address target address
+   * @param {object} message payload message
+   * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
+   * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
    *                                       no replyHandler will be created
-   * @returns {promise}
+   * @returns {object} promise
    */
   send(address, message, timeout = 10000, expectReply = true) {
     let deferred = this.$q.defer();
@@ -183,20 +261,38 @@ class LiveDelegate extends BaseDelegate {
   }
 
   /**
-   * Publish a message to the specified address (using EventBus.publish).
-   * @param {string} address - targeting address in the bus
-   * @param {object} message - payload
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#publish
+   *
+   * @description
+   * Publishes a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_publish vertxEventBus.publish()}).
+   *
+   * @param {string} address target address
+   * @param {object} message payload message
+   * @returns {boolean} false if cannot be send or queued
    */
   publish(address, message) {
     return this.ensureOpenAuthConnection(() => this.eventBus.publish(address, message));
   }
 
   /**
-   * Send a login message
-   * @param {string} [options.username] username
-   * @param {string} [options.password] password
-   * @param {number} [timeout=5000]
-   * @returns {promise}
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#login
+   *
+   * @description
+   * Sends a login request
+   *
+   * See also
+   * - {@link knalli.angular-vertxbus.vertxEventBus#methods_login vertxEventBus.login()}
+   *
+   * @param {string} username credential's username
+   * @param {string} password credential's password
+   * @param {number=} [timeout=5000] timeout
+   * @returns {object} promise
    */
   login(username = this.options.username, password = this.options.password, timeout = 5000) {
     let deferred = this.$q.defer();
@@ -217,6 +313,20 @@ class LiveDelegate extends BaseDelegate {
     return deferred.promise;
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#ensureOpenConnection
+   *
+   * @description
+   * Ensures the callback will be performed with an open connection.
+   *
+   * Unless an open connection was found, the callback will be queued in the message buffer (if available).
+   *
+   * @param {function} fn callback
+   * @returns {boolean} false if the callback cannot be performed or queued
+   */
   ensureOpenConnection(fn) {
     if (this.isConnectionOpen()) {
       fn();
@@ -228,6 +338,22 @@ class LiveDelegate extends BaseDelegate {
     return false;
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#ensureOpenAuthConnection
+   *
+   * @description
+   * Ensures the callback will be performed with a valid session.
+   *
+   * Unless `loginRequired` is enabled, this will be simple forward.
+   *
+   * Unless a valid session exist (but required), the callback will be not invoked.
+   *
+   * @param {function} fn callback
+   * @returns {boolean} false if the callback cannot be performed or queued
+   */
   ensureOpenAuthConnection(fn) {
     if (!this.options.loginRequired) {
       // easy: no login required
@@ -250,6 +376,18 @@ class LiveDelegate extends BaseDelegate {
     }
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#getConnectionState
+   *
+   * @description
+   * Returns the current connection state. The state is being cached internally.
+   *
+   * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
+   * @returns {number} state type of vertx.EventBus
+   */
   getConnectionState(immediate) {
     if (this.options.enabled) {
       if (immediate) {
@@ -261,22 +399,67 @@ class LiveDelegate extends BaseDelegate {
     return this.connectionState;
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#isConnectionOpen
+   *
+   * @description
+   * Returns true if the current connection state ({@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()}) is `OPEN`.
+   *
+   * @returns {boolean} connection open state
+   */
   isConnectionOpen() {
     return this.getConnectionState() === this.eventBus.EventBus.OPEN;
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#isValidSession
+   *
+   * @description
+   * Returns true if the session is valid
+   *
+   * @returns {boolean} state
+   */
   isValidSession() {
     return this.states.validSession;
   }
 
+  // internal
   isConnected() {
     return this.states.connected;
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#isEnabled
+   *
+   * @description
+   * Returns true if service is being enabled.
+   *
+   * @returns {boolean} state
+   */
   isEnabled() {
     return this.options.enabled;
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#isConnectionOpen
+   *
+   * @description
+   * Returns the current amount of messages in the internal buffer.
+   *
+   * @returns {number} amount
+   */
   getMessageQueueLength() {
     return this.messageQueue.size();
   }

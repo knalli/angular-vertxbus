@@ -1,6 +1,6 @@
 {
   "name": "angular-vertxbus",
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-beta.6",
   "description": "AngularJS facade and service acting as a Vert.x SockJS client",
   "main": "dist/angular-vertxbus.js",
   "keywords": [
@@ -55,6 +55,7 @@
     "grunt-conventional-changelog": "~1.1.x",
     "grunt-extract-sourcemap": "^0.1.14",
     "grunt-karma": "~0.9.0",
+    "grunt-ngdocs": "^0.2.7",
     "istanbul": "^0.3.5",
     "karma": "~0.12.28",
     "karma-babel-preprocessor": "^5.0.1",
