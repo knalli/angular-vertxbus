@@ -136,7 +136,7 @@ angular.module(moduleName)
    * @module knalli.angular-vertxbus
    * @name knalli.angular-vertxbus.vertxEventBusService
    * @description
-   * A service utilizing an underlaying Vert.x Event Bus
+   * A service utilizing an underlying Vert.x Event Bus
    *
    * The advanced features of this service are:
    *  - broadcasting the connection changes (vertx-eventbus.system.connected, vertx-eventbus.system.disconnected) on $rootScope
