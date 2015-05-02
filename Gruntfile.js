@@ -147,7 +147,7 @@ module.exports = function (grunt) {
       options: {
         dest: 'dist/docs',
         html5Mode: false,
-        startPage: '/api',
+        startPage: '/api/knalli.angular-vertxbus',
         scripts: [
           'angular.js',
           'docs/github-badge.js'
