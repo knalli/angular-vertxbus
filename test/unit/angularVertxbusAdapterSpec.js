@@ -374,8 +374,8 @@ describe('knalli.angular-vertxbus', function () {
     describe('with disabled message queue (default)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+        vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
       beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_) {
@@ -419,8 +419,8 @@ describe('knalli.angular-vertxbus', function () {
     describe('with enabled message queue (size 3)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(3);
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+        vertxEventBusServiceProvider.useMessageBuffer(3);
       }));
 
       beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_) {
@@ -503,8 +503,8 @@ describe('knalli.angular-vertxbus', function () {
     describe('should broadcast event', function () {
       var vertxEventBus, vertxEventBusService, $rootScope, $timeout, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+        vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
       beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_) {
@@ -562,7 +562,7 @@ describe('knalli.angular-vertxbus', function () {
       var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+        vertxEventBusServiceProvider.useMessageBuffer(0);
         vertxEventBusServiceProvider.requireLogin(true);
       }));
 
@@ -597,8 +597,8 @@ describe('knalli.angular-vertxbus', function () {
     describe('when the service is not connected correctly (stalled connection)', function () {
       var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+        vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
       }));
 
       beforeEach(inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
@@ -751,8 +751,8 @@ describe('knalli.angular-vertxbus', function () {
 
       var vertxEventBusService;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+        vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
       beforeEach(inject(function (_vertxEventBusService_) {
@@ -795,8 +795,8 @@ describe('knalli.angular-vertxbus', function () {
 
     var vertxEventBusService;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-        vertxEventBusProvider.useMessageBuffer(0);
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
     beforeEach(inject(function (_vertxEventBusService_) {
@@ -837,8 +837,8 @@ describe('knalli.angular-vertxbus', function () {
 
     var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-      vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
     }));
 
     beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
@@ -889,8 +889,8 @@ describe('knalli.angular-vertxbus', function () {
 
     var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
-      vertxEventBusProvider.useMessageBuffer(0).useDebug(true);
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
     }));
 
     beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {

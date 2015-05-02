@@ -95,6 +95,10 @@ module.exports = function (grunt) {
       scripts : {
         files : ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
         tasks : ['karma:unit']
+      },
+      ngdocs: {
+        files : ['src/**/*.js'],
+        tasks : ['ngdocs:api']
       }
     },
     browserify: {
@@ -139,6 +143,14 @@ module.exports = function (grunt) {
         dest : 'CHANGELOG.md'
       }
     },
+    ngdocs: {
+      options: {
+        dest: 'docs',
+        html5Mode: false,
+        startPage: '/api'
+      },
+      api: ['src/**/*.js']
+    },
 
     'bower-install-simple' : loadTestScopeConfigurations()
 
@@ -162,6 +174,14 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('test-server', [
     'karma:server'
+  ]);
+
+  grunt.registerTask('docs', [
+    'ngdocs:api'
+  ]);
+
+  grunt.registerTask('watch-docs', [
+    'docs', 'watch:ngdocs'
   ]);
 
   // Building & releasing

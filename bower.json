@@ -14,7 +14,8 @@
     "/temp/",
     "/test/",
     "/test_scopes/",
-    "/build/"
+    "/build/",
+    "/docs/"
   ],
   "repository": {
     "type": "git",

@@ -4,17 +4,70 @@ import Queue from './../../helpers/Queue';
 import SimpleMap from './../../helpers/SimpleMap';
 import BaseDelegate from './Base';
 
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name disconnected
+ *
+ * @description
+ * After a connection was being terminated.
+ *
+ * Event name is `prefix + 'system.disconnected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name connected
+ *
+ * @description
+ * After a connection was being established
+ *
+ * Event name is `prefix + 'system.connected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name login-succeeded
+ *
+ * @description
+ * After a login has been validated successfully
+ *
+ * Event name is `prefix + 'system.login.succeeded'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ *
+ * @param {object} data data
+ * @param {boolean} data.status must be `'ok'`
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
+ * @name login-failed
+ *
+ * @description
+ * After a login has been destroyed or was invalidated
+ *
+ * Event name is `prefix + 'system.login.failed'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ *
+ * @param {object} data data
+ * @param {boolean} data.status must be not`'ok'`
+ */
+
 class LiveDelegate extends BaseDelegate {
   constructor($rootScope, $interval, $log, $q, eventBus, {
     enabled,
     debugEnabled,
     prefix,
-    urlServer,
-    urlPath,
-    reconnectEnabled,
     sockjsStateInterval,
-    sockjsReconnectInterval,
-    sockjsOptions,
     messageBuffer,
     loginRequired
     }) {
@@ -28,12 +81,7 @@ class LiveDelegate extends BaseDelegate {
       enabled,
       debugEnabled,
       prefix,
-      urlServer,
-      urlPath,
-      reconnectEnabled,
       sockjsStateInterval,
-      sockjsReconnectInterval,
-      sockjsOptions,
       messageBuffer,
       loginRequired
     };
