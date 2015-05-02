@@ -145,9 +145,13 @@ module.exports = function (grunt) {
     },
     ngdocs: {
       options: {
-        dest: 'docs',
+        dest: 'dist/docs',
         html5Mode: false,
-        startPage: '/api'
+        startPage: '/api',
+        scripts: [
+          'angular.js',
+          'docs/github-badge.js'
+        ]
       },
       api: ['src/**/*.js']
     },

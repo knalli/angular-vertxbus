@@ -3,7 +3,7 @@ node_modules
 components
 bower_components
 temp
-docs
+dist/docs
 
 # Test Stuff
 /test/
