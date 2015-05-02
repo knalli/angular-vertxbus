@@ -1,3 +1,33 @@
+<a name="2.0.0-beta.6"></a>
+### 2.0.0-beta.6 (2015-05-02)
+
+
+#### Breaking Changes
+
+* configuration settings rearranged/moved
+
+Until now options were not be correctly assigned to its actual service. This has been changed.
+
+The wrapper has following options:
+- enabled
+- debugEnabled
+- urlServer
+- urlPath
+- reconnectEnabled
+- sockjsReconnectInterval
+- sockjsOptions
+- messageBuffer
+
+The service has following options:
+- enabled
+- debugEnabled
+- loginRequired
+- prefix
+- sockjsStateInterval
+- messageBuffer
+
+For each configuration property you will an appropriate setter.
+
 <a name="2.0.0-beta.5"></a>
 ### 2.0.0-beta.5 (2015-05-02)
 
