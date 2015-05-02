@@ -13,6 +13,6 @@
     a.href = 'https://github.com/knalli/angular-vertxbus';
     a.appendChild(img);
     document.body.appendChild(a);
-  }, 0);
+  }, 150);
 
 })();
