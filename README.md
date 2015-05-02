@@ -24,7 +24,7 @@ Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](http
 
 ### API
 
-An [Api Documentation](http://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus) is available.
+An [Api Documentation](https://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus) is available.
 
 ### Quick start
 
@@ -94,8 +94,8 @@ angular.module('app', ['knalli.angular-vertxbus'])
   });
 ```
 
-Please have a look at the API documentation for [vertxEventBusProvider](http://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus.vertxEventBusProvider)
-and [vertxEventBusServiceProvider](http://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus.vertxEventBusServiceProvider) for further options.
+Please have a look at the API documentation for [vertxEventBusProvider](https://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus.vertxEventBusProvider)
+and [vertxEventBusServiceProvider](https://knalli.github.io/angular-vertxbus.docs/docs/#/api/knalli.angular-vertxbus.vertxEventBusServiceProvider) for further options.
 
 ## Architecture details
 
