@@ -63,7 +63,8 @@ module.exports = function (grunt) {
     },
     babel : {
       options : {
-        sourceMap : false
+        sourceMap : false,
+        sourceType: 'module'
       },
       src : {
         expand : true,
