@@ -6,16 +6,16 @@ module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
   var _ = require('lodash');
 
-  var karmaConfig = function(configFile, customOptions) {
-    var options = { configFile: configFile, keepalive: true };
-    var travisOptions = process.env.TRAVIS && { browsers: ['Firefox'], reporters: 'dots' };
+  var karmaConfig = function (configFile, customOptions) {
+    var options = {configFile : configFile, keepalive : true};
+    var travisOptions = process.env.TRAVIS && {browsers : ['Firefox'], reporters : 'dots'};
     return _.extend(options, customOptions, travisOptions);
   };
 
   // Returns configuration for bower-install plugin
   var loadTestScopeConfigurations = function () {
     var scopes = fs.readdirSync('./test_scopes').filter(function (filename) {
-      return filename[0] !== '.';
+      return typeof filename === 'string' && filename[0] !== '.';
     });
     var config = {
       options : {
@@ -25,149 +25,180 @@ module.exports = function (grunt) {
     };
     // Create a sub config for each test scope
     for (var idx in scopes) {
-      var scope = scopes[idx];
-      config['test_scopes_' + scope] = {
-        options : {
-          cwd : 'test_scopes/' + scope,
-          production : false
-        }
-      };
+      if (scopes.hasOwnProperty(idx)) {
+        var scope = scopes[idx];
+        config['test_scopes_' + scope] = {
+          options : {
+            cwd : 'test_scopes/' + scope,
+            production : false
+          }
+        };
+      }
     }
-    return  config;
+    return config;
   };
 
   grunt.initConfig({
-    pkg: grunt.file.readJSON('bower.json'),
-    meta: {
-      banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
+    pkg : grunt.file.readJSON('package.json'),
+    meta : {
+      banner : '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
+      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
+      ' Licensed <%= _.pluck(pkg.licenses, "name").join(", ") %> */'
     },
-    clean: {
-      dist: 'dist/',
-      temp: 'temp/'
+    clean : {
+      dist : 'dist/',
+      temp : 'temp/'
     },
-    watch: {
-      'coffee-src': {
-        files: ['src/**/*.coffee'],
-        tasks: ['coffee:src']
-      },
-      'coffee-test': {
-        files: ['test/**/*.coffee'],
-        tasks: ['coffee:test']
-      },
-      scripts: {
-        files: ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
-        tasks: ['jshint', 'karma:unit']
-      }
-    },
-    jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js', 'test/unit/*.js'],
-      options: {
-        eqeqeq: true,
-        globals: {
-          angular: true
+    jshint : {
+      all : ['Gruntfile.js', 'test/unit/*.js', 'src/**/*.js'],
+      options : {
+        esnext: true,
+        eqeqeq : true,
+        globals : {
+          angular : true
         }
       }
     },
-    coffee: {
-      src: {
+    babel : {
+      options : {
+        sourceMap : false
+      },
+      src : {
+        expand : true,
+        cwd : 'src/',
+        src : ['**/*.js'],
+        dest : 'temp/',
+        ext : '.js'
+      }
+    },
+    karma : {
+      unit : {
+        options : karmaConfig('karma.conf.js', {
+          singleRun : true
+        })
+      },
+      headless : {
+        options : karmaConfig('karma.conf.js', {
+          singleRun : true,
+          browsers : ['PhantomJS']
+        })
+      },
+      server : {
+        options : karmaConfig('karma.conf.js', {
+          singleRun : false
+        })
+      }
+    },
+    watch : {
+      scripts : {
+        files : ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
+        tasks : ['karma:unit']
+      },
+      ngdocs: {
+        files : ['src/**/*.js'],
+        tasks : ['ngdocs:api']
+      }
+    },
+    browserify: {
+      dist : {
         options: {
-          join: true
+          browserifyOptions: {
+            fullPaths: false,
+            debug: false // TODO enable sourcemaps
+          },
+          transform: ['babelify', require('browserify-ngannotate')],
+          banner : '<%= meta.banner %>',
+          watch: true
         },
-        files: {
-          'temp/src/angular-vertxbus-adapter.js': [
-            'src/module.coffee', 'src/wrapper.coffee', 'src/service.coffee'
+        files : {
+          'dist/angular-vertxbus.js' : [
+            'src/index.js'
           ]
         }
-      },
-      test: {
-        options: {
-          bare: true
-        },
-        expand: true,
-        cwd: 'test/',
-        src: ['unit/**/*.coffee'],
-        dest: 'temp/test/',
-        ext: '.js'
       }
     },
-    concat: {
-      src: {
-        options: {
-          banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-            '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-            ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n'
-        },
-        src: ['temp/src/**/*.js'],
-        dest: 'dist/angular-vertxbus.js'
-      },
-      lib: {
-        options: {
-          banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-            '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-            ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n'
-        },
-        src: [
-          'build-data-for-requirejs/angular-vertxbus_start.txt',
-          'temp/src/**/*.js',
-          'build-data-for-requirejs/angular-vertxbus_end.txt'
-        ],
-        dest: 'dist/requirejs/angular-vertxbus.js'
-      }
-    },
-    uglify: {
-      src: {
+    extract_sourcemap: {
+      dist: {
         files: {
-          'dist/angular-vertxbus.min.js': '<%= concat.src.dest %>'
+          'dist': ['dist/angular-vertxbus.js']
         }
       }
     },
-    karma: {
-      unit: {
-        options: karmaConfig('karma.conf.js', {
-          singleRun: true
-        })
+    uglify : {
+      options : {
+        preserveComments : 'some',
+        sourceMap: false, // TODO enable sourcemaps
+        sourceMapIn: 'dist/angular-vertxbus.js.map'
       },
-      server: {
-        options: karmaConfig('karma.conf.js', {
-          singleRun: false
-        })
+      dist : {
+        files : {
+          'dist/angular-vertxbus.min.js' : 'dist/angular-vertxbus.js'
+        }
       }
     },
-    changelog: {
-      options: {
-        dest: 'CHANGELOG.md'
+    changelog : {
+      options : {
+        dest : 'CHANGELOG.md'
       }
     },
-    ngAnnotate: {
+    ngdocs: {
       options: {
-        singleQuotes: true
+        dest: 'dist/docs',
+        html5Mode: false,
+        startPage: '/api/knalli.angular-vertxbus',
+        scripts: [
+          'angular.js',
+          'docs/github-badge.js'
+        ]
       },
-      src: {
-        src: '<%= concat.src.dest %>',
-        dest: '<%= concat.src.dest %>'
-      },
-      lib: {
-        src: '<%= concat.lib.dest %>',
-        dest: '<%= concat.lib.dest %>'
-      }
+      api: ['src/**/*.js']
     },
 
-    'bower-install-simple': loadTestScopeConfigurations()
+    'bower-install-simple' : loadTestScopeConfigurations()
 
   });
 
-  grunt.registerTask('default', ['clean:temp', 'coffee', 'jshint', 'karma:unit']);
-  grunt.registerTask('test', ['coffee', 'jshint', 'karma:unit']);
-  grunt.registerTask('install-test', ['bower-install-simple']);
-  grunt.registerTask('test-server', ['karma:server']);
-  grunt.registerTask('build', ['clean', 'coffee', 'jshint', 'karma:unit', 'concat', 'ngAnnotate', 'uglify']);
-  grunt.registerTask('release', ['changelog', 'build']);
+  // Compile and test (use "build" for dist/*)
+  grunt.registerTask('default', [
+    'clean',
+    'jshint',
+    'karma:unit'
+  ]);
+
+  // Testing
+  grunt.registerTask('test', [
+    'clean',
+    'jshint',
+    'karma:unit'
+  ]);
+  grunt.registerTask('install-test', [
+    'bower-install-simple'
+  ]);
+  grunt.registerTask('test-server', [
+    'karma:server'
+  ]);
+
+  grunt.registerTask('docs', [
+    'ngdocs:api'
+  ]);
+
+  grunt.registerTask('watch-docs', [
+    'docs', 'watch:ngdocs'
+  ]);
+
+  // Building & releasing
+  grunt.registerTask('build', [
+    'clean',
+    'jshint',
+    'karma:unit',
+    'browserify',
+    // 'extract_sourcemap',// TODO enable sourcemaps
+    'uglify'
+  ]);
+  grunt.registerTask('release', [
+    'changelog',
+    'build'
+  ]);
 };
