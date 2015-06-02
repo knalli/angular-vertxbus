@@ -1,3 +1,38 @@
+<a name="2.0.0"></a>
+## 2.0.0 (2015-06-01)
+
+This release includes everything from the 1.1.x line.
+
+#### Breaking Changes
+
+* The internal language has been changed: this project uses internally ES6+ level using BabelJS.
+* The build artifact has been changed: instead of an UMD output, a CommonJS module output is now being available.
+* The optional RequireJS variant has been dropped. Use the standard file.
+
+#### Features
+
+* **service:** change signature of <service>.send() #51 ([7534034d](http://github.com/knalli/angular-vertxbus/commit/7534034d24b5e994c4d3f9f7ac3a4d75ef6ebe1a))
+* Official support for AngularJS 1.4 (older versions are already compatible, but you had to enforce it)
+
+
+#### Breaking Changes
+
+* The arguments of vertxEventBusService.send() have
+been restructured.
+
+Instead of `send(address, message, timeout, expectReply)` it is now
+`send(address, message, {timeout, expectReply})`.
+
+Reasons for this improvement of api:
+1. Both `address` and `message` are required, but the other ones are only
+optional.
+2. Long arguments are not a good api design
+3. Using default timeout does not require an `undefined` argument or
+even a missplaced `null` or `0`.
+ ([7534034d](http://github.com/knalli/angular-vertxbus/commit/7534034d24b5e994c4d3f9f7ac3a4d75ef6ebe1a))
+
+
+
 <a name="1.1.4"></a>
 ### 1.1.4 (2015-05-01)
 
