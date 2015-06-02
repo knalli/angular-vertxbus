@@ -86,7 +86,7 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       extensions: ['.js'],
-      transform: [ 'brfs', 'babelify' ]
+      transform: [ 'babelify' ]
     },
 
     coverageReporter: isDefaultScope(scope) ? {
