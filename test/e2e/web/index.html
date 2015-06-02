@@ -10,12 +10,13 @@
       <label for="username">Username</label>
       <input type="text" id="username" ng-model="register.username"/>
       <label for="password">Password</label>
-      <input type="password" ng-model="register.password"/>
+      <input type="password" id="password" ng-model="register.password"/>
       <input type="submit" value="Login" >
       <input type="button" value="Demo: Valid user login" ng-click="login('valid', register.password)">
       <br><br>
       <input type="button" value="Register for TimeService" ng-click="registerTimeService()">
       <input type="button" value="Deregister for TimeService" ng-click="deregisterTimeService()" ng-disabled="!timeServiceActive">
+      <input type="button" value="Deregister for TimeService (2x)" ng-click="deregisterTimeService2x()" ng-disabled="!timeServiceActive">
       <input type="text" size="50" disabled ng-model="currentDateTime">
     </form>
   </div>
@@ -25,10 +26,26 @@
     <span ng-hide="sessionIsValid">Invalid Session</span>
   </div>
 
+  <fieldset>
+    <legend>Statistics</legend>
+    <dl>
+      <dt>vertxEventBus.readyState()</dt>
+      <dd>{{moduleStats.wrapper.readyState | eventBusState}}</dd>
+      <dt>vertxEventBusService.readyState()</dt>
+      <dd>{{moduleStats.service.readyState | eventBusState}}</dd>
+      <dt>vertxEventBusService.getConnectionState()</dt>
+      <dd>{{moduleStats.service.getConnectionState | eventBusState}}</dd>
+      <dt>vertxEventBusService.isEnabled()</dt>
+      <dd>{{moduleStats.service.isEnabled}}</dd>
+      <dt>vertxEventBusService.isConnected()</dt>
+      <dd>{{moduleStats.service.isConnected}}</dd>
+    </dl>
+  </fieldset>
+
   <script src="bower_components/sockjs-client/dist/sockjs.js"></script>
   <script src="bower_components/vertxbus.js/index.js"></script>
   <script src="bower_components/angular/angular.js"></script>
-  <script src="temp/src/angular-vertxbus-adapter.js"></script>
+  <script src="dist/angular-vertxbus.js"></script>
   <script src="app.js"></script>
 
 </body>

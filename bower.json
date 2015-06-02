@@ -2,7 +2,7 @@
   "author": "Jan Philipp",
   "name": "angular-vertxbus",
   "description": "AngularJS facade and service acting as a Vert.x SockJS client",
-  "version": "1.1.4",
+  "version": "2.0.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "main": "./dist/angular-vertxbus.js",
   "keywords": ["angular", "vertx", "facade", "websocket"],
@@ -11,18 +11,18 @@
     ".jshintrc",
     ".travis.yml",
     "karma.conf.js",
-    "/build-data-for-requirejs/",
     "/temp/",
     "/test/",
     "/test_scopes/",
-    "/build/"
+    "/build/",
+    "/dist/docs/"
   ],
   "repository": {
     "type": "git",
     "url": "git://github.com/knalli/angular-vertxbus"
   },
   "dependencies": {
-    "angular": ">=1.2 <=1.4",
+    "angular": ">=1.2 <=1.5",
     "sockjs-client": "~0.3.4",
     "vertxbus.js": "http://cdnjs.cloudflare.com/ajax/libs/vertx/2.0.0/vertxbus.js"
   },
