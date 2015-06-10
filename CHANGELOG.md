@@ -1,3 +1,12 @@
+<a name"2.0.1"></a>
+### 2.0.1 (2015-06-10)
+
+
+#### Bug Fixes
+
+* **wrapper:** fix npe `Cannot read property 'CLOSED' of undefined` ([e369a7ad](https://github.com/knalli/angular-vertxbus/commit/e369a7ad))
+
+
 <a name="2.0.0"></a>
 ## 2.0.0 (2015-06-01)
 

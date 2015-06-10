@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v2.0.0 - 2015-06-02
+/*! angular-vertxbus - v2.0.1 - 2015-06-10
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -1558,6 +1558,8 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -1569,12 +1571,12 @@ var _Base = require('./Base');
 var _Base2 = _interopRequireDefault(_Base);
 
 var NoopWrapper = (function (_BaseWrapper) {
-  function NoopWrapper() {
+  function NoopWrapper(EventBus) {
     _classCallCheck(this, NoopWrapper);
 
-    if (_BaseWrapper != null) {
-      _BaseWrapper.apply(this, arguments);
-    }
+    _get(Object.getPrototypeOf(NoopWrapper.prototype), 'constructor', this).call(this);
+    // actual EventBus type
+    this.EventBus = EventBus;
   }
 
   _inherits(NoopWrapper, _BaseWrapper);
@@ -2057,7 +2059,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Disabled');
       }
-      return new _libWrapperNoop2['default']();
+      return new _libWrapperNoop2['default'](vertx.EventBus);
     }
   }]; // $get
 });
