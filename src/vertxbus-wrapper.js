@@ -193,7 +193,7 @@ angular.module(moduleName)
       if (instanceOptions.debugEnabled) {
         $log.debug("[Vert.x EB Stub] Disabled");
       }
-      return new NoopWrapper();
+      return new NoopWrapper(vertx.EventBus);
     }
   }; // $get
 
