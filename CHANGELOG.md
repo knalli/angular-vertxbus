@@ -1,3 +1,12 @@
+<a name"2.0.2"></a>
+### 2.0.2 (2015-06-15)
+
+
+#### Features
+
+* **artifact:** provide a variant with polyfill included ([98e17aa4](https://github.com/knalli/angular-vertxbus/commit/98e17aa4))
+
+
 <a name"2.0.1"></a>
 ### 2.0.1 (2015-06-10)
 
