@@ -125,6 +125,11 @@ module.exports = function (grunt) {
         files: {
           'dist': ['dist/angular-vertxbus.js']
         }
+      },
+      'dist-withpolyfill': {
+        files: {
+          'dist': ['dist/angular-vertxbus.withpolyfill.js']
+        }
       }
     },
     uglify : {
@@ -137,6 +142,28 @@ module.exports = function (grunt) {
         files : {
           'dist/angular-vertxbus.min.js' : 'dist/angular-vertxbus.js'
         }
+      },
+      'dist-withPolyfill' : {
+        files : {
+          'dist/angular-vertxbus.withpolyfill.min.js' : 'dist/angular-vertxbus.withpolyfill.js'
+        }
+      }
+    },
+    concat : {
+      options : {
+        stripBanners : true,
+        banner : '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+        '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
+        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
+        ' Licensed <%= _.pluck(pkg.licenses, "name").join(", ") %> */\n'
+      },
+      'dist-withPolyfill' : {
+        src : [
+          'node_modules/babelify/node_modules/babel-core/browser-polyfill.js',
+          'dist/angular-vertxbus.js'
+        ],
+        dest : 'dist/angular-vertxbus.withpolyfill.js'
       }
     },
     changelog : {
@@ -194,9 +221,12 @@ module.exports = function (grunt) {
     'clean',
     'jshint',
     'karma:unit',
-    'browserify',
-    // 'extract_sourcemap',// TODO enable sourcemaps
-    'uglify'
+    'browserify:dist',
+    'concat:dist-withPolyfill',
+    // 'extract_sourcemap:dist',// TODO enable sourcemaps
+    // 'extract_sourcemap:dist-withPolyfill',// TODO enable sourcemaps
+    'uglify:dist',
+    'uglify:dist-withPolyfill'
   ]);
   grunt.registerTask('release', [
     'changelog',

@@ -20,6 +20,24 @@ Then only import `dist/angular-vertxbus.js` or `dist/angular-vertxbus.min.js`. T
 
 Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](https://cdnjs.com/libraries/angular-vertxbus).
 
+## Dependencies
+
+### JavaScript (Polyfill)
+
+The source code is written using newer JavaScript 2015 (partly) and is using the JavaScript transpiler [BabelJS](https://babeljs.io).
+
+Depending on your target clients, you probably need to include a browser polyfill (for ES5 clients). BabelJS itself
+recommends the [requirement of its own polyfill](https://babeljs.io/docs/usage/polyfill/). Either you use the explained
+way using npm modules and/or browserify, or you can use the alternative artifact variant `dist/angular-vertxbus.withpolyfill.js`.
+
+### AngularJS
+
+This library is being developed against *AngularJS 1.3*, and additional tests are performed against *AngularJS 1.2* and *AngularJS 1.4*.
+
+### Vert.x
+
+This library is being developed against the `eventbus.js` from Vert.X 2.
+
 ## How to use
 
 ### API
