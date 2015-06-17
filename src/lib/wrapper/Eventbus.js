@@ -143,7 +143,7 @@ class EventbusWrapper extends BaseWrapper {
         this.disconnectTimeoutEnabled = true;
         this.connect();
       } else if (this.options.reconnectEnabled) {
-        // automatical reconnect after timeout
+        // automatic reconnect after timeout
         if (this.options.debugEnabled) {
           this.$log.debug(`[Vert.x EB Stub] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
         }
