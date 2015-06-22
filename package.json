@@ -1,6 +1,6 @@
 {
   "name": "angular-vertxbus",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "AngularJS facade and service acting as a Vert.x SockJS client",
   "main": "dist/angular-vertxbus.js",
   "keywords": [
@@ -14,7 +14,7 @@
     "test": "grunt install-test && grunt test",
     "test-scopes": "grunt install-test && for f in test_scopes/*; do TEST_SCOPE=\"`basename $f`\" grunt test; done",
     "clean-test-scopes": "for f in test_scopes/*; do (cd $f; rm -rf bower_components); done",
-    "start-it-web-server": "coffee test/e2e/server.coffee",
+    "start-it-web-server": "babel-node test/e2e/server.js",
     "install-it-vertx-server": "cd test/e2e/vertx && ./install.sh",
     "start-it-vertx-server": "cd test/e2e/vertx/app && ../vert.x-2.1.1/bin/vertx run config.js"
   },
@@ -34,6 +34,7 @@
     }
   ],
   "devDependencies": {
+    "babel": "^5.6.2",
     "babelify": "~6.1.2",
     "bower": "^1.4.1",
     "browserify": "^10.2.3",
