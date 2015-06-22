@@ -190,7 +190,6 @@ class LiveDelegate extends BaseDelegate {
     }
     if (this.options.debugEnabled) {
       this.$log.debug(`[Vert.x EB Service] Register handler for ${address}`);
-      console.trace();
     }
     var callbackWrapper = (message, replyTo) => {
       callback(message, replyTo);
