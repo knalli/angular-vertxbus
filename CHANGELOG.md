@@ -1,3 +1,12 @@
+<a name"2.0.4"></a>
+### 2.0.4 (2015-06-22)
+
+
+#### Bug Fixes
+
+* **service:** remove invalid debug console ([333520b2](https://github.com/knalli/angular-vertxbus/commit/333520b2))
+
+
 <a name"2.0.3"></a>
 ### 2.0.3 (2015-06-22)
 
