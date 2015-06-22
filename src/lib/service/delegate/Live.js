@@ -112,13 +112,19 @@ class LiveDelegate extends BaseDelegate {
 
   // internal
   onEventbusOpen() {
+    let connectionStateFlipped = false;
     this.getConnectionState(true);
     if (!this.states.connected) {
       this.states.connected = true;
+      connectionStateFlipped = true;
+    }
+    // Ensure all events will be re-attached
+    this.afterEventbusConnected();
+    // Everything is online and registered again, let's notify everybody
+    if (connectionStateFlipped) {
       this.$rootScope.$broadcast(`${this.options.prefix}system.connected`);
     }
-    this.afterEventbusConnected();
-    this.$rootScope.$digest();
+    this.$rootScope.$digest(); // explicitly
     // consume message queue?
     if (this.options.messageBuffer && this.messageQueue.size()) {
       while (this.messageQueue.size()) {
@@ -184,6 +190,7 @@ class LiveDelegate extends BaseDelegate {
     }
     if (this.options.debugEnabled) {
       this.$log.debug(`[Vert.x EB Service] Register handler for ${address}`);
+      console.trace();
     }
     var callbackWrapper = (message, replyTo) => {
       callback(message, replyTo);
