@@ -1,3 +1,13 @@
+<a name"2.0.3"></a>
+### 2.0.3 (2015-06-22)
+
+
+#### Bug Fixes
+
+* **demo:** Replace CoffeeScript w/ BabelJS runner ([4dc71a07](https://github.com/knalli/angular-vertxbus/commit/4dc71a07))
+* **service:** fix doubled handler registration in special circumstances ([f3311ca5](https://github.com/knalli/angular-vertxbus/commit/f3311ca5))
+
+
 <a name"2.0.2"></a>
 ### 2.0.2 (2015-06-15)
 
