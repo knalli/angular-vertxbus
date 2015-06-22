@@ -3,10 +3,11 @@
   'use strict';
 
   angular.module('app', ['ng', 'knalli.angular-vertxbus'])
-  .config(function(vertxEventBusProvider) {
+  .config(function(vertxEventBusProvider, vertxEventBusServiceProvider) {
     vertxEventBusProvider
     .useDebug(true)
     .useUrlServer('http://localhost:8080');
+    vertxEventBusServiceProvider.useDebug(true);
   })
   .run(function ($rootScope, vertxEventBus, vertxEventBusService, $interval) {
     $rootScope.sessionIsValid = false;
