@@ -236,10 +236,11 @@ class EventbusWrapper extends BaseWrapper {
    * @param {string} address target address
    * @param {object} message payload message
    * @param {function=} replyHandler optional callback
+   * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
    */
-  send(address, message, replyHandler) {
+  send(address, message, replyHandler, failureHandler) {
     if (this.instance) {
-      this.instance.send(address, message, replyHandler);
+      this.instance.send(address, message, replyHandler, failureHandler);
     }
   }
 

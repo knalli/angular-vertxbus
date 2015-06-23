@@ -10,7 +10,7 @@ class BaseWrapper {
 
   login(username, password, replyHandler) {}
 
-  send(address, message, replyHandler) {}
+  send(address, message, replyHandler, failureHandler) {}
 
   publish(address, message) {  }
 

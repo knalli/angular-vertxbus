@@ -250,6 +250,7 @@ class LiveDelegate extends BaseDelegate {
           deferred.reject();
         }), timeout, 1);
         // Send message
+        // TODO after dropping support for Vert.x < v3, this can be enriched with failureHandler
         this.eventBus.send(address, message, (reply) => {
           this.$interval.cancel(timer); // because it's resolved
           deferred.resolve(reply);
