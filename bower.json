@@ -5,7 +5,12 @@
   "version": "3.0.0",
   "homepage": "http://github.com/knalli/angular-vertxbus",
   "main": "./dist/angular-vertxbus.js",
-  "keywords": ["angular", "vertx", "facade", "websocket"],
+  "keywords": [
+    "angular",
+    "vertx",
+    "facade",
+    "websocket"
+  ],
   "ignore": [
     ".editorconfig",
     ".jshintrc",
@@ -23,8 +28,8 @@
   },
   "dependencies": {
     "angular": ">=1.2 <=1.5",
-    "sockjs-client": "~0.3.4",
-    "vertxbus.js": "http://cdnjs.cloudflare.com/ajax/libs/vertx/2.0.0/vertxbus.js"
+    "sockjs-client": "~1.0.3",
+    "vertx3-eventbus-client": "~3.0.0"
   },
   "devDependencies": {
     "angular": "~1.4.4",

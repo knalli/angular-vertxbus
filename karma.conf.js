@@ -48,7 +48,7 @@ module.exports = function(config) {
       injectByScope(scope, 'angular/angular.js'),
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
       'test/unit/mock/sockjs.js',
-      injectByScope(scope, 'vertxbus.js/index.js'),
+      injectByScope(scope, 'vertx3-eventbus-client/vertxbus.js'),
       'src/lib/**/*.js',
       'src/vertxbus-module.js',
       'src/vertxbus-wrapper.js',
