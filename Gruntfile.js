@@ -166,9 +166,15 @@ module.exports = function (grunt) {
         dest : 'dist/angular-vertxbus.withpolyfill.js'
       }
     },
-    changelog : {
-      options : {
-        dest : 'CHANGELOG.md'
+    conventionalChangelog : {
+      options: {
+        changelogOpts: {
+          // conventional-changelog options go here
+          preset: 'angular'
+        }
+      },
+      release: {
+        src : 'CHANGELOG.md'
       }
     },
     ngdocs: {
@@ -229,7 +235,7 @@ module.exports = function (grunt) {
     'uglify:dist-withPolyfill'
   ]);
   grunt.registerTask('release', [
-    'changelog',
+    'conventionalChangelog',
     'build'
   ]);
 };
