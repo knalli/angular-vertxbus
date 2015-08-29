@@ -1,6 +1,6 @@
-/*! angular-vertxbus - v2.0.4 - 2015-06-22
+/*! angular-vertxbus - v3.0.0 - 2015-08-29
 * http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2015 Jan Philipp; Licensed MIT */
+* Copyright (c) 2015 Jan Philipp; Licensed  */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -20,16 +20,16 @@ Object.defineProperty(exports, '__esModule', {
 
 var _config = require('./config');
 
-require('./vertxbus-module');
+require('./vertxbus.module');
 
-require('./vertxbus-wrapper');
+require('./vertxbus.wrapper.provider.js');
 
-require('./vertxbus-service');
+require('./vertxbus.service.provider.js');
 
 exports['default'] = _config.moduleName;
 module.exports = exports['default'];
 
-},{"./config":1,"./vertxbus-module":12,"./vertxbus-service":13,"./vertxbus-wrapper":14}],3:[function(require,module,exports){
+},{"./config":1,"./vertxbus.module":12,"./vertxbus.service.provider.js":13,"./vertxbus.wrapper.provider.js":14}],3:[function(require,module,exports){
 /*
  Simple queue implementation
 
@@ -48,7 +48,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Queue = (function () {
   function Queue() {
-    var maxSize = arguments[0] === undefined ? 10 : arguments[0];
+    var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
 
     _classCallCheck(this, Queue);
 
@@ -116,11 +116,11 @@ var SimpleMap = (function () {
     this.clear();
   }
 
+  // Stores the value under the key.
+  // Chainable
+
   _createClass(SimpleMap, [{
     key: "put",
-
-    // Stores the value under the key.
-    // Chainable
     value: function put(key, value) {
       var idx = this._indexForKey(key);
       if (idx > -1) {
@@ -131,36 +131,36 @@ var SimpleMap = (function () {
       }
       return this;
     }
-  }, {
-    key: "get",
 
     // Returns value for key, otherwise undefined.
+  }, {
+    key: "get",
     value: function get(key) {
       var idx = this._indexForKey(key);
       if (idx > -1) {
         return this.values[idx];
       }
     }
-  }, {
-    key: "containsKey",
 
     // Returns true if the key exists.
+  }, {
+    key: "containsKey",
     value: function containsKey(key) {
       var idx = this._indexForKey(key);
       return idx > -1;
     }
-  }, {
-    key: "containsValue",
 
     // Returns true if the value exists.
+  }, {
+    key: "containsValue",
     value: function containsValue(value) {
       var idx = this._indexForValue(value);
       return idx > -1;
     }
-  }, {
-    key: "remove",
 
     // Removes the key and its value.
+  }, {
+    key: "remove",
     value: function remove(key) {
       var idx = this._indexForKey(key);
       if (idx > -1) {
@@ -168,19 +168,19 @@ var SimpleMap = (function () {
         this.values[idx] = undefined;
       }
     }
-  }, {
-    key: "clear",
 
     // Clears all keys and values.
+  }, {
+    key: "clear",
     value: function clear() {
       this.keys = [];
       this.values = [];
       return this;
     }
-  }, {
-    key: "_indexForKey",
 
     // Returns index of key, otherwise -1.
+  }, {
+    key: "_indexForKey",
     value: function _indexForKey(key) {
       for (var i in this.keys) {
         if (key === this.keys[i]) {
@@ -302,7 +302,7 @@ var InterfaceService = (function () {
           }
         }
       };
-      deconstructor.displayName = '' + _configJs.moduleName + '.service.registerHandler.deconstructor';
+      deconstructor.displayName = _configJs.moduleName + '.service.registerHandler.deconstructor';
       return deconstructor;
     }
   }, {
@@ -346,11 +346,11 @@ var InterfaceService = (function () {
   }, {
     key: 'send',
     value: function send(address, message) {
-      var options = arguments[2] === undefined ? {} : arguments[2];
+      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
       // FALLBACK: signature change since 2.0
       if (!angular.isObject(options)) {
-        this.$log.error('' + _configJs.moduleName + ': Signature of vertxEventBusService.send() has been changed!');
+        this.$log.error(_configJs.moduleName + ': Signature of vertxEventBusService.send() has been changed!');
         return this.send(address, message, {
           timeout: arguments[2] !== undefined ? arguments[2] : 10000,
           expectReply: arguments[3] !== undefined ? arguments[3] : true
@@ -466,13 +466,13 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x6, _x7, _x8) { var _again = true; _function: while (_again) { var object = _x6, property = _x7, receiver = _x8; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x6 = parent; _x7 = property; _x8 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x6, _x7, _x8) { var _again = true; _function: while (_again) { var object = _x6, property = _x7, receiver = _x8; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x6 = parent; _x7 = property; _x8 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _configJs = require('../../../config.js');
 
@@ -547,6 +547,8 @@ var _Base2 = _interopRequireDefault(_Base);
  */
 
 var LiveDelegate = (function (_BaseDelegate) {
+  _inherits(LiveDelegate, _BaseDelegate);
+
   function LiveDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
@@ -554,6 +556,7 @@ var LiveDelegate = (function (_BaseDelegate) {
     var sockjsStateInterval = _ref.sockjsStateInterval;
     var messageBuffer = _ref.messageBuffer;
     var loginRequired = _ref.loginRequired;
+    var loginInterceptor = _ref.loginInterceptor;
 
     _classCallCheck(this, LiveDelegate);
 
@@ -571,6 +574,7 @@ var LiveDelegate = (function (_BaseDelegate) {
       messageBuffer: messageBuffer,
       loginRequired: loginRequired
     };
+    this.loginInterceptor = loginInterceptor;
     this.connectionState = this.eventBus.EventBus.CLOSED;
     this.states = {
       connected: false,
@@ -585,12 +589,10 @@ var LiveDelegate = (function (_BaseDelegate) {
     this.initialize();
   }
 
-  _inherits(LiveDelegate, _BaseDelegate);
+  // internal
 
   _createClass(LiveDelegate, [{
     key: 'initialize',
-
-    // internal
     value: function initialize() {
       var _this = this;
 
@@ -610,10 +612,10 @@ var LiveDelegate = (function (_BaseDelegate) {
         return connectionIntervalCheck();
       }, this.options.sockjsStateInterval);
     }
-  }, {
-    key: 'onEventbusOpen',
 
     // internal
+  }, {
+    key: 'onEventbusOpen',
     value: function onEventbusOpen() {
       var connectionStateFlipped = false;
       this.getConnectionState(true);
@@ -625,7 +627,7 @@ var LiveDelegate = (function (_BaseDelegate) {
       this.afterEventbusConnected();
       // Everything is online and registered again, let's notify everybody
       if (connectionStateFlipped) {
-        this.$rootScope.$broadcast('' + this.options.prefix + 'system.connected');
+        this.$rootScope.$broadcast(this.options.prefix + 'system.connected');
       }
       this.$rootScope.$digest(); // explicitly
       // consume message queue?
@@ -639,19 +641,17 @@ var LiveDelegate = (function (_BaseDelegate) {
         this.$rootScope.$digest();
       }
     }
-  }, {
-    key: 'onEventbusClose',
 
     // internal
+  }, {
+    key: 'onEventbusClose',
     value: function onEventbusClose() {
       this.getConnectionState(true);
       if (this.states.connected) {
         this.states.connected = false;
-        this.$rootScope.$broadcast('' + this.options.prefix + 'system.disconnected');
+        this.$rootScope.$broadcast(this.options.prefix + 'system.disconnected');
       }
     }
-  }, {
-    key: 'observe',
 
     /**
      * @ngdoc method
@@ -665,13 +665,15 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {object} observer observer
      * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
      */
+  }, {
+    key: 'observe',
     value: function observe(observer) {
       this.observers.push(observer);
     }
-  }, {
-    key: 'afterEventbusConnected',
 
     // internal
+  }, {
+    key: 'afterEventbusConnected',
     value: function afterEventbusConnected() {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -700,8 +702,6 @@ var LiveDelegate = (function (_BaseDelegate) {
         }
       }
     }
-  }, {
-    key: 'registerHandler',
 
     /**
      * @ngdoc method
@@ -716,6 +716,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {function} callback handler with params `(message, replyTo)`
      * @returns {function=} deconstructor
      */
+  }, {
+    key: 'registerHandler',
     value: function registerHandler(address, callback) {
       var _this2 = this;
 
@@ -729,12 +731,10 @@ var LiveDelegate = (function (_BaseDelegate) {
         callback(message, replyTo);
         _this2.$rootScope.$digest();
       };
-      callbackWrapper.displayName = '' + _configJs.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
+      callbackWrapper.displayName = _configJs.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
       this.callbackMap.put(callback, callbackWrapper);
       return this.eventBus.registerHandler(address, callbackWrapper);
     }
-  }, {
-    key: 'unregisterHandler',
 
     /**
      * @ngdoc method
@@ -748,6 +748,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {string} address target address
      * @param {function} callback handler with params `(message, replyTo)`
      */
+  }, {
+    key: 'unregisterHandler',
     value: function unregisterHandler(address, callback) {
       if (!angular.isFunction(callback)) {
         return;
@@ -758,8 +760,6 @@ var LiveDelegate = (function (_BaseDelegate) {
       this.eventBus.unregisterHandler(address, this.callbackMap.get(callback));
       this.callbackMap.remove(callback);
     }
-  }, {
-    key: 'send',
 
     /**
      * @ngdoc method
@@ -777,11 +777,13 @@ var LiveDelegate = (function (_BaseDelegate) {
      *                                       no replyHandler will be created
      * @returns {object} promise
      */
+  }, {
+    key: 'send',
     value: function send(address, message) {
       var _this3 = this;
 
-      var timeout = arguments[2] === undefined ? 10000 : arguments[2];
-      var expectReply = arguments[3] === undefined ? true : arguments[3];
+      var timeout = arguments.length <= 2 || arguments[2] === undefined ? 10000 : arguments[2];
+      var expectReply = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
 
       var deferred = this.$q.defer();
       var next = function next() {
@@ -795,6 +797,7 @@ var LiveDelegate = (function (_BaseDelegate) {
               deferred.reject();
             }, timeout, 1);
             // Send message
+            // TODO after dropping support for Vert.x < v3, this can be enriched with failureHandler
             _this3.eventBus.send(address, message, function (reply) {
               _this3.$interval.cancel(timer); // because it's resolved
               deferred.resolve(reply);
@@ -805,14 +808,12 @@ var LiveDelegate = (function (_BaseDelegate) {
           deferred.resolve(); // we don't care
         }
       };
-      next.displayName = '' + _configJs.moduleName + '.service.delegate.live.send.next';
+      next.displayName = _configJs.moduleName + '.service.delegate.live.send.next';
       if (!this.ensureOpenAuthConnection(next)) {
         deferred.reject();
       }
       return deferred.promise;
     }
-  }, {
-    key: 'publish',
 
     /**
      * @ngdoc method
@@ -827,6 +828,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {object} message payload message
      * @returns {boolean} false if cannot be send or queued
      */
+  }, {
+    key: 'publish',
     value: function publish(address, message) {
       var _this4 = this;
 
@@ -834,8 +837,6 @@ var LiveDelegate = (function (_BaseDelegate) {
         return _this4.eventBus.publish(address, message);
       });
     }
-  }, {
-    key: 'login',
 
     /**
      * @ngdoc method
@@ -844,7 +845,7 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @name .#login
      *
      * @description
-     * Sends a login request
+     * Sends a login request.
      *
      * See also
      * - {@link knalli.angular-vertxbus.vertxEventBus#methods_login vertxEventBus.login()}
@@ -854,35 +855,47 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {number=} [timeout=5000] timeout
      * @returns {object} promise
      */
+  }, {
+    key: 'login',
     value: function login() {
-      var username = arguments[0] === undefined ? this.options.username : arguments[0];
+      var username = arguments.length <= 0 || arguments[0] === undefined ? this.options.username : arguments[0];
 
       var _this5 = this;
 
-      var password = arguments[1] === undefined ? this.options.password : arguments[1];
-      var timeout = arguments[2] === undefined ? 5000 : arguments[2];
+      var password = arguments.length <= 1 || arguments[1] === undefined ? this.options.password : arguments[1];
+      var timeout = arguments.length <= 2 || arguments[2] === undefined ? 5000 : arguments[2];
 
       var deferred = this.$q.defer();
       var next = function next(reply) {
-        if (reply && reply.status === 'ok') {
+        reply = reply || {};
+        if (reply.status === 'ok') {
           _this5.states.validSession = true;
           deferred.resolve(reply);
-          _this5.$rootScope.$broadcast('' + _this5.options.prefix + 'system.login.succeeded', { status: reply.status });
+          _this5.$rootScope.$broadcast(_this5.options.prefix + 'system.login.succeeded', { status: reply.status });
         } else {
           _this5.states.validSession = false;
           deferred.reject(reply);
-          _this5.$rootScope.$broadcast('' + _this5.options.prefix + 'system.login.failed', { status: reply.status });
+          _this5.$rootScope.$broadcast(_this5.options.prefix + 'system.login.failed', { status: reply.status });
         }
       };
-      next.displayName = '' + _configJs.moduleName + '.service.delegate.live.login.next';
-      this.eventBus.login(username, password, next);
+      next.displayName = _configJs.moduleName + '.service.delegate.live.login.next';
+
+      if (this.loginInterceptor) {
+        // reference to a direct sender
+        var send = function send(address, message, reply) {
+          _this5.eventBus.send(address, message, reply);
+        };
+        this.loginInterceptor(send, username, password, next);
+      } else {
+        // Legacy way like Vert.x 2
+        this.eventBus.login(username, password, next);
+      }
+
       this.$interval(function () {
         return deferred.reject();
       }, timeout, 1);
       return deferred.promise;
     }
-  }, {
-    key: 'ensureOpenConnection',
 
     /**
      * @ngdoc method
@@ -898,6 +911,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {function} fn callback
      * @returns {boolean} false if the callback cannot be performed or queued
      */
+  }, {
+    key: 'ensureOpenConnection',
     value: function ensureOpenConnection(fn) {
       if (this.isConnectionOpen()) {
         fn();
@@ -908,8 +923,6 @@ var LiveDelegate = (function (_BaseDelegate) {
       }
       return false;
     }
-  }, {
-    key: 'ensureOpenAuthConnection',
 
     /**
      * @ngdoc method
@@ -927,6 +940,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {function} fn callback
      * @returns {boolean} false if the callback cannot be performed or queued
      */
+  }, {
+    key: 'ensureOpenAuthConnection',
     value: function ensureOpenAuthConnection(fn) {
       var _this6 = this;
 
@@ -946,12 +961,10 @@ var LiveDelegate = (function (_BaseDelegate) {
             return false;
           }
         };
-        fnWrapper.displayName = '' + _configJs.moduleName + '.service.delegate.live.ensureOpenAuthConnection.fnWrapper';
+        fnWrapper.displayName = _configJs.moduleName + '.service.delegate.live.ensureOpenAuthConnection.fnWrapper';
         return this.ensureOpenConnection(fnWrapper);
       }
     }
-  }, {
-    key: 'getConnectionState',
 
     /**
      * @ngdoc method
@@ -965,6 +978,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
      * @returns {number} state type of vertx.EventBus
      */
+  }, {
+    key: 'getConnectionState',
     value: function getConnectionState(immediate) {
       if (this.options.enabled) {
         if (immediate) {
@@ -975,8 +990,6 @@ var LiveDelegate = (function (_BaseDelegate) {
       }
       return this.connectionState;
     }
-  }, {
-    key: 'isConnectionOpen',
 
     /**
      * @ngdoc method
@@ -989,11 +1002,11 @@ var LiveDelegate = (function (_BaseDelegate) {
      *
      * @returns {boolean} connection open state
      */
+  }, {
+    key: 'isConnectionOpen',
     value: function isConnectionOpen() {
       return this.getConnectionState() === this.eventBus.EventBus.OPEN;
     }
-  }, {
-    key: 'isValidSession',
 
     /**
      * @ngdoc method
@@ -1006,18 +1019,18 @@ var LiveDelegate = (function (_BaseDelegate) {
      *
      * @returns {boolean} state
      */
+  }, {
+    key: 'isValidSession',
     value: function isValidSession() {
       return this.states.validSession;
     }
-  }, {
-    key: 'isConnected',
 
     // internal
+  }, {
+    key: 'isConnected',
     value: function isConnected() {
       return this.states.connected;
     }
-  }, {
-    key: 'isEnabled',
 
     /**
      * @ngdoc method
@@ -1030,11 +1043,11 @@ var LiveDelegate = (function (_BaseDelegate) {
      *
      * @returns {boolean} state
      */
+  }, {
+    key: 'isEnabled',
     value: function isEnabled() {
       return this.options.enabled;
     }
-  }, {
-    key: 'getMessageQueueLength',
 
     /**
      * @ngdoc method
@@ -1047,6 +1060,8 @@ var LiveDelegate = (function (_BaseDelegate) {
      *
      * @returns {number} amount
      */
+  }, {
+    key: 'getMessageQueueLength',
     value: function getMessageQueueLength() {
       return this.messageQueue.size();
     }
@@ -1065,26 +1080,26 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _Base = require('./Base');
 
 var _Base2 = _interopRequireDefault(_Base);
 
 var NoopDelegate = (function (_BaseDelegate) {
+  _inherits(NoopDelegate, _BaseDelegate);
+
   function NoopDelegate() {
     _classCallCheck(this, NoopDelegate);
 
-    if (_BaseDelegate != null) {
-      _BaseDelegate.apply(this, arguments);
-    }
+    _get(Object.getPrototypeOf(NoopDelegate.prototype), 'constructor', this).apply(this, arguments);
   }
-
-  _inherits(NoopDelegate, _BaseDelegate);
 
   return NoopDelegate;
 })(_Base2['default']);
@@ -1122,7 +1137,7 @@ var BaseWrapper = (function () {
     value: function login(username, password, replyHandler) {}
   }, {
     key: "send",
-    value: function send(address, message, replyHandler) {}
+    value: function send(address, message, replyHandler, failureHandler) {}
   }, {
     key: "publish",
     value: function publish(address, message) {}
@@ -1140,15 +1155,15 @@ var BaseWrapper = (function () {
     value: function getOptions() {
       return {};
     }
+
+    // empty: can be overriden by externals
   }, {
     key: "onopen",
+    value: function onopen() {}
 
     // empty: can be overriden by externals
-    value: function onopen() {}
   }, {
     key: "onclose",
-
-    // empty: can be overriden by externals
     value: function onclose() {}
   }]);
 
@@ -1167,13 +1182,13 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _configJs = require('../../config.js');
 
@@ -1259,6 +1274,8 @@ var _Base2 = _interopRequireDefault(_Base);
  */
 
 var EventbusWrapper = (function (_BaseWrapper) {
+  _inherits(EventbusWrapper, _BaseWrapper);
+
   function EventbusWrapper(EventBus, $timeout, $log, _ref) {
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
@@ -1289,14 +1306,12 @@ var EventbusWrapper = (function (_BaseWrapper) {
     this.connect();
   }
 
-  _inherits(EventbusWrapper, _BaseWrapper);
-
   _createClass(EventbusWrapper, [{
     key: 'connect',
     value: function connect() {
       var _this = this;
 
-      var url = '' + this.options.urlServer + '' + this.options.urlPath;
+      var url = '' + this.options.urlServer + this.options.urlPath;
       if (this.options.debugEnabled) {
         this.$log.debug('[Vert.x EB Stub] Enabled: connecting \'' + url + '\'');
       }
@@ -1305,7 +1320,7 @@ var EventbusWrapper = (function (_BaseWrapper) {
       this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
       this.instance.onopen = function () {
         if (_this.options.debugEnabled) {
-          _this.$log.debug('[Vert.x EB Stub] Connected');
+          _this.$log.debug("[Vert.x EB Stub] Connected");
         }
         if (angular.isFunction(_this.onopen)) {
           _this.onopen();
@@ -1324,7 +1339,7 @@ var EventbusWrapper = (function (_BaseWrapper) {
         if (!_this.disconnectTimeoutEnabled) {
           // reconnect required asap
           if (_this.options.debugEnabled) {
-            _this.$log.debug('[Vert.x EB Stub] Reconnect immediately');
+            _this.$log.debug("[Vert.x EB Stub] Reconnect immediately");
           }
           _this.disconnectTimeoutEnabled = true;
           _this.connect();
@@ -1339,8 +1354,6 @@ var EventbusWrapper = (function (_BaseWrapper) {
         }
       };
     }
-  }, {
-    key: 'reconnect',
 
     /**
      * @ngdoc method
@@ -1358,8 +1371,10 @@ var EventbusWrapper = (function (_BaseWrapper) {
      *
      * @param {boolean} [immediately=false] optionally enforce a reconnect asap instead of using the timeout
      */
+  }, {
+    key: 'reconnect',
     value: function reconnect() {
-      var immediately = arguments[0] === undefined ? false : arguments[0];
+      var immediately = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
       if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
         if (immediately) {
@@ -1370,8 +1385,6 @@ var EventbusWrapper = (function (_BaseWrapper) {
         this.connect();
       }
     }
-  }, {
-    key: 'close',
 
     /**
      * @ngdoc method
@@ -1387,13 +1400,13 @@ var EventbusWrapper = (function (_BaseWrapper) {
      * See also:
      * - {@link vertx.EventBus#methods_close vertx.EventBus.close()}
      */
+  }, {
+    key: 'close',
     value: function close() {
       if (this.instance) {
         this.instance.close();
       }
     }
-  }, {
-    key: 'login',
 
     /**
      * @ngdoc method
@@ -1411,13 +1424,18 @@ var EventbusWrapper = (function (_BaseWrapper) {
      * @param {string} password credential's password
      * @param {function=} replyHandler optional callback
      */
+  }, {
+    key: 'login',
     value: function login(username, password, replyHandler) {
       if (this.instance) {
+        if (!this.instance.login) {
+          this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor');
+          replyHandler();
+          return;
+        }
         this.instance.login(username, password, replyHandler);
       }
     }
-  }, {
-    key: 'send',
 
     /**
      * @ngdoc method
@@ -1434,14 +1452,15 @@ var EventbusWrapper = (function (_BaseWrapper) {
      * @param {string} address target address
      * @param {object} message payload message
      * @param {function=} replyHandler optional callback
+     * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
      */
-    value: function send(address, message, replyHandler) {
+  }, {
+    key: 'send',
+    value: function send(address, message, replyHandler, failureHandler) {
       if (this.instance) {
-        this.instance.send(address, message, replyHandler);
+        this.instance.send(address, message, replyHandler, failureHandler);
       }
     }
-  }, {
-    key: 'publish',
 
     /**
      * @ngdoc method
@@ -1458,13 +1477,13 @@ var EventbusWrapper = (function (_BaseWrapper) {
      * @param {string} address target address
      * @param {object} message payload message
      */
+  }, {
+    key: 'publish',
     value: function publish(address, message) {
       if (this.instance) {
         this.instance.publish(address, message);
       }
     }
-  }, {
-    key: 'registerHandler',
 
     /**
      * @ngdoc method
@@ -1481,6 +1500,8 @@ var EventbusWrapper = (function (_BaseWrapper) {
      * @param {string} address target address
      * @param {function} handler callback handler
      */
+  }, {
+    key: 'registerHandler',
     value: function registerHandler(address, handler) {
       var _this2 = this;
 
@@ -1490,12 +1511,10 @@ var EventbusWrapper = (function (_BaseWrapper) {
         var deconstructor = function deconstructor() {
           _this2.unregisterHandler(address, handler);
         };
-        deconstructor.displayName = '' + _configJs.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
+        deconstructor.displayName = _configJs.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
         return deconstructor;
       }
     }
-  }, {
-    key: 'unregisterHandler',
 
     /**
      * @ngdoc method
@@ -1512,13 +1531,13 @@ var EventbusWrapper = (function (_BaseWrapper) {
      * @param {string} address target address
      * @param {function} handler callback handler to be removed
      */
+  }, {
+    key: 'unregisterHandler',
     value: function unregisterHandler(address, handler) {
       if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
         this.instance.unregisterHandler(address, handler);
       }
     }
-  }, {
-    key: 'readyState',
 
     /**
      * @ngdoc method
@@ -1534,6 +1553,8 @@ var EventbusWrapper = (function (_BaseWrapper) {
      *
      * @returns {number} value of vertxbus connection states
      */
+  }, {
+    key: 'readyState',
     value: function readyState() {
       if (this.instance) {
         return this.instance.readyState();
@@ -1541,10 +1562,10 @@ var EventbusWrapper = (function (_BaseWrapper) {
         return this.EventBus.CLOSED;
       }
     }
-  }, {
-    key: 'getOptions',
 
     // private
+  }, {
+    key: 'getOptions',
     value: function getOptions() {
       // clone options
       return angular.extend({}, this.options);
@@ -1564,19 +1585,21 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _Base = require('./Base');
 
 var _Base2 = _interopRequireDefault(_Base);
 
 var NoopWrapper = (function (_BaseWrapper) {
+  _inherits(NoopWrapper, _BaseWrapper);
+
   function NoopWrapper(EventBus) {
     _classCallCheck(this, NoopWrapper);
 
@@ -1584,8 +1607,6 @@ var NoopWrapper = (function (_BaseWrapper) {
     // actual EventBus type
     this.EventBus = EventBus;
   }
-
-  _inherits(NoopWrapper, _BaseWrapper);
 
   return NoopWrapper;
 })(_Base2['default']);
@@ -1698,7 +1719,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @returns {object} this
    */
   this.enable = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
 
     options.enabled = value === true;
     return _this;
@@ -1717,7 +1738,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @returns {object} this
    */
   this.useDebug = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
 
     options.debugEnabled = value === true;
     return _this;
@@ -1736,7 +1757,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @returns {object} this
    */
   this.usePrefix = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.prefix : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.prefix : arguments[0];
 
     options.prefix = value;
     return _this;
@@ -1749,13 +1770,13 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    *
    *
    * @description
-   * Defines whether a login is being required or not.
+   * Defines whether a login is being required or not. This feature is only available using Vert.x 2.
    *
    * @param {boolean} [value=false] defines requirement of a valid session
    * @returns {object} this
    */
   this.requireLogin = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.loginRequired : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.loginRequired : arguments[0];
 
     options.loginRequired = value === true;
     return _this;
@@ -1774,7 +1795,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @returns {object} this
    */
   this.useSockJsStateInterval = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.sockjsStateInterval : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsStateInterval : arguments[0];
 
     options.sockjsStateInterval = value;
     return _this;
@@ -1795,10 +1816,67 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @returns {object} this
    */
   this.useMessageBuffer = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.messageBuffer : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.messageBuffer : arguments[0];
 
     options.messageBuffer = value;
     return _this;
+  };
+
+  /**
+   * @ngdoc method
+   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+   * @name .#useLoginInterceptor
+   *
+   * @description
+   * Defines a login interceptor corresponding for the option `loginRequired`.
+   *
+   * The argument must be a valid function reference with four arguments
+   * - send (an at runtime injected function for actual sending: i.e. `send(username, password, next)`
+   * - username (the used username)
+   * - password (the used password)
+   * - next (the callback function reference)
+   *
+   * @param {function} a function with params `(send, username, password, next)`
+   * @returns {object} this
+   */
+  this.useLoginInterceptor = function (value) {
+    options.loginInterceptor = value;
+    return _this;
+  };
+
+  /**
+   * @ngdoc method
+   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+   * @name .#configureLoginInterceptor
+   *
+   * @description
+   * Configures and defines a login interceptor corresponding for the option `loginRequired`.
+   *
+   * This utilizes #useLoginInterceptor and is available as a convenient method.
+   *
+   * At default, the created request will look similar like vertx.basicauthmanager.login.
+   *
+   * @param {string} the address to send
+   * @param {function=} optional a builder for creating the message body
+   * @returns {object} this
+   */
+  this.configureLoginInterceptor = function (address, argumentsBuilder) {
+    if (!argumentsBuilder) {
+      // Legacy fallback: create a message like in Vert.x 2
+      argumentsBuilder = function (username, password) {
+        return {
+          action: 'findone',
+          collection: 'users',
+          matcher: {
+            username: username,
+            password: password
+          }
+        };
+      };
+    }
+    return _this.useLoginInterceptor(function (send, username, password, next) {
+      send(address, argumentsBuilder(username, password), next);
+    });
   };
 
   /**
@@ -1817,11 +1895,11 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * Basic usage:
    * <pre>
    * module.controller('MyController', function('vertxEventService') {
-   *   vertxEventService.on('my.address', function(message) {
-   *     console.log("JSON Message received: ", message)
-   *   });
-   *   vertxEventService.publish('my.other.address', {type: 'foo', data: 'bar'});
-   * });
+  *   vertxEventService.on('my.address', function(message) {
+  *     console.log("JSON Message received: ", message)
+  *   });
+  *   vertxEventService.publish('my.other.address', {type: 'foo', data: 'bar'});
+  * });
    * </pre>
    *
    * Note the additional {@link knalli.angular-vertxbus.vertxEventBusServiceProvider configuration} of the module itself.
@@ -1868,7 +1946,7 @@ var _libWrapperNoop2 = _interopRequireDefault(_libWrapperNoop);
 var DEFAULTS = {
   enabled: true,
   debugEnabled: false,
-  urlServer: '' + location.protocol + '//' + location.hostname + ((function () {
+  urlServer: location.protocol + '//' + location.hostname + ((function () {
     if (location.port) {
       return ':' + location.port;
     }
@@ -1898,7 +1976,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.enable = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
 
     options.enabled = value === true;
     return _this;
@@ -1917,7 +1995,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.useDebug = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
 
     options.debugEnabled = value === true;
     return _this;
@@ -1941,7 +2019,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.useUrlServer = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.urlServer : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.urlServer : arguments[0];
 
     options.urlServer = value;
     return _this;
@@ -1960,7 +2038,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.useUrlPath = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.urlPath : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.urlPath : arguments[0];
 
     options.urlPath = value;
     return _this;
@@ -1979,7 +2057,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.useReconnect = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.reconnectEnabled : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.reconnectEnabled : arguments[0];
 
     options.reconnectEnabled = value;
     return _this;
@@ -1998,7 +2076,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.useSockJsReconnectInterval = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.sockjsReconnectInterval : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsReconnectInterval : arguments[0];
 
     options.sockjsReconnectInterval = value;
     return _this;
@@ -2019,7 +2097,7 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @returns {object} this
    */
   this.useSockJsOptions = function () {
-    var value = arguments[0] === undefined ? DEFAULTS.sockjsOptions : arguments[0];
+    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsOptions : arguments[0];
 
     options.sockjsOptions = value;
     return _this;
@@ -2058,12 +2136,12 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
 
     if (instanceOptions.enabled && vertx && vertx.EventBus) {
       if (instanceOptions.debugEnabled) {
-        $log.debug('[Vert.x EB Stub] Enabled');
+        $log.debug("[Vert.x EB Stub] Enabled");
       }
       return new _libWrapperEventbus2['default'](vertx.EventBus, $timeout, $log, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
-        $log.debug('[Vert.x EB Stub] Disabled');
+        $log.debug("[Vert.x EB Stub] Disabled");
       }
       return new _libWrapperNoop2['default'](vertx.EventBus);
     }
