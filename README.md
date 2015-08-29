@@ -32,7 +32,7 @@ way using npm modules and/or browserify, or you can use the alternative artifact
 
 ### AngularJS
 
-This library is being developed against *AngularJS 1.3*, and additional tests are performed against *AngularJS 1.2* and *AngularJS 1.4*.
+This library is being developed against *AngularJS 1.4*, and additional tests are performed against *AngularJS 1.2* and *AngularJS 1.3*.
 
 ### Vert.x
 

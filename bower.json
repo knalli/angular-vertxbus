@@ -27,7 +27,7 @@
     "vertxbus.js": "http://cdnjs.cloudflare.com/ajax/libs/vertx/2.0.0/vertxbus.js"
   },
   "devDependencies": {
-    "angular": "~1.2.27",
-    "angular-mocks": "~1.2.27"
+    "angular": "~1.4.4",
+    "angular-mocks": "~1.4.4"
   }
 }
