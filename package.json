@@ -16,9 +16,9 @@
     "clean-test-scopes": "for f in test_scopes/*; do (cd $f; rm -rf bower_components); done",
     "start-it-web-server": "babel-node test/e2e/server.js",
     "install-it-vertx-server": "cd test/e2e/vertx && ./install.sh",
-    "start-it-vertx-server": "cd test/e2e/vertx/app && ../vert.x-2.1.1/bin/vertx run config.js",
+    "start-it-vertx-server": "cd test/e2e/vertx/app && ../vert.x-2.1.1/bin/vertx run vertx2-config.js",
     "install-it-vertx3-server": "cd test/e2e/vertx && ./install-v3.sh",
-    "start-it-vertx3-server": "cd test/e2e/vertx/app && ../vert.x-3.0.0/bin/vertx run index.js"
+    "start-it-vertx3-server": "cd test/e2e/vertx/app && ../vert.x-3.0.0/bin/vertx run vertx3-config.js"
   },
   "author": {
     "name": "Jan Philipp",
