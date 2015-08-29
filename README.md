@@ -36,7 +36,7 @@ This library is being developed against *AngularJS 1.4*, and additional tests ar
 
 ### Vert.x
 
-This library is being developed against the `eventbus.js` from Vert.X 2.
+This library is being developed against the `eventbus.js` from Vert.x 2.
 
 ## How to use
 
@@ -117,9 +117,9 @@ and [vertxEventBusServiceProvider](https://knalli.github.io/angular-vertxbus.doc
 
 ## Architecture details
 
-The module contains two items: the stub holder `vertxEventBus` for the Vert.X EventBus and a more comfortbale high level service `vertxEventBusService`.
+The module contains two items: the stub holder `vertxEventBus` for the Vert.x EventBus and a more comfortbale high level service `vertxEventBusService`.
 
-*The stub* is required because the Vert.X Event Bus cannot handle a reconnect. The reason is the underlaying SockJS which cannot handle a reconnect, too. A reconnect means to create a new instance of `SockJS`, therefore a new instanve of `vertx.EventBus`. The stub ensures only one single instance exists. Otherwise a global module was not possible.
+*The stub* is required because the Vert.x Event Bus cannot handle a reconnect. The reason is the underlaying SockJS which cannot handle a reconnect, too. A reconnect means to create a new instance of `SockJS`, therefore a new instanve of `vertx.EventBus`. The stub ensures only one single instance exists. Otherwise a global module was not possible.
 
 More or less the stub supports the same API calls like the original `vertx.EventBus`.
 
@@ -196,10 +196,10 @@ The *unit tests* are available with `npm test` which is actually a shortcut for 
 
 Note: Check that dependencies are be installed (`npm install`).
 
-The *end-to-end tests* start and utilize a full Vert.X node and a NodeJS based web server.
+The *end-to-end tests* start and utilize a full Vert.x node and a NodeJS based web server.
 
-1. `npm run install-it-vertx-server` downloads and installs a Vert.X locally.
-2. `npm run start-it-vertx-server` starts Vert.X on port `8080`.
+1. `npm run install-it-vertx-server` downloads and installs a Vert.x locally.
+2. `npm run start-it-vertx-server` starts Vert.x on port `8080`.
 3. `npm run start-it-web-server` starts a web server on port `3000`.
 4. Open http://localhost:3000/ in your browser.
 

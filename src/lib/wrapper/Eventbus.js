@@ -218,7 +218,7 @@ export default class EventbusWrapper extends BaseWrapper {
   login(username, password, replyHandler) {
     if (this.instance) {
       if (!this.instance.login) {
-        this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already?');
+        this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor');
         replyHandler();
         return;
       }

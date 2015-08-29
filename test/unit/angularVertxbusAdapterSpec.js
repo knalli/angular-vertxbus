@@ -1,5 +1,5 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
-/* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false, vertx: false */
+/* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
 describe('knalli.angular-vertxbus', function () {
 
@@ -505,6 +505,7 @@ describe('knalli.angular-vertxbus', function () {
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0);
+        vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
       }));
 
       beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
@@ -529,11 +530,6 @@ describe('knalli.angular-vertxbus', function () {
       });
 
       it('"system login succeeded"', function (done) {
-        if (!vertx.EventBus.login) {
-          $log.warn('Skipping test because vertx.EventBus.login is missing (Vert.X v3)');
-          done();
-          return;
-        }
         var result;
         $rootScope.$on('vertx-eventbus.system.login.succeeded', function () {
           result = true;
@@ -548,11 +544,6 @@ describe('knalli.angular-vertxbus', function () {
       });
 
       it('"system login failed"', function (done) {
-        if (!vertx.EventBus.login) {
-          $log.warn('Skipping test because vertx.EventBus.login is missing (Vert.X v3)');
-          done();
-          return;
-        }
         var result;
         SockJS.currentMockInstance.nextLoginState = false;
         $rootScope.$on('vertx-eventbus.system.login.failed', function () {

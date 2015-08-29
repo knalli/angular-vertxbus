@@ -70,7 +70,8 @@ export default class LiveDelegate extends BaseDelegate {
     prefix,
     sockjsStateInterval,
     messageBuffer,
-    loginRequired
+    loginRequired,
+    loginInterceptor
     }) {
     super();
     this.$rootScope = $rootScope;
@@ -86,6 +87,7 @@ export default class LiveDelegate extends BaseDelegate {
       messageBuffer,
       loginRequired
     };
+    this.loginInterceptor = loginInterceptor;
     this.connectionState = this.eventBus.EventBus.CLOSED;
     this.states = {
       connected: false,
@@ -292,7 +294,7 @@ export default class LiveDelegate extends BaseDelegate {
    * @name .#login
    *
    * @description
-   * Sends a login request
+   * Sends a login request.
    *
    * See also
    * - {@link knalli.angular-vertxbus.vertxEventBus#methods_login vertxEventBus.login()}
@@ -305,7 +307,8 @@ export default class LiveDelegate extends BaseDelegate {
   login(username = this.options.username, password = this.options.password, timeout = 5000) {
     let deferred = this.$q.defer();
     let next = (reply) => {
-      if (reply && reply.status === 'ok') {
+      reply = reply || {};
+      if (reply.status === 'ok') {
         this.states.validSession = true;
         deferred.resolve(reply);
         this.$rootScope.$broadcast(`${this.options.prefix}system.login.succeeded`, {status: reply.status});
@@ -316,7 +319,18 @@ export default class LiveDelegate extends BaseDelegate {
       }
     };
     next.displayName = `${moduleName}.service.delegate.live.login.next`;
-    this.eventBus.login(username, password, next);
+
+    if (this.loginInterceptor) {
+      // reference to a direct sender
+      let send = (address, message, reply) => {
+        this.eventBus.send(address, message, reply);
+      };
+      this.loginInterceptor(send, username, password, next);
+    } else {
+      // Legacy way like Vert.x 2
+      this.eventBus.login(username, password, next);
+    }
+
     this.$interval((() => deferred.reject()), timeout, 1);
     return deferred.promise;
   }
