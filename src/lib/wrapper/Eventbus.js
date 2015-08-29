@@ -79,7 +79,7 @@ import BaseWrapper from './Base';
  * @returns {number} value of vertxbus connection states
  */
 
-class EventbusWrapper extends BaseWrapper {
+export default class EventbusWrapper extends BaseWrapper {
 
   constructor(EventBus, $timeout, $log, {
     enabled,
@@ -345,6 +345,5 @@ class EventbusWrapper extends BaseWrapper {
     // clone options
     return angular.extend({}, this.options);
   }
-}
 
-export default EventbusWrapper;
+}

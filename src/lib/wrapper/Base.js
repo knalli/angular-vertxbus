@@ -1,4 +1,4 @@
-class BaseWrapper {
+export default class BaseWrapper {
 
   constructor() {}
 
@@ -31,5 +31,3 @@ class BaseWrapper {
   onclose() {}
 
 }
-
-export default BaseWrapper;

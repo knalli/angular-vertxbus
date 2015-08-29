@@ -1,6 +1,6 @@
 import BaseWrapper from './Base';
 
-class NoopWrapper extends BaseWrapper {
+export default class NoopWrapper extends BaseWrapper {
 
   constructor(EventBus) {
     super();
@@ -9,5 +9,3 @@ class NoopWrapper extends BaseWrapper {
   }
 
 }
-
-export default NoopWrapper;

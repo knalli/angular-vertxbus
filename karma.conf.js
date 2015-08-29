@@ -50,9 +50,9 @@ module.exports = function(config) {
       'test/unit/mock/sockjs.js',
       injectByScope(scope, 'vertx3-eventbus-client/vertxbus.js'),
       'src/lib/**/*.js',
-      'src/vertxbus-module.js',
-      'src/vertxbus-wrapper.js',
-      'src/vertxbus-service.js',
+      'src/vertxbus.module.js',
+      'src/vertxbus.wrapper.provider.js',
+      'src/vertxbus.service.provider.js',
       'test/**/*Spec.js'
     ],
 

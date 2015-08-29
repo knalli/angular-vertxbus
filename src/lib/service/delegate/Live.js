@@ -62,7 +62,8 @@ import BaseDelegate from './Base';
  * @param {boolean} data.status must be not`'ok'`
  */
 
-class LiveDelegate extends BaseDelegate {
+export default class LiveDelegate extends BaseDelegate {
+
   constructor($rootScope, $interval, $log, $q, eventBus, {
     enabled,
     debugEnabled,
@@ -470,6 +471,5 @@ class LiveDelegate extends BaseDelegate {
   getMessageQueueLength() {
     return this.messageQueue.size();
   }
-}
 
-export default LiveDelegate;
+}
