@@ -86,7 +86,7 @@ angular
      *
      *
      * @description
-     * Defines whether a login is being required or not. This feature is only available using Vert.x 2.
+     * Defines whether a login is being required or not.
      *
      * @param {boolean} [value=false] defines requirement of a valid session
      * @returns {object} this
