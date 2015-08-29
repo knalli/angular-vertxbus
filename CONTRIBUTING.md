@@ -7,7 +7,7 @@ It also covers provided grunt tasks, that help you developing on this repo.
 
 ## Dependencies
 
-To make sure, that the following instructions work, please install the following dependecies
+To make sure, that the following instructions work, please install the following dependencies
 on you machine:
 
 - Node.js
@@ -17,9 +17,7 @@ on you machine:
 If you install node through the binary installation file, **npm** will be already there.
 When **npm** is installed, use it to install the needed npm packages:
 
-- bower <code>npm install -g bower</code>
 - grunt-cli <code>npm install -g grunt-cli</code>
-- karma <code>npm install -g karma</code> (optional)
 
 ## Installation
 
@@ -30,12 +28,13 @@ $ git clone https://github.com/knalli/angular-vertxbus
 ````
 
 This will clone the complete source to your local machine. Navigate to the project folder
-and install all needed dendencies via **npm** and **bower**:
+and install all needed dependencies via **npm** and **bower**:
 
 ````
 $ npm install
-$ bower install
 ````
+
+(This will invoke a `bower install` automatically.)
 
 The project is now installed and ready to be built.
 
@@ -63,9 +62,8 @@ source. After running this task, you'll find the following files in a generated
 <code>dist</code> folder:
 
 ````
-dist/angular-vertxbus-x.x.x.js
-dist/angular-vertxbus-x.x.x.min.js
-dist/requirejs/angular-vertxbus.js
+dist/angular-vertxbus.js
+dist/angular-vertxbus.min.js
 ````
 
 #### <code>grunt watch</code>
@@ -86,15 +84,16 @@ Note: In general, pull requests should be based on the `canary` branch. Most lik
     ````
   - Use one branch per fix/feature
 - Make your changes
-  - Make sure to provide a spec for unit tests
-  - Run your tests with either <code>karma start</code> or <code>grunt test</code>
-  - When all tests pass, everything's fine
+  - Make sure to provide a spec for unit tests.
+  - Run your tests with either <code>karma start karma.conf.js</code> or simply <code>grunt test</code>.
+  - In order to verify everything will work in the other test scopes (different AngularJS version), please run `npm run test-scopes`. If you are getting dependency resolution issue, run `npm run clean-test-scopes` and try again.
+  - When all tests pass, everything's fine.
 - Commit your changes
-  - Please provide a git message which explains what you've done
-  - This repo uses [Brian's conventional-changelog task](https://github.com/btford/grunt-conventional-changelog) so please make sure your commits follow the [conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit)
-  - Commit to the forked repository
+  - Please provide a git message which explains what you've done.
+  - This repo uses [Brian's conventional-changelog task](https://github.com/btford/grunt-conventional-changelog) so please make sure your commits follow the [conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit).
+  - Commit to the forked repository.
 - Make a pull request
-  - Make sure you send the PR to the <code>canary</code> branch
-  - Travis CI is watching you!
+  - Make sure you send the PR to the <code>canary</code> branch.
+  - Travis CI and a Hound are watching you!
 
 If you follow these instructions, your PR will land pretty safety in the main repo!

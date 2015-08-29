@@ -86,7 +86,7 @@ angular
      *
      *
      * @description
-     * Defines whether a login is being required or not. This feature is only available using Vert.x 2.
+     * Defines whether a login is being required or not.
      *
      * @param {boolean} [value=false] defines requirement of a valid session
      * @returns {object} this
@@ -141,7 +141,7 @@ angular
      * Defines a login interceptor corresponding for the option `loginRequired`.
      *
      * The argument must be a valid function reference with four arguments
-     * - send (an at runtime injected function for actual sending: i.e. `send(username, password, next)`
+     * - send (an at runtime injected function for actual sending: i.e. `send(address, message, next)`
      * - username (the used username)
      * - password (the used password)
      * - next (the callback function reference)
@@ -160,7 +160,7 @@ angular
      * @name .#configureLoginInterceptor
      *
      * @description
-     * Configures and defines a login interceptor corresponding for the option `loginRequired`.
+     * Configures and defines a login interceptor corresponding for the option #requireLogin().
      *
      * This utilizes #useLoginInterceptor and is available as a convenient method.
      *
