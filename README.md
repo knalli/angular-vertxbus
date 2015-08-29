@@ -36,7 +36,7 @@ This library is being developed against *AngularJS 1.4*, and additional tests ar
 
 ### Vert.x
 
-This library is being developed against the `eventbus.js` from Vert.x 2.
+This library is being developed against the `eventbus.js` from Vert.x 3.
 
 ## How to use
 
