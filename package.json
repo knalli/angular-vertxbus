@@ -29,12 +29,7 @@
     "type": "git",
     "url": "git://github.com/knalli/angular-vertxbus"
   },
-  "licenses": [
-    {
-      "name": "MIT",
-      "url": "https://github.com/knalli/angular-vertxbus/blob/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "devDependencies": {
     "babel": "^5.6.2",
     "babelify": "~6.1.2",
