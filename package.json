@@ -1,6 +1,6 @@
 {
   "name": "angular-vertxbus",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "AngularJS facade and service acting as a Vert.x SockJS client",
   "main": "dist/angular-vertxbus.js",
   "keywords": [
