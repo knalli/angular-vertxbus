@@ -8,15 +8,16 @@
     .useDebug(true)
     .useUrlServer('http://localhost:8080');
     vertxEventBusServiceProvider.useDebug(true);
+    vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
   })
   .run(function ($rootScope, vertxEventBus, vertxEventBusService, $interval) {
     $rootScope.sessionIsValid = false;
     $rootScope.$on('vertx-eventbus.system.login.succeeded', function (event, data) {
-      console.log('Vert.X Login succeeded (status)', data);
+      console.log('Vert.x Login succeeded (status)', data);
       $rootScope.sessionIsValid = (data && data.status === 'ok');
     });
     $rootScope.$on('vertx-eventbus.system.login.failed', function (event, data) {
-      console.log('Vert.X Login failed (status)', data);
+      console.log('Vert.x Login failed (status)', data);
       $rootScope.sessionIsValid = false;
     });
 

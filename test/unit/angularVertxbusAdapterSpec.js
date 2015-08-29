@@ -501,17 +501,19 @@ describe('knalli.angular-vertxbus', function () {
     });
 
     describe('should broadcast event', function () {
-      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, result;
+      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
 
       beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0);
+        vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_) {
+      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
         $rootScope = _$rootScope_;
         $timeout = _$timeout_;
+        $log = _$log_;
         vertxEventBus.readyState = function () {
           return vertxEventBus.EventBus.OPEN;
         };

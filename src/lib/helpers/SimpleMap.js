@@ -3,7 +3,7 @@
 
  This implementation allows usage of non serializable keys for values.
  */
-class SimpleMap {
+export default class SimpleMap {
 
   constructor() {
     this.clear();
@@ -79,5 +79,3 @@ class SimpleMap {
   }
 
 }
-
-export default SimpleMap;

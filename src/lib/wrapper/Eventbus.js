@@ -79,7 +79,7 @@ import BaseWrapper from './Base';
  * @returns {number} value of vertxbus connection states
  */
 
-class EventbusWrapper extends BaseWrapper {
+export default class EventbusWrapper extends BaseWrapper {
 
   constructor(EventBus, $timeout, $log, {
     enabled,
@@ -217,6 +217,11 @@ class EventbusWrapper extends BaseWrapper {
    */
   login(username, password, replyHandler) {
     if (this.instance) {
+      if (!this.instance.login) {
+        this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor');
+        replyHandler();
+        return;
+      }
       this.instance.login(username, password, replyHandler);
     }
   }
@@ -236,10 +241,11 @@ class EventbusWrapper extends BaseWrapper {
    * @param {string} address target address
    * @param {object} message payload message
    * @param {function=} replyHandler optional callback
+   * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
    */
-  send(address, message, replyHandler) {
+  send(address, message, replyHandler, failureHandler) {
     if (this.instance) {
-      this.instance.send(address, message, replyHandler);
+      this.instance.send(address, message, replyHandler, failureHandler);
     }
   }
 
@@ -339,6 +345,5 @@ class EventbusWrapper extends BaseWrapper {
     // clone options
     return angular.extend({}, this.options);
   }
-}
 
-export default EventbusWrapper;
+}

@@ -4,7 +4,7 @@
  FIFO: #push() + #first()
  LIFO: #push() + #last()
  */
-class Queue {
+export default class Queue {
 
   constructor(maxSize = 10) {
     this.maxSize = maxSize;
@@ -36,5 +36,3 @@ class Queue {
   }
 
 }
-
-export default Queue;

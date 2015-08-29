@@ -43,4 +43,5 @@ import {moduleName} from './config';
  *
  * However, if you are looking for a simple, clean and promised based high api, the service is much better you.
  */
-angular.module(moduleName, ['ng']);
+angular
+  .module(moduleName, ['ng']);

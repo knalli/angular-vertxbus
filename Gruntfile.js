@@ -54,7 +54,7 @@ module.exports = function (grunt) {
     jshint : {
       all : ['Gruntfile.js', 'test/unit/*.js', 'src/**/*.js'],
       options : {
-        esnext: true,
+        esnext : true,
         eqeqeq : true,
         globals : {
           angular : true
@@ -64,7 +64,7 @@ module.exports = function (grunt) {
     babel : {
       options : {
         sourceMap : false,
-        sourceType: 'module'
+        sourceType : 'module'
       },
       src : {
         expand : true,
@@ -97,21 +97,21 @@ module.exports = function (grunt) {
         files : ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
         tasks : ['karma:unit']
       },
-      ngdocs: {
+      ngdocs : {
         files : ['src/**/*.js'],
         tasks : ['ngdocs:api']
       }
     },
-    browserify: {
+    browserify : {
       dist : {
-        options: {
-          browserifyOptions: {
-            fullPaths: false,
-            debug: false // TODO enable sourcemaps
+        options : {
+          browserifyOptions : {
+            fullPaths : false,
+            debug : false // TODO enable sourcemaps
           },
-          transform: ['babelify', require('browserify-ngannotate')],
+          transform : ['babelify', require('browserify-ngannotate')],
           banner : '<%= meta.banner %>',
-          watch: true
+          watch : true
         },
         files : {
           'dist/angular-vertxbus.js' : [
@@ -120,23 +120,23 @@ module.exports = function (grunt) {
         }
       }
     },
-    extract_sourcemap: {
-      dist: {
-        files: {
-          'dist': ['dist/angular-vertxbus.js']
+    extract_sourcemap : {
+      dist : {
+        files : {
+          'dist' : ['dist/angular-vertxbus.js']
         }
       },
-      'dist-withpolyfill': {
-        files: {
-          'dist': ['dist/angular-vertxbus.withpolyfill.js']
+      'dist-withpolyfill' : {
+        files : {
+          'dist' : ['dist/angular-vertxbus.withpolyfill.js']
         }
       }
     },
     uglify : {
       options : {
         preserveComments : 'some',
-        sourceMap: false, // TODO enable sourcemaps
-        sourceMapIn: 'dist/angular-vertxbus.js.map'
+        sourceMap : false, // TODO enable sourcemaps
+        sourceMapIn : 'dist/angular-vertxbus.js.map'
       },
       dist : {
         files : {
@@ -166,22 +166,28 @@ module.exports = function (grunt) {
         dest : 'dist/angular-vertxbus.withpolyfill.js'
       }
     },
-    changelog : {
-      options : {
-        dest : 'CHANGELOG.md'
+    conventionalChangelog : {
+      options: {
+        changelogOpts: {
+          // conventional-changelog options go here
+          preset: 'angular'
+        }
+      },
+      release: {
+        src : 'CHANGELOG.md'
       }
     },
-    ngdocs: {
-      options: {
-        dest: 'dist/docs',
-        html5Mode: false,
-        startPage: '/api/knalli.angular-vertxbus',
-        scripts: [
+    ngdocs : {
+      options : {
+        dest : 'dist/docs',
+        html5Mode : false,
+        startPage : '/api/knalli.angular-vertxbus',
+        scripts : [
           'angular.js',
           'docs/github-badge.js'
         ]
       },
-      api: ['src/**/*.js']
+      api : ['src/**/*.js']
     },
 
     'bower-install-simple' : loadTestScopeConfigurations()
@@ -229,7 +235,7 @@ module.exports = function (grunt) {
     'uglify:dist-withPolyfill'
   ]);
   grunt.registerTask('release', [
-    'changelog',
+    'conventionalChangelog',
     'build'
   ]);
 };

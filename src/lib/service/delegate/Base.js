@@ -1,4 +1,4 @@
-class BaseDelegate {
+export default class BaseDelegate {
 
   getConnectionState() {
     return 3; // CLOSED
@@ -25,5 +25,3 @@ class BaseDelegate {
   publish() {}
 
 }
-
-export default BaseDelegate;
