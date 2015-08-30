@@ -53,10 +53,10 @@ module.exports = function(config) {
       'src/vertxbus.module.js',
       'src/vertxbus.wrapper.provider.js',
       'src/vertxbus.service.provider.js',
-      'test/**/*Spec.js'
+      'test/**/*.spec.js'
     ],
 
-    frameworks: ['browserify', 'mocha', 'expect'],
+    frameworks: ['browserify', 'mocha', 'expect', 'jasmine'],
 
 
     // list of files to exclude
