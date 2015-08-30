@@ -72,6 +72,7 @@ module.exports = function(config) {
     preprocessors: (function () {
       var config = {
         'src/**/*.js': [ 'browserify' ],
+        'test/unit/lib/**/*.js': [ 'browserify' ],
         'test/unit/mock/sockjs.js': [ 'browserify' ]
       };
 
