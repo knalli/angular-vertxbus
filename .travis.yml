@@ -1,16 +1,15 @@
 sudo: false
 language: node_js
 node_js:
-  - "0.12"
+  - "4.1"
 
 addons:
   code_climate:
     repo_token: 94ea5ac76984c311dcbadb53a52dd219400775e20402587a0063d8b9d3a66bca
 
 before_install:
-  - '[ "${TRAVIS_NODE_VERSION}" != "0.8" ] || npm install -g npm@1.4.28'
-  - npm install -g npm@latest
-  - npm install -g grunt-cli codeclimate-test-reporter
+  - npm install -qg npm
+  - npm install -qg grunt-cli codeclimate-test-reporter
 
 before_script:
   - export DISPLAY=:99.0
