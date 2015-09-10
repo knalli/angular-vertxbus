@@ -1,5 +1,8 @@
 import {moduleName} from './config';
 
+import VertxEventBusWrapperProvider from './vertxbus.wrapper.provider';
+import VertxEventBusServiceProvider from './vertxbus.service.provider';
+
 /**
  * @ngdoc overview
  * @module knalli.angular-vertxbus
@@ -43,5 +46,11 @@ import {moduleName} from './config';
  *
  * However, if you are looking for a simple, clean and promised based high api, the service is much better you.
  */
-angular
-  .module(moduleName, ['ng']);
+export default angular
+
+  .module(moduleName, ['ng'])
+
+  .provider('vertxEventBus', VertxEventBusWrapperProvider)
+  .provider('vertxEventBusService', VertxEventBusServiceProvider)
+
+  .name;
