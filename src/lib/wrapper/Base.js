@@ -24,6 +24,10 @@ export default class BaseWrapper {
     return {};
   }
 
+  get() {
+    return this;
+  }
+
   // empty: can be overriden by externals
   onopen() {}
 

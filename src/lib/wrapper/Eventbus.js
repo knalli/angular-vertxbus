@@ -82,6 +82,7 @@ import BaseWrapper from './Base';
 export default class EventbusWrapper extends BaseWrapper {
 
   constructor(EventBus, $timeout, $log, {
+    id,
     enabled,
     debugEnabled,
     urlServer,
@@ -96,6 +97,7 @@ export default class EventbusWrapper extends BaseWrapper {
     this.$timeout = $timeout;
     this.$log = $log;
     this.options = {
+      id,
       enabled,
       debugEnabled,
       urlServer,
@@ -112,14 +114,14 @@ export default class EventbusWrapper extends BaseWrapper {
   connect() {
     let url = `${this.options.urlServer}${this.options.urlPath}`;
     if (this.options.debugEnabled) {
-      this.$log.debug(`[Vert.x EB Stub] Enabled: connecting '${url}'`);
+      this.$log.debug(`[Vert.x EB Stub "${this.options.id}"] Enabled: connecting '${url}'`);
     }
     // Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
     // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
     this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
     this.instance.onopen = () => {
       if (this.options.debugEnabled) {
-        this.$log.debug("[Vert.x EB Stub] Connected");
+        this.$log.debug(`[Vert.x EB Stub "${this.options.id}"] Connected`);
       }
       if (angular.isFunction(this.onopen)) {
         this.onopen();
@@ -128,7 +130,7 @@ export default class EventbusWrapper extends BaseWrapper {
     // instance onClose handler
     this.instance.onclose = () => {
       if (this.options.debugEnabled) {
-        this.$log.debug(`[Vert.x EB Stub] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
+        this.$log.debug(`[Vert.x EB Stub "${this.options.id}"] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
       }
       if (angular.isFunction(this.onclose)) {
         this.onclose();
@@ -138,14 +140,14 @@ export default class EventbusWrapper extends BaseWrapper {
       if (!this.disconnectTimeoutEnabled) {
         // reconnect required asap
         if (this.options.debugEnabled) {
-          this.$log.debug("[Vert.x EB Stub] Reconnect immediately");
+          this.$log.debug(`[Vert.x EB Stub "${this.options.id}"] Reconnect immediately`);
         }
         this.disconnectTimeoutEnabled = true;
         this.connect();
       } else if (this.options.reconnectEnabled) {
         // automatic reconnect after timeout
         if (this.options.debugEnabled) {
-          this.$log.debug(`[Vert.x EB Stub] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
+          this.$log.debug(`[Vert.x EB Stub "${this.options.id}"] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
         }
         this.$timeout((() => this.connect()), this.options.sockjsReconnectInterval);
       }
@@ -218,7 +220,7 @@ export default class EventbusWrapper extends BaseWrapper {
   login(username, password, replyHandler) {
     if (this.instance) {
       if (!this.instance.login) {
-        this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor');
+        this.$log.error(`[Vert.x EB Stub "${this.options.id}"] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor`);
         replyHandler();
         return;
       }
