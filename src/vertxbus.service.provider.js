@@ -218,6 +218,7 @@ let VertxEventBusServiceProvider = function () {
    * @requires $interval
    * @requires $log
    */
+  /* @ngInject */
   this.$get = ($rootScope, $q, $interval, vertxEventBus, $log) => {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
@@ -230,7 +231,6 @@ let VertxEventBusServiceProvider = function () {
       return new InterfaceService(new NoopDelegate());
     }
   };
-  this.$get.$inject = ['$rootScope', '$q', '$interval', 'vertxEventBus', '$log'];
 
 };
 

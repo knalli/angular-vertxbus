@@ -182,6 +182,7 @@ let VertxEventBusWrapperProvider = function () {
    * @requires $timeout
    * @requires $log
    */
+  /* @ngInject */
   this.$get = ($timeout, $log) => {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, DEFAULTS, options);
@@ -197,7 +198,6 @@ let VertxEventBusWrapperProvider = function () {
       return new NoopWrapper(vertx.EventBus);
     }
   };
-  this.$get.$inject = ['$timeout', '$log'];
 
 };
 
