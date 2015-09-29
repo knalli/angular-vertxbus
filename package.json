@@ -52,7 +52,7 @@
     "grunt-karma": "^0.11.2",
     "grunt-ngdocs": "^0.2.9",
     "istanbul": "^0.3.18",
-    "karma": "^0.12.37",
+    "karma": "0.13.10",
     "karma-babel-preprocessor": "5.2.1",
     "karma-browserify": "^4.3.0",
     "karma-chrome-launcher": "^0.2.0",
