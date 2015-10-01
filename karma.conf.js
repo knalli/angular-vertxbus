@@ -44,19 +44,19 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/karma-babel-preprocessor/node_modules/babel-core/browser-polyfill.js',
+      'node_modules/babel-core/browser-polyfill.js',
       injectByScope(scope, 'angular/angular.js'),
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
       'test/unit/mock/sockjs.js',
       injectByScope(scope, 'vertx3-eventbus-client/vertxbus.js'),
       'src/lib/**/*.js',
-      'src/vertxbus.module.js',
+      'src/module.js',
       'src/vertxbus.wrapper.provider.js',
       'src/vertxbus.service.provider.js',
-      'test/**/*Spec.js'
+      'test/**/*.spec.js'
     ],
 
-    frameworks: ['browserify', 'mocha', 'expect'],
+    frameworks: ['browserify', 'mocha', 'expect', 'jasmine'],
 
 
     // list of files to exclude
@@ -72,6 +72,7 @@ module.exports = function(config) {
     preprocessors: (function () {
       var config = {
         'src/**/*.js': [ 'browserify' ],
+        'test/unit/lib/**/*.js': [ 'browserify' ],
         'test/unit/mock/sockjs.js': [ 'browserify' ]
       };
 

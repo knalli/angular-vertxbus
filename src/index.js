@@ -1,7 +1,3 @@
-import {moduleName} from './config';
-
-import './vertxbus.module';
-import './vertxbus.wrapper.provider.js';
-import './vertxbus.service.provider.js';
+import moduleName from './module';
 
 export default moduleName;

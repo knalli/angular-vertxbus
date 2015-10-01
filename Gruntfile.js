@@ -160,7 +160,7 @@ module.exports = function (grunt) {
       },
       'dist-withPolyfill' : {
         src : [
-          'node_modules/babelify/node_modules/babel-core/browser-polyfill.js',
+          'node_modules/babel-core/browser-polyfill.js',
           'dist/angular-vertxbus.js'
         ],
         dest : 'dist/angular-vertxbus.withpolyfill.js'
