@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v3.0.0 - 2015-08-29
+/*! angular-vertxbus - v3.0.1 - 2015-10-01
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 Jan Philipp; Licensed  */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -18,18 +18,16 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _config = require('./config');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-require('./vertxbus.module');
+var _module2 = require('./module');
 
-require('./vertxbus.wrapper.provider.js');
+var _module3 = _interopRequireDefault(_module2);
 
-require('./vertxbus.service.provider.js');
-
-exports['default'] = _config.moduleName;
+exports['default'] = _module3['default'];
 module.exports = exports['default'];
 
-},{"./config":1,"./vertxbus.module":12,"./vertxbus.service.provider.js":13,"./vertxbus.wrapper.provider.js":14}],3:[function(require,module,exports){
+},{"./module":12}],3:[function(require,module,exports){
 /*
  Simple queue implementation
 
@@ -1617,7 +1615,21 @@ module.exports = exports['default'];
 },{"./Base":9}],12:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 var _config = require('./config');
+
+var _vertxbusWrapperProvider = require('./vertxbus.wrapper.provider');
+
+var _vertxbusWrapperProvider2 = _interopRequireDefault(_vertxbusWrapperProvider);
+
+var _vertxbusServiceProvider = require('./vertxbus.service.provider');
+
+var _vertxbusServiceProvider2 = _interopRequireDefault(_vertxbusServiceProvider);
 
 /**
  * @ngdoc overview
@@ -1662,10 +1674,15 @@ var _config = require('./config');
  *
  * However, if you are looking for a simple, clean and promised based high api, the service is much better you.
  */
-angular.module(_config.moduleName, ['ng']);
+exports['default'] = angular.module(_config.moduleName, ['ng']).provider('vertxEventBus', _vertxbusWrapperProvider2['default']).provider('vertxEventBusService', _vertxbusServiceProvider2['default']).name;
+module.exports = exports['default'];
 
-},{"./config":1}],13:[function(require,module,exports){
+},{"./config":1,"./vertxbus.service.provider":13,"./vertxbus.wrapper.provider":14}],13:[function(require,module,exports){
 'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -1700,7 +1717,7 @@ var DEFAULTS = {
   messageBuffer: 10000
 };
 
-angular.module(_config.moduleName).provider('vertxEventBusService', function () {
+var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
   var _this = this;
 
   // options (globally, application-wide)
@@ -1770,7 +1787,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    *
    *
    * @description
-   * Defines whether a login is being required or not. This feature is only available using Vert.x 2.
+   * Defines whether a login is being required or not.
    *
    * @param {boolean} [value=false] defines requirement of a valid session
    * @returns {object} this
@@ -1831,7 +1848,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * Defines a login interceptor corresponding for the option `loginRequired`.
    *
    * The argument must be a valid function reference with four arguments
-   * - send (an at runtime injected function for actual sending: i.e. `send(username, password, next)`
+   * - send (an at runtime injected function for actual sending: i.e. `send(address, message, next)`
    * - username (the used username)
    * - password (the used password)
    * - next (the callback function reference)
@@ -1850,7 +1867,7 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @name .#configureLoginInterceptor
    *
    * @description
-   * Configures and defines a login interceptor corresponding for the option `loginRequired`.
+   * Configures and defines a login interceptor corresponding for the option #requireLogin().
    *
    * This utilizes #useLoginInterceptor and is available as a convenient method.
    *
@@ -1910,18 +1927,28 @@ angular.module(_config.moduleName).provider('vertxEventBusService', function () 
    * @requires $interval
    * @requires $log
    */
-  this.$get = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log", function ($rootScope, $q, $interval, vertxEventBus, $log) {
+  /* @ngInject */
+  this.$get = function ($rootScope, $q, $interval, vertxEventBus, $log) {
+    // Current options (merged defaults with application-wide settings)
     var instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
     if (instanceOptions.enabled) {
       return new _libServiceInterfaceService2['default'](new _libServiceDelegateLive2['default']($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions), $log);
     } else {
       return new _libServiceInterfaceService2['default'](new _libServiceDelegateNoop2['default']());
     }
-  }]; // $get
-});
+  };
+  this.$get.$inject = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log"];
+};
+
+exports['default'] = VertxEventBusServiceProvider;
+module.exports = exports['default'];
 
 },{"./config":1,"./lib/service/InterfaceService":5,"./lib/service/delegate/Live":7,"./lib/service/delegate/Noop":8}],14:[function(require,module,exports){
 'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -1957,7 +1984,7 @@ var DEFAULTS = {
   sockjsOptions: {}
 };
 
-angular.module(_config.moduleName).provider('vertxEventBus', function () {
+var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
   var _this = this;
 
   // options (globally, application-wide)
@@ -2129,11 +2156,10 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
    * @requires $timeout
    * @requires $log
    */
-  this.$get = ["$timeout", "$log", function ($timeout, $log) {
-
+  /* @ngInject */
+  this.$get = function ($timeout, $log) {
     // Current options (merged defaults with application-wide settings)
     var instanceOptions = angular.extend({}, DEFAULTS, options);
-
     if (instanceOptions.enabled && vertx && vertx.EventBus) {
       if (instanceOptions.debugEnabled) {
         $log.debug("[Vert.x EB Stub] Enabled");
@@ -2145,7 +2171,11 @@ angular.module(_config.moduleName).provider('vertxEventBus', function () {
       }
       return new _libWrapperNoop2['default'](vertx.EventBus);
     }
-  }]; // $get
-});
+  };
+  this.$get.$inject = ["$timeout", "$log"];
+};
+
+exports['default'] = VertxEventBusWrapperProvider;
+module.exports = exports['default'];
 
 },{"./config":1,"./lib/wrapper/Eventbus":10,"./lib/wrapper/Noop":11}]},{},[2]);

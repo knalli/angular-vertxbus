@@ -1,5 +1,13 @@
+<a name="3.0.1"></a>
+## [3.0.1](https://github.com/knalli/angular-vertxbus/compare/3.0.0...v3.0.1) (2015-10-01)
+
+### No functional changes
+
+* This update changes only internals, structures and internal dependencies (patch only).
+
+
 <a name="3.0.0"></a>
-# [3.0.0](https://github.com/knalli/angular-vertxbus/compare/3.0.0...v3.0.0) (2015-08-29)
+# [3.0.0](https://github.com/knalli/angular-vertxbus/compare/2.0.4...v3.0.0) (2015-08-29)
 
 
 ### Bug Fixes
