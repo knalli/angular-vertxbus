@@ -9,6 +9,9 @@
     "facade",
     "websocket"
   ],
+  "engines": {
+    "node": ">=4.0"
+  },
   "scripts": {
     "prepublish": "bower install",
     "test": "grunt install-test && grunt test",
@@ -65,6 +68,7 @@
     "karma-phantomjs-launcher": "^0.2.1",
     "load-grunt-tasks": "~3.2.0",
     "lodash": "^3.10.1",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "phantomjs": "^1.9.18"
   }
 }
