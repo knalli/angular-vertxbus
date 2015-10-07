@@ -59,7 +59,7 @@
     "karma": "^0.13.9",
     "karma-babel-preprocessor": "^5.2.2",
     "karma-browserify": "^4.3.0",
-    "karma-chrome-launcher": "^0.2.0",
+    "karma-chrome-launcher": "^0.2.1",
     "karma-coverage": "^0.5.2",
     "karma-expect": "~1.1.0",
     "karma-firefox-launcher": "~0.1.3",
