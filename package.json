@@ -36,7 +36,7 @@
   "devDependencies": {
     "babel": "^5.8.23",
     "babelify": "^6.2.0",
-    "bower": "^1.5.2",
+    "bower": "^1.5.3",
     "browserify": "^11.0.1",
     "browserify-ngannotate": "^1.0.1",
     "browserify-shim": "^3.8.10",
