@@ -1,4 +1,4 @@
-import Queue from '../../../../src/lib/helpers/Queue';
+import Queue from '../../../../src/lib/support/Queue';
 
 describe('lib.helpers.Queue', () => {
 

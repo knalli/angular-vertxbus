@@ -1,4 +1,4 @@
-import SimpleMap from '../../../../src/lib/helpers/SimpleMap';
+import SimpleMap from '../../../../src/lib/support/SimpleMap';
 
 describe('lib.helpers.SimpleMap', () => {
 

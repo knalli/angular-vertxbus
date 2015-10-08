@@ -1,6 +1,6 @@
 import {moduleName} from '../../config.js';
 
-import BaseWrapper from './Base';
+import BaseAdapter from './BaseAdapter';
 
 /**
  * @ngdoc service
@@ -79,7 +79,7 @@ import BaseWrapper from './Base';
  * @returns {number} value of vertxbus connection states
  */
 
-export default class EventbusWrapper extends BaseWrapper {
+export default class EventBusAdapter extends BaseAdapter {
 
   constructor(EventBus, $timeout, $log, {
     enabled,
@@ -119,7 +119,7 @@ export default class EventbusWrapper extends BaseWrapper {
     this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
     this.instance.onopen = () => {
       if (this.options.debugEnabled) {
-        this.$log.debug("[Vert.x EB Stub] Connected");
+        this.$log.debug('[Vert.x EB Stub] Connected');
       }
       if (angular.isFunction(this.onopen)) {
         this.onopen();
@@ -138,7 +138,7 @@ export default class EventbusWrapper extends BaseWrapper {
       if (!this.disconnectTimeoutEnabled) {
         // reconnect required asap
         if (this.options.debugEnabled) {
-          this.$log.debug("[Vert.x EB Stub] Reconnect immediately");
+          this.$log.debug('[Vert.x EB Stub] Reconnect immediately');
         }
         this.disconnectTimeoutEnabled = true;
         this.connect();
