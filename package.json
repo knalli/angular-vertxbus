@@ -54,7 +54,7 @@
     "grunt-extract-sourcemap": "^0.1.16",
     "grunt-karma": "^0.12.1",
     "grunt-ngdocs": "^0.2.9",
-    "istanbul": "^0.3.18",
+    "istanbul": "^0.3.22",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.9",
     "karma-babel-preprocessor": "^5.2.2",
