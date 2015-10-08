@@ -1,0 +1,11 @@
+{
+  "env": {
+    "jasmine": true
+  },
+  "plugins": [
+    "angular"
+  ],
+  "globals": {
+    "inject": false
+  }
+}

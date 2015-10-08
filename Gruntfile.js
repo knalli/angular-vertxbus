@@ -51,14 +51,18 @@ module.exports = function (grunt) {
       dist : 'dist/',
       temp : 'temp/'
     },
-    jshint : {
-      all : ['Gruntfile.js', 'test/unit/*.js', 'src/**/*.js'],
-      options : {
-        esnext : true,
-        eqeqeq : true,
-        globals : {
-          angular : true
+    eslint : {
+      chore: {
+        src : ['Gruntfile.js'],
+        options: {
+          configFile: 'Gruntfile.eslint.json'
         }
+      },
+      src: {
+        src : ['src/**/*.js']
+      },
+      test: {
+        src : ['test/unit/*.js']
       }
     },
     babel : {
@@ -94,8 +98,20 @@ module.exports = function (grunt) {
     },
     watch : {
       scripts : {
-        files : ['Gruntfile.js', 'temp/**/*.js', 'test/**/*.js'],
+        files : ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
         tasks : ['karma:unit']
+      },
+      lint_chore : {
+        files : ['Gruntfile.js'],
+        tasks : ['eslint:chore']
+      },
+      lint_src : {
+        files : ['src/**/*.js'],
+        tasks : ['eslint:src']
+      },
+      lint_test : {
+        files : ['test/**/*.js'],
+        tasks : ['eslint:test']
       },
       ngdocs : {
         files : ['src/**/*.js'],
@@ -167,13 +183,13 @@ module.exports = function (grunt) {
       }
     },
     conventionalChangelog : {
-      options: {
-        changelogOpts: {
+      options : {
+        changelogOpts : {
           // conventional-changelog options go here
-          preset: 'angular'
+          preset : 'angular'
         }
       },
-      release: {
+      release : {
         src : 'CHANGELOG.md'
       }
     },
@@ -194,17 +210,24 @@ module.exports = function (grunt) {
 
   });
 
+  grunt.loadNpmTasks('gruntify-eslint');
+
   // Compile and test (use "build" for dist/*)
   grunt.registerTask('default', [
     'clean',
-    'jshint',
+    'eslint',
     'karma:unit'
+  ]);
+
+  // Linting
+  grunt.registerTask('lint', [
+    'eslint'
   ]);
 
   // Testing
   grunt.registerTask('test', [
     'clean',
-    'jshint',
+    'eslint',
     'karma:unit'
   ]);
   grunt.registerTask('install-test', [
@@ -225,7 +248,7 @@ module.exports = function (grunt) {
   // Building & releasing
   grunt.registerTask('build', [
     'clean',
-    'jshint',
+    'eslint',
     'karma:unit',
     'browserify:dist',
     'concat:dist-withPolyfill',

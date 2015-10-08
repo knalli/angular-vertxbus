@@ -119,7 +119,7 @@ export default class EventBusAdapter extends BaseAdapter {
     this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
     this.instance.onopen = () => {
       if (this.options.debugEnabled) {
-        this.$log.debug("[Vert.x EB Stub] Connected");
+        this.$log.debug('[Vert.x EB Stub] Connected');
       }
       if (angular.isFunction(this.onopen)) {
         this.onopen();
@@ -138,7 +138,7 @@ export default class EventBusAdapter extends BaseAdapter {
       if (!this.disconnectTimeoutEnabled) {
         // reconnect required asap
         if (this.options.debugEnabled) {
-          this.$log.debug("[Vert.x EB Stub] Reconnect immediately");
+          this.$log.debug('[Vert.x EB Stub] Reconnect immediately');
         }
         this.disconnectTimeoutEnabled = true;
         this.connect();

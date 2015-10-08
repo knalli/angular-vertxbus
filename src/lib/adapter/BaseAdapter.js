@@ -1,33 +1,45 @@
 export default class BaseAdapter {
 
-  constructor() {}
+  constructor() {
+  }
 
-  connect() {}
+  connect() {
+  }
 
-  reconnect() {}
+  reconnect() {
+  }
 
-  close() {}
+  close() {
+  }
 
-  login(username, password, replyHandler) {}
+  login() {
+  }
 
-  send(address, message, replyHandler, failureHandler) {}
+  send() {
+  }
 
-  publish(address, message) {  }
+  publish() {
+  }
 
-  registerHandler(address, handler) {  }
+  registerHandler() {
+  }
 
-  unregisterHandler(address, handler) {}
+  unregisterHandler() {
+  }
 
-  readyState() {}
+  readyState() {
+  }
 
   getOptions() {
     return {};
   }
 
   // empty: can be overriden by externals
-  onopen() {}
+  onopen() {
+  }
 
   // empty: can be overriden by externals
-  onclose() {}
+  onclose() {
+  }
 
 }

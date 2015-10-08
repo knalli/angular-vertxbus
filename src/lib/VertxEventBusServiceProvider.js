@@ -1,5 +1,3 @@
-import {moduleName} from './../config';
-
 import EventBusDelegate from './service/delegate/EventBusDelegate';
 import NoopDelegate from './service/delegate/NoopDelegate';
 import Delegator from './service/Delegator';

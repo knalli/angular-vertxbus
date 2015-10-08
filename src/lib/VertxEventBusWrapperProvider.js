@@ -1,5 +1,3 @@
-import {moduleName} from './../config';
-
 import EventBusAdapter from './adapter/EventBusAdapter';
 import NoopAdapter from './adapter/NoopAdapter';
 
@@ -188,12 +186,12 @@ let VertxEventBusWrapperProvider = function () {
     let instanceOptions = angular.extend({}, DEFAULTS, options);
     if (instanceOptions.enabled && vertx && vertx.EventBus) {
       if (instanceOptions.debugEnabled) {
-        $log.debug("[Vert.x EB Stub] Enabled");
+        $log.debug('[Vert.x EB Stub] Enabled');
       }
       return new EventBusAdapter(vertx.EventBus, $timeout, $log, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
-        $log.debug("[Vert.x EB Stub] Disabled");
+        $log.debug('[Vert.x EB Stub] Disabled');
       }
       return new NoopAdapter(vertx.EventBus);
     }
