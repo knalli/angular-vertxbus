@@ -66,7 +66,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-mocha": "^0.2.0",
     "karma-phantomjs-launcher": "^0.2.1",
-    "load-grunt-tasks": "~3.2.0",
+    "load-grunt-tasks": "^3.3.0",
     "lodash": "^3.10.1",
     "mocha": "^2.3.3",
     "phantomjs": "^1.9.18"
