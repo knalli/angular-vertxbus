@@ -1,6 +1,6 @@
-import BaseWrapper from './Base';
+import BaseAdapter from './BaseAdapter';
 
-export default class NoopWrapper extends BaseWrapper {
+export default class NoopAdapter extends BaseAdapter {
 
   constructor(EventBus) {
     super();

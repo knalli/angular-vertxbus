@@ -1,6 +1,6 @@
-import {moduleName} from '../../config.js';
+import {moduleName} from '../../config';
 
-export default class InterfaceService {
+export default class Delegator {
 
   constructor(delegate, $log) {
     this.delegate = delegate;

@@ -1,4 +1,4 @@
-export default class BaseWrapper {
+export default class BaseAdapter {
 
   constructor() {}
 

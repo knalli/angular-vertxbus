@@ -1,6 +1,6 @@
 import {moduleName} from '../../config.js';
 
-import BaseWrapper from './Base';
+import BaseAdapter from './BaseAdapter';
 
 /**
  * @ngdoc service
@@ -79,7 +79,7 @@ import BaseWrapper from './Base';
  * @returns {number} value of vertxbus connection states
  */
 
-export default class EventbusWrapper extends BaseWrapper {
+export default class EventBusAdapter extends BaseAdapter {
 
   constructor(EventBus, $timeout, $log, {
     enabled,

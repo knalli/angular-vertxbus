@@ -1,8 +1,8 @@
-import {moduleName} from './config';
+import {moduleName} from './../config';
 
-import LiveDelegate from './lib/service/delegate/Live';
-import NoopDelegate from './lib/service/delegate/Noop';
-import InterfaceService from './lib/service/InterfaceService';
+import EventBusDelegate from './service/delegate/EventBusDelegate';
+import NoopDelegate from './service/delegate/NoopDelegate';
+import Delegator from './service/Delegator';
 
 /**
  * @ngdoc service
@@ -223,12 +223,12 @@ let VertxEventBusServiceProvider = function () {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
     if (instanceOptions.enabled) {
-      return new InterfaceService(
-        new LiveDelegate($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions),
+      return new Delegator(
+        new EventBusDelegate($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions),
         $log
       );
     } else {
-      return new InterfaceService(new NoopDelegate());
+      return new Delegator(new NoopDelegate());
     }
   };
 

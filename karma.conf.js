@@ -51,8 +51,6 @@ module.exports = function(config) {
       injectByScope(scope, 'vertx3-eventbus-client/vertxbus.js'),
       'src/lib/**/*.js',
       'src/module.js',
-      'src/vertxbus.wrapper.provider.js',
-      'src/vertxbus.service.provider.js',
       'test/**/*.spec.js'
     ],
 

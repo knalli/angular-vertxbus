@@ -1,7 +1,7 @@
-import {moduleName} from './config';
+import {moduleName} from './../config';
 
-import EventbusWrapper from './lib/wrapper/Eventbus';
-import NoopWrapper from './lib/wrapper/Noop';
+import EventBusAdapter from './adapter/EventBusAdapter';
+import NoopAdapter from './adapter/NoopAdapter';
 
 /**
  * @ngdoc service
@@ -190,12 +190,12 @@ let VertxEventBusWrapperProvider = function () {
       if (instanceOptions.debugEnabled) {
         $log.debug("[Vert.x EB Stub] Enabled");
       }
-      return new EventbusWrapper(vertx.EventBus, $timeout, $log, instanceOptions);
+      return new EventBusAdapter(vertx.EventBus, $timeout, $log, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
         $log.debug("[Vert.x EB Stub] Disabled");
       }
-      return new NoopWrapper(vertx.EventBus);
+      return new NoopAdapter(vertx.EventBus);
     }
   };
 

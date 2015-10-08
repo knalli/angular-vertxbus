@@ -1,8 +1,8 @@
-import {moduleName} from '../../../config.js';
+import {moduleName} from '../../../config';
 
-import Queue from './../../helpers/Queue';
-import SimpleMap from './../../helpers/SimpleMap';
-import BaseDelegate from './Base';
+import Queue from './../../support/Queue';
+import SimpleMap from './../../support/SimpleMap';
+import BaseDelegate from './BaseDelegate';
 
 /**
  * @ngdoc event
@@ -62,7 +62,7 @@ import BaseDelegate from './Base';
  * @param {boolean} data.status must be not`'ok'`
  */
 
-export default class LiveDelegate extends BaseDelegate {
+export default class EventBusDelegate extends BaseDelegate {
 
   constructor($rootScope, $interval, $log, $q, eventBus, {
     enabled,

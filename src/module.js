@@ -1,7 +1,7 @@
 import {moduleName} from './config';
 
-import VertxEventBusWrapperProvider from './vertxbus.wrapper.provider';
-import VertxEventBusServiceProvider from './vertxbus.service.provider';
+import VertxEventBusWrapperProvider from './lib/VertxEventBusWrapperProvider';
+import VertxEventBusServiceProvider from './lib/VertxEventBusServiceProvider';
 
 /**
  * @ngdoc overview
