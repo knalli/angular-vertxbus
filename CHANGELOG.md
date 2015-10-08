@@ -1,3 +1,13 @@
+<a name="3.0.2"></a>
+## [3.0.2](https://github.com/knalli/angular-vertxbus/compare/3.0.1...v3.0.2) (2015-10-08)
+
+
+### Features
+
+* **linting:** switch from JSHint to ESLint ([b70eea8](https://github.com/knalli/angular-vertxbus/commit/b70eea8))
+
+
+
 <a name="3.0.1"></a>
 ## [3.0.1](https://github.com/knalli/angular-vertxbus/compare/3.0.0...v3.0.1) (2015-10-01)
 
