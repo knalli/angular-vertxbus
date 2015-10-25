@@ -121,8 +121,8 @@ export default class EventBusAdapter extends BaseAdapter {
    * @description
    * Reconfigure the connection details.
    *
-   * @param {string} urlServer
-   * @param {string} [urlPath=/eventbus]
+   * @param {string} urlServer see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlServer vertxEventBusProvider.useUrlServer()}
+   * @param {string} [urlPath=/eventbus] see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlPath vertxEventBusProvider.useUrlPath()}
    */
   configureConnection(urlServer, urlPath = '/eventbus') {
     this.options.connectionConfig = new ConnectionConfigHolder({urlServer, urlPath});
