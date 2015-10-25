@@ -1,6 +1,6 @@
-/*! angular-vertxbus - v3.0.2 - 2015-10-09
+/*! angular-vertxbus - v3.1.0 - 2015-10-25
 * http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2015 Jan Philipp; Licensed  */
+* Copyright (c) 2015 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -27,7 +27,7 @@ var _module3 = _interopRequireDefault(_module2);
 exports['default'] = _module3['default'];
 module.exports = exports['default'];
 
-},{"./module":14}],3:[function(require,module,exports){
+},{"./module":15}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -308,6 +308,10 @@ var _adapterNoopAdapter = require('./adapter/NoopAdapter');
 
 var _adapterNoopAdapter2 = _interopRequireDefault(_adapterNoopAdapter);
 
+var _supportConnectionConfigHolder = require('./support/ConnectionConfigHolder');
+
+var _supportConnectionConfigHolder2 = _interopRequireDefault(_supportConnectionConfigHolder);
+
 /**
  * @ngdoc service
  * @module knalli.angular-vertxbus
@@ -319,6 +323,7 @@ var _adapterNoopAdapter2 = _interopRequireDefault(_adapterNoopAdapter);
 var DEFAULTS = {
   enabled: true,
   debugEnabled: false,
+  initialConnectEnabled: true,
   urlServer: location.protocol + '//' + location.hostname + ((function () {
     if (location.port) {
       return ':' + location.port;
@@ -352,6 +357,25 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
     var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
 
     options.enabled = value === true;
+    return _this;
+  };
+
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#disableAutoConnect
+   *
+   * @description
+   * Disables the auto connection feature.
+   *
+   * This feature will be only available if `enable == true`.
+   *
+   * @param {boolean} [value=true] auto connect on startup
+   * @returns {object} this
+   */
+  this.disableAutoConnect = function () {
+    options.initialConnectEnabled = false;
     return _this;
   };
 
@@ -510,6 +534,15 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Enabled');
       }
+
+      // aggregate server connection params
+      instanceOptions.connectionConfig = new _supportConnectionConfigHolder2['default']({
+        urlServer: instanceOptions.urlServer,
+        urlPath: instanceOptions.urlPath
+      });
+      delete instanceOptions.urlServer;
+      delete instanceOptions.urlPath;
+
       return new _adapterEventBusAdapter2['default'](vertx.EventBus, $timeout, $log, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
@@ -524,7 +557,7 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
 exports['default'] = VertxEventBusWrapperProvider;
 module.exports = exports['default'];
 
-},{"./adapter/EventBusAdapter":6,"./adapter/NoopAdapter":7}],5:[function(require,module,exports){
+},{"./adapter/EventBusAdapter":6,"./adapter/NoopAdapter":7,"./support/ConnectionConfigHolder":12}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -541,6 +574,9 @@ var BaseAdapter = (function () {
   }
 
   _createClass(BaseAdapter, [{
+    key: "configureConnection",
+    value: function configureConnection() {}
+  }, {
     key: "connect",
     value: function connect() {}
   }, {
@@ -599,7 +635,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -612,6 +648,10 @@ var _configJs = require('../../config.js');
 var _BaseAdapter2 = require('./BaseAdapter');
 
 var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
+
+var _supportConnectionConfigHolder = require('./../support/ConnectionConfigHolder');
+
+var _supportConnectionConfigHolder2 = _interopRequireDefault(_supportConnectionConfigHolder);
 
 /**
  * @ngdoc service
@@ -696,8 +736,8 @@ var EventBusAdapter = (function (_BaseAdapter) {
   function EventBusAdapter(EventBus, $timeout, $log, _ref) {
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
-    var urlServer = _ref.urlServer;
-    var urlPath = _ref.urlPath;
+    var initialConnectEnabled = _ref.initialConnectEnabled;
+    var connectionConfig = _ref.connectionConfig;
     var reconnectEnabled = _ref.reconnectEnabled;
     var sockjsReconnectInterval = _ref.sockjsReconnectInterval;
     var sockjsOptions = _ref.sockjsOptions;
@@ -712,23 +752,46 @@ var EventBusAdapter = (function (_BaseAdapter) {
     this.options = {
       enabled: enabled,
       debugEnabled: debugEnabled,
-      urlServer: urlServer,
-      urlPath: urlPath,
+      initialConnectEnabled: initialConnectEnabled,
+      connectionConfig: connectionConfig,
       reconnectEnabled: reconnectEnabled,
       sockjsReconnectInterval: sockjsReconnectInterval,
       sockjsOptions: sockjsOptions
     };
     this.disconnectTimeoutEnabled = true;
-    // asap create connection
-    this.connect();
+    if (initialConnectEnabled) {
+      // asap create connection
+      this.connect();
+    }
   }
 
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBus
+   * @name .#configureConnect
+   *
+   * @description
+   * Reconfigure the connection details.
+   *
+   * @param {string} urlServer
+   * @param {string} [urlPath=/eventbus]
+   */
+
   _createClass(EventBusAdapter, [{
+    key: 'configureConnection',
+    value: function configureConnection(urlServer) {
+      var urlPath = arguments.length <= 1 || arguments[1] === undefined ? '/eventbus' : arguments[1];
+
+      this.options.connectionConfig = new _supportConnectionConfigHolder2['default']({ urlServer: urlServer, urlPath: urlPath });
+      return this;
+    }
+  }, {
     key: 'connect',
     value: function connect() {
       var _this = this;
 
-      var url = '' + this.options.urlServer + this.options.urlPath;
+      var url = '' + this.options.connectionConfig.urlServer + this.options.connectionConfig.urlPath;
       if (this.options.debugEnabled) {
         this.$log.debug('[Vert.x EB Stub] Enabled: connecting \'' + url + '\'');
       }
@@ -995,14 +1058,14 @@ var EventBusAdapter = (function (_BaseAdapter) {
 exports['default'] = EventBusAdapter;
 module.exports = exports['default'];
 
-},{"../../config.js":1,"./BaseAdapter":5}],7:[function(require,module,exports){
+},{"../../config.js":1,"./../support/ConnectionConfigHolder":12,"./BaseAdapter":5}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -1290,7 +1353,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x6, _x7, _x8) { var _again = true; _function: while (_again) { var object = _x6, property = _x7, receiver = _x8; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x6 = parent; _x7 = property; _x8 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x6, _x7, _x8) { var _again = true; _function: while (_again) { var object = _x6, property = _x7, receiver = _x8; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x6 = parent; _x7 = property; _x8 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -1897,14 +1960,14 @@ var EventBusDelegate = (function (_BaseDelegate) {
 exports['default'] = EventBusDelegate;
 module.exports = exports['default'];
 
-},{"../../../config":1,"./../../support/Queue":12,"./../../support/SimpleMap":13,"./BaseDelegate":9}],11:[function(require,module,exports){
+},{"../../../config":1,"./../../support/Queue":13,"./../../support/SimpleMap":14,"./BaseDelegate":9}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -1932,6 +1995,46 @@ exports['default'] = NoopDelegate;
 module.exports = exports['default'];
 
 },{"./BaseDelegate":9}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ConnectionConfigHolder = (function () {
+  function ConnectionConfigHolder(_ref) {
+    var urlServer = _ref.urlServer;
+    var urlPath = _ref.urlPath;
+
+    _classCallCheck(this, ConnectionConfigHolder);
+
+    this._urlServer = urlServer;
+    this._urlPath = urlPath;
+  }
+
+  _createClass(ConnectionConfigHolder, [{
+    key: "urlServer",
+    get: function get() {
+      return this._urlServer;
+    }
+  }, {
+    key: "urlPath",
+    get: function get() {
+      return this._urlPath;
+    }
+  }]);
+
+  return ConnectionConfigHolder;
+})();
+
+exports["default"] = ConnectionConfigHolder;
+module.exports = exports["default"];
+
+},{}],13:[function(require,module,exports){
 /*
  Simple queue implementation
 
@@ -1995,7 +2098,7 @@ var Queue = (function () {
 exports["default"] = Queue;
 module.exports = exports["default"];
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*
  Simple Map implementation
 
@@ -2109,7 +2212,7 @@ var SimpleMap = (function () {
 exports["default"] = SimpleMap;
 module.exports = exports["default"];
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

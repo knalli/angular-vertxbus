@@ -1,3 +1,17 @@
+<a name="3.1.0"></a>
+# [3.1.0](https://github.com/knalli/angular-vertxbus/compare/3.0.2...v3.1.0) (2015-10-25)
+
+
+### Bug Fixes
+
+* **build:** fix invalid license header in artifacts' headers ([f0597fb](https://github.com/knalli/angular-vertxbus/commit/f0597fb))
+
+### Features
+
+* **wrapper:** introduce `.disableAutoConnect()` #71 ([ce3a0af](https://github.com/knalli/angular-vertxbus/commit/ce3a0af))
+
+
+
 <a name="3.0.2"></a>
 ## [3.0.2](https://github.com/knalli/angular-vertxbus/compare/3.0.1...v3.0.2) (2015-10-08)
 
