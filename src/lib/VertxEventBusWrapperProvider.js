@@ -1,5 +1,6 @@
 import EventBusAdapter from './adapter/EventBusAdapter';
 import NoopAdapter from './adapter/NoopAdapter';
+import ConnectionConfigHolder from './support/ConnectionConfigHolder';
 
 /**
  * @ngdoc service
@@ -12,6 +13,7 @@ import NoopAdapter from './adapter/NoopAdapter';
 const DEFAULTS = {
   enabled : true,
   debugEnabled : false,
+  initialConnectEnabled : true,
   urlServer : `${location.protocol}//${location.hostname}` + ((() => {
     if (location.port) {
       return `:${location.port}`;
@@ -42,6 +44,25 @@ let VertxEventBusWrapperProvider = function () {
    */
   this.enable = (value = DEFAULTS.enabled) => {
     options.enabled = (value === true);
+    return this;
+  };
+
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+   * @name .#disableAutoConnect
+   *
+   * @description
+   * Disables the auto connection feature.
+   *
+   * This feature will be only available if `enable == true`.
+   *
+   * @param {boolean} [value=true] auto connect on startup
+   * @returns {object} this
+   */
+  this.disableAutoConnect = () => {
+    options.initialConnectEnabled = false;
     return this;
   };
 
@@ -188,6 +209,15 @@ let VertxEventBusWrapperProvider = function () {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Enabled');
       }
+
+      // aggregate server connection params
+      instanceOptions.connectionConfig = new ConnectionConfigHolder({
+        urlServer : instanceOptions.urlServer,
+        urlPath : instanceOptions.urlPath
+      });
+      delete instanceOptions.urlServer;
+      delete instanceOptions.urlPath;
+
       return new EventBusAdapter(vertx.EventBus, $timeout, $log, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {

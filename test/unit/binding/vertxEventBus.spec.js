@@ -265,4 +265,88 @@ describe('integration of module::vertxEventBus', function () {
 
   });
 
+  describe('vertxEventBus (w/o autoconnect)', function () {
+
+    var vertxEventBus, $timeout, $rootScope, $log;
+
+    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+      // Override (improve test running time)
+      vertxEventBusProvider
+        .useDebug(true)
+        .useSockJsReconnectInterval(2000)
+        .useReconnect(false)
+        .disableAutoConnect();
+    }));
+
+    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+      vertxEventBus = _vertxEventBus_;
+      $timeout = _$timeout_;
+      $rootScope = _$rootScope_;
+      $log = _$log_;
+      SockJS.currentMockInstance.$log = $log;
+    }));
+
+    it('should not fail calling close() on non existing connection', function (done) {
+      this.timeout(20000);
+      setTimeout(function () {
+        vertxEventBus.close();
+        setTimeout(done, 1200);
+      }, 200);
+    });
+
+    it('should not fail calling reconnect() on non existing connection', function (done) {
+      this.timeout(20000);
+      setTimeout(function () {
+        vertxEventBus.reconnect(true);
+        setTimeout(done, 1200);
+      }, 200);
+    });
+
+    it('should not call the onopen function because no automatic connect', function (done) {
+      this.timeout(20000);
+      var onopenCount = 0;
+      vertxEventBus.onopen = function () {
+        $log.debug('onopen');
+        onopenCount++;
+      };
+      var oncloseCount = 0;
+      vertxEventBus.onclose = function () {
+        $log.debug('onclose');
+        oncloseCount++;
+      };
+      setTimeout(function () {
+        expect(onopenCount).to.be(0); // should be not called!
+        setTimeout(done, 1200);
+      }, 200);
+    });
+
+    it('should not call the onopen function because no automatic connect', function (done) {
+      this.timeout(20000);
+      var onopenCount = 0;
+      vertxEventBus.onopen = function () {
+        $log.debug('onopen');
+        onopenCount++;
+      };
+      var oncloseCount = 0;
+      vertxEventBus.onclose = function () {
+        $log.debug('onclose');
+        oncloseCount++;
+      };
+      setTimeout(function () {
+        expect(onopenCount).to.be(0); // should be not called!
+        $log.debug('apply connection config..');
+        vertxEventBus.configureConnection('http://localhost:1234', '/eventbus1');
+        vertxEventBus.connect();
+        setTimeout(function () {
+          $log.debug('check..');
+          expect(SockJS.currentMockInstance.url).to.be('http://localhost:1234/eventbus1');
+          expect(onopenCount).to.be(1);
+          expect(oncloseCount).to.be(0);
+          done();
+        }, 1200);
+      }, 200);
+    });
+
+  });
+
 });

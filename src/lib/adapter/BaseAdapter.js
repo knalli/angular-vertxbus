@@ -3,6 +3,9 @@ export default class BaseAdapter {
   constructor() {
   }
 
+  configureConnection() {
+  }
+
   connect() {
   }
 

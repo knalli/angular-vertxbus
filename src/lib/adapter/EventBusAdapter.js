@@ -1,6 +1,7 @@
 import {moduleName} from '../../config.js';
 
 import BaseAdapter from './BaseAdapter';
+import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 /**
  * @ngdoc service
@@ -84,8 +85,8 @@ export default class EventBusAdapter extends BaseAdapter {
   constructor(EventBus, $timeout, $log, {
     enabled,
     debugEnabled,
-    urlServer,
-    urlPath,
+    initialConnectEnabled,
+    connectionConfig,
     reconnectEnabled,
     sockjsReconnectInterval,
     sockjsOptions
@@ -98,19 +99,38 @@ export default class EventBusAdapter extends BaseAdapter {
     this.options = {
       enabled,
       debugEnabled,
-      urlServer,
-      urlPath,
+      initialConnectEnabled,
+      connectionConfig,
       reconnectEnabled,
       sockjsReconnectInterval,
       sockjsOptions
     };
     this.disconnectTimeoutEnabled = true;
-    // asap create connection
-    this.connect();
+    if (initialConnectEnabled) {
+      // asap create connection
+      this.connect();
+    }
+  }
+
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBus
+   * @name .#configureConnect
+   *
+   * @description
+   * Reconfigure the connection details.
+   *
+   * @param {string} urlServer
+   * @param {string} [urlPath=/eventbus]
+   */
+  configureConnection(urlServer, urlPath = '/eventbus') {
+    this.options.connectionConfig = new ConnectionConfigHolder({urlServer, urlPath});
+    return this;
   }
 
   connect() {
-    let url = `${this.options.urlServer}${this.options.urlPath}`;
+    let url = `${this.options.connectionConfig.urlServer}${this.options.connectionConfig.urlPath}`;
     if (this.options.debugEnabled) {
       this.$log.debug(`[Vert.x EB Stub] Enabled: connecting '${url}'`);
     }

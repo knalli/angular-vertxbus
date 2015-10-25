@@ -45,7 +45,7 @@ module.exports = function (grunt) {
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
       '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
       '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-      ' Licensed <%= _.pluck(pkg.licenses, "name").join(", ") %> */'
+      ' Licensed <%= pkg.license %> */'
     },
     clean : {
       dist : 'dist/',
@@ -172,7 +172,7 @@ module.exports = function (grunt) {
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
         '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
         '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= _.pluck(pkg.licenses, "name").join(", ") %> */\n'
+        ' Licensed <%= pkg.license %> */\n'
       },
       'dist-withPolyfill' : {
         src : [
