@@ -40,7 +40,7 @@
     "browserify": "^12.0.1",
     "browserify-ngannotate": "^1.0.1",
     "browserify-shim": "^3.8.10",
-    "eslint-plugin-angular": "^0.12.0",
+    "eslint-plugin-angular": "^0.13.0",
     "estraverse": "^4.1.0",
     "express": "^4.13.3",
     "grunt": "~0.4.5",
