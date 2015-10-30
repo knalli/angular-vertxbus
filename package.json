@@ -35,7 +35,7 @@
   "license": "MIT",
   "devDependencies": {
     "babel": "^6.0.14",
-    "babelify": "^6.2.0",
+    "babelify": "^7.0.2",
     "bower": "^1.5.3",
     "browserify": "^12.0.1",
     "browserify-ngannotate": "^1.0.1",
