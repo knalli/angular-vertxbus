@@ -3,9 +3,9 @@
 
 describe('integration of module::vertxEventBusService', function () {
 
-  beforeEach(module('knalli.angular-vertxbus'));
+  beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
-  beforeEach(module('knalli.angular-vertxbus', function ($provide) {
+  beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
     $provide.value('$log', window.console);
   }));
 
@@ -116,7 +116,7 @@ describe('integration of module::vertxEventBusService', function () {
     describe('with disabled message queue (default)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
@@ -161,7 +161,7 @@ describe('integration of module::vertxEventBusService', function () {
     describe('with enabled message queue (size 3)', function () {
       var vertxEventBus, vertxEventBusService, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(3);
       }));
 
@@ -245,7 +245,7 @@ describe('integration of module::vertxEventBusService', function () {
     describe('should broadcast event', function () {
       var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0);
         vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
       }));
@@ -305,7 +305,7 @@ describe('integration of module::vertxEventBusService', function () {
     describe('should not send message', function () {
       var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0);
         vertxEventBusServiceProvider.requireLogin(true);
       }));
@@ -341,7 +341,7 @@ describe('integration of module::vertxEventBusService', function () {
     describe('when the service is not connected correctly (stalled connection)', function () {
       var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
       }));
 
@@ -495,7 +495,7 @@ describe('integration of module::vertxEventBusService', function () {
 
       var vertxEventBusService;
 
-      beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
         vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
@@ -539,7 +539,7 @@ describe('integration of module::vertxEventBusService', function () {
 
     var vertxEventBusService;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+    beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
       vertxEventBusServiceProvider.useMessageBuffer(0);
     }));
 
@@ -581,7 +581,7 @@ describe('integration of module::vertxEventBusService', function () {
 
     var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+    beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
       vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
     }));
 
@@ -633,7 +633,7 @@ describe('integration of module::vertxEventBusService', function () {
 
     var vertxEventBusService, vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+    beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
       vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
     }));
 
