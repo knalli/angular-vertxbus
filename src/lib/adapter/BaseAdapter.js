@@ -1,12 +1,14 @@
 export default class BaseAdapter {
 
-  constructor() {
+  constructor($q) {
+    this.$q = $q;
   }
 
   configureConnection() {
   }
 
   connect() {
+    return this.$q.reject();
   }
 
   reconnect() {

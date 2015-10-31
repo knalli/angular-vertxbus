@@ -176,7 +176,7 @@ module.exports = function (grunt) {
       },
       'dist-withPolyfill' : {
         src : [
-          'node_modules/babel-core/browser-polyfill.js',
+          'node_modules/babel-polyfill/dist/polyfill.js',
           'dist/angular-vertxbus.js'
         ],
         dest : 'dist/angular-vertxbus.withpolyfill.js'
@@ -226,7 +226,6 @@ module.exports = function (grunt) {
 
   // Testing
   grunt.registerTask('test', [
-    'clean',
     'eslint',
     'karma:unit'
   ]);
@@ -246,16 +245,18 @@ module.exports = function (grunt) {
   ]);
 
   // Building & releasing
-  grunt.registerTask('build', [
-    'clean',
-    'eslint',
-    'karma:unit',
+  grunt.registerTask('compile', [
     'browserify:dist',
     'concat:dist-withPolyfill',
     // 'extract_sourcemap:dist',// TODO enable sourcemaps
     // 'extract_sourcemap:dist-withPolyfill',// TODO enable sourcemaps
     'uglify:dist',
     'uglify:dist-withPolyfill'
+  ]);
+  grunt.registerTask('build', [
+    'clean',
+    'test',
+    'compile'
   ]);
   grunt.registerTask('release', [
     'conventionalChangelog',

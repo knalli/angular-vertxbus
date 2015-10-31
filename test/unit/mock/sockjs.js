@@ -20,7 +20,7 @@ class SockJS {
   }
 
   log(...args) {
-    let log = window.console;
+    var log = window.console;
     if (SockJS.currentMockInstance && SockJS.currentMockInstance.$log) {
       log = SockJS.currentMockInstance.$log;
     }

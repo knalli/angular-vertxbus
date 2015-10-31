@@ -3,28 +3,26 @@
 
 describe('integration of module::vertxEventBus', function () {
 
-  beforeEach(module('knalli.angular-vertxbus'));
+  beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
-  beforeEach(module('knalli.angular-vertxbus', function ($provide) {
+  beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
     $provide.value('$log', window.console);
   }));
 
-  it('should have vertxEventBus', function () {
-    inject(function (vertxEventBus) {
-      expect(vertxEventBus).not.to.be(undefined);
-    });
-  });
+  it('should have vertxEventBus', angular.mock.inject(function (vertxEventBus) {
+    expect(vertxEventBus).not.to.be(undefined);
+  }));
 
   describe('vertxEventBus (w/ reconnect)', function () {
 
     var vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+    beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
       // Override (improve test running time)
       vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
@@ -224,12 +222,12 @@ describe('integration of module::vertxEventBus', function () {
 
     var vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+    beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
       // Override (improve test running time)
       vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000).useReconnect(false);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
@@ -269,7 +267,7 @@ describe('integration of module::vertxEventBus', function () {
 
     var vertxEventBus, $timeout, $rootScope, $log;
 
-    beforeEach(module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
+    beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusProvider) {
       // Override (improve test running time)
       vertxEventBusProvider
         .useDebug(true)
@@ -278,7 +276,7 @@ describe('integration of module::vertxEventBus', function () {
         .disableAutoConnect();
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
@@ -336,12 +334,19 @@ describe('integration of module::vertxEventBus', function () {
         expect(onopenCount).to.be(0); // should be not called!
         $log.debug('apply connection config..');
         vertxEventBus.configureConnection('http://localhost:1234', '/eventbus1');
-        vertxEventBus.connect();
+        var connectPromise = vertxEventBus.connect();
+        expect(connectPromise).not.to.be(undefined);
+        var connectPromiseResult = false;
+        connectPromise.then(() => {
+          connectPromiseResult = true
+        });
         setTimeout(function () {
+          $rootScope.$digest(); // for $q
           $log.debug('check..');
           expect(SockJS.currentMockInstance.url).to.be('http://localhost:1234/eventbus1');
           expect(onopenCount).to.be(1);
           expect(oncloseCount).to.be(0);
+          expect(connectPromiseResult ).to.be(true);
           done();
         }, 1200);
       }, 200);
