@@ -226,7 +226,6 @@ module.exports = function (grunt) {
 
   // Testing
   grunt.registerTask('test', [
-    'clean',
     'eslint',
     'karma:unit'
   ]);
@@ -256,8 +255,7 @@ module.exports = function (grunt) {
   ]);
   grunt.registerTask('build', [
     'clean',
-    'eslint',
-    'karma:unit',
+    'test',
     'package'
   ]);
   grunt.registerTask('release', [
