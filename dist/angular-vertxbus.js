@@ -1,10 +1,10 @@
-/*! angular-vertxbus - v3.1.0 - 2015-10-25
+/*! angular-vertxbus - v3.2.0 - 2015-10-31
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2015 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var moduleName = 'knalli.angular-vertxbus';
@@ -14,39 +14,38 @@ exports.moduleName = moduleName;
 },{}],2:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+var _module = require('./module');
 
-var _module2 = require('./module');
+var _module2 = _interopRequireDefault(_module);
 
-var _module3 = _interopRequireDefault(_module2);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports['default'] = _module3['default'];
-module.exports = exports['default'];
+exports.default = _module2.default;
 
 },{"./module":15}],3:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+var _EventBusDelegate = require('./service/delegate/EventBusDelegate');
 
-var _serviceDelegateEventBusDelegate = require('./service/delegate/EventBusDelegate');
+var _EventBusDelegate2 = _interopRequireDefault(_EventBusDelegate);
 
-var _serviceDelegateEventBusDelegate2 = _interopRequireDefault(_serviceDelegateEventBusDelegate);
+var _NoopDelegate = require('./service/delegate/NoopDelegate');
 
-var _serviceDelegateNoopDelegate = require('./service/delegate/NoopDelegate');
+var _NoopDelegate2 = _interopRequireDefault(_NoopDelegate);
 
-var _serviceDelegateNoopDelegate2 = _interopRequireDefault(_serviceDelegateNoopDelegate);
+var _Delegator = require('./service/Delegator');
 
-var _serviceDelegator = require('./service/Delegator');
+var _Delegator2 = _interopRequireDefault(_Delegator);
 
-var _serviceDelegator2 = _interopRequireDefault(_serviceDelegator);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * @ngdoc service
@@ -280,37 +279,36 @@ var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
     // Current options (merged defaults with application-wide settings)
     var instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
     if (instanceOptions.enabled) {
-      return new _serviceDelegator2['default'](new _serviceDelegateEventBusDelegate2['default']($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions), $log);
+      return new _Delegator2.default(new _EventBusDelegate2.default($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions), $log);
     } else {
-      return new _serviceDelegator2['default'](new _serviceDelegateNoopDelegate2['default']());
+      return new _Delegator2.default(new _NoopDelegate2.default());
     }
   };
   this.$get.$inject = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log"];
 };
 
-exports['default'] = VertxEventBusServiceProvider;
-module.exports = exports['default'];
+exports.default = VertxEventBusServiceProvider;
 
 },{"./service/Delegator":8,"./service/delegate/EventBusDelegate":10,"./service/delegate/NoopDelegate":11}],4:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+var _EventBusAdapter = require('./adapter/EventBusAdapter');
 
-var _adapterEventBusAdapter = require('./adapter/EventBusAdapter');
+var _EventBusAdapter2 = _interopRequireDefault(_EventBusAdapter);
 
-var _adapterEventBusAdapter2 = _interopRequireDefault(_adapterEventBusAdapter);
+var _NoopAdapter = require('./adapter/NoopAdapter');
 
-var _adapterNoopAdapter = require('./adapter/NoopAdapter');
+var _NoopAdapter2 = _interopRequireDefault(_NoopAdapter);
 
-var _adapterNoopAdapter2 = _interopRequireDefault(_adapterNoopAdapter);
+var _ConnectionConfigHolder = require('./support/ConnectionConfigHolder');
 
-var _supportConnectionConfigHolder = require('./support/ConnectionConfigHolder');
+var _ConnectionConfigHolder2 = _interopRequireDefault(_ConnectionConfigHolder);
 
-var _supportConnectionConfigHolder2 = _interopRequireDefault(_supportConnectionConfigHolder);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * @ngdoc service
@@ -527,7 +525,7 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
    * @requires $log
    */
   /* @ngInject */
-  this.$get = function ($timeout, $log) {
+  this.$get = function ($timeout, $log, $q) {
     // Current options (merged defaults with application-wide settings)
     var instanceOptions = angular.extend({}, DEFAULTS, options);
     if (instanceOptions.enabled && vertx && vertx.EventBus) {
@@ -536,41 +534,42 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
       }
 
       // aggregate server connection params
-      instanceOptions.connectionConfig = new _supportConnectionConfigHolder2['default']({
+      instanceOptions.connectionConfig = new _ConnectionConfigHolder2.default({
         urlServer: instanceOptions.urlServer,
         urlPath: instanceOptions.urlPath
       });
       delete instanceOptions.urlServer;
       delete instanceOptions.urlPath;
 
-      return new _adapterEventBusAdapter2['default'](vertx.EventBus, $timeout, $log, instanceOptions);
+      return new _EventBusAdapter2.default(vertx.EventBus, $timeout, $log, $q, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Disabled');
       }
-      return new _adapterNoopAdapter2['default'](vertx.EventBus);
+      return new _NoopAdapter2.default(vertx.EventBus, $q);
     }
   };
-  this.$get.$inject = ["$timeout", "$log"];
+  this.$get.$inject = ["$timeout", "$log", "$q"];
 };
 
-exports['default'] = VertxEventBusWrapperProvider;
-module.exports = exports['default'];
+exports.default = VertxEventBusWrapperProvider;
 
 },{"./adapter/EventBusAdapter":6,"./adapter/NoopAdapter":7,"./support/ConnectionConfigHolder":12}],5:[function(require,module,exports){
 "use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var BaseAdapter = (function () {
-  function BaseAdapter() {
+  function BaseAdapter($q) {
     _classCallCheck(this, BaseAdapter);
+
+    this.$q = $q;
   }
 
   _createClass(BaseAdapter, [{
@@ -578,7 +577,9 @@ var BaseAdapter = (function () {
     value: function configureConnection() {}
   }, {
     key: "connect",
-    value: function connect() {}
+    value: function connect() {
+      return this.$q.reject();
+    }
   }, {
     key: "reconnect",
     value: function reconnect() {}
@@ -610,11 +611,13 @@ var BaseAdapter = (function () {
     }
 
     // empty: can be overriden by externals
+
   }, {
     key: "onopen",
     value: function onopen() {}
 
     // empty: can be overriden by externals
+
   }, {
     key: "onclose",
     value: function onclose() {}
@@ -623,35 +626,34 @@ var BaseAdapter = (function () {
   return BaseAdapter;
 })();
 
-exports["default"] = BaseAdapter;
-module.exports = exports["default"];
+exports.default = BaseAdapter;
 
 },{}],6:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var _configJs = require('../../config.js');
+var _config = require('../../config.js');
 
 var _BaseAdapter2 = require('./BaseAdapter');
 
 var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
 
-var _supportConnectionConfigHolder = require('./../support/ConnectionConfigHolder');
+var _ConnectionConfigHolder = require('./../support/ConnectionConfigHolder');
 
-var _supportConnectionConfigHolder2 = _interopRequireDefault(_supportConnectionConfigHolder);
+var _ConnectionConfigHolder2 = _interopRequireDefault(_ConnectionConfigHolder);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /**
  * @ngdoc service
@@ -733,7 +735,9 @@ var _supportConnectionConfigHolder2 = _interopRequireDefault(_supportConnectionC
 var EventBusAdapter = (function (_BaseAdapter) {
   _inherits(EventBusAdapter, _BaseAdapter);
 
-  function EventBusAdapter(EventBus, $timeout, $log, _ref) {
+  function EventBusAdapter(EventBus, $timeout, $log, $q, _ref) {
+    _classCallCheck(this, EventBusAdapter);
+
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
     var initialConnectEnabled = _ref.initialConnectEnabled;
@@ -742,14 +746,15 @@ var EventBusAdapter = (function (_BaseAdapter) {
     var sockjsReconnectInterval = _ref.sockjsReconnectInterval;
     var sockjsOptions = _ref.sockjsOptions;
 
-    _classCallCheck(this, EventBusAdapter);
-
-    _get(Object.getPrototypeOf(EventBusAdapter.prototype), 'constructor', this).call(this);
     // actual EventBus type
-    this.EventBus = EventBus;
-    this.$timeout = $timeout;
-    this.$log = $log;
-    this.options = {
+
+    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusAdapter).call(this, $q));
+
+    _this3.EventBus = EventBus;
+    _this3.$timeout = $timeout;
+    _this3.$log = $log;
+    _this3.$q = $q;
+    _this3.options = {
       enabled: enabled,
       debugEnabled: debugEnabled,
       initialConnectEnabled: initialConnectEnabled,
@@ -758,11 +763,12 @@ var EventBusAdapter = (function (_BaseAdapter) {
       sockjsReconnectInterval: sockjsReconnectInterval,
       sockjsOptions: sockjsOptions
     };
-    this.disconnectTimeoutEnabled = true;
+    _this3.disconnectTimeoutEnabled = true;
     if (initialConnectEnabled) {
       // asap create connection
-      this.connect();
+      _this3.connect();
     }
+    return _this3;
   }
 
   /**
@@ -774,8 +780,8 @@ var EventBusAdapter = (function (_BaseAdapter) {
    * @description
    * Reconfigure the connection details.
    *
-   * @param {string} urlServer
-   * @param {string} [urlPath=/eventbus]
+   * @param {string} urlServer see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlServer vertxEventBusProvider.useUrlServer()}
+   * @param {string} [urlPath=/eventbus] see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlPath vertxEventBusProvider.useUrlPath()}
    */
 
   _createClass(EventBusAdapter, [{
@@ -783,7 +789,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
     value: function configureConnection(urlServer) {
       var urlPath = arguments.length <= 1 || arguments[1] === undefined ? '/eventbus' : arguments[1];
 
-      this.options.connectionConfig = new _supportConnectionConfigHolder2['default']({ urlServer: urlServer, urlPath: urlPath });
+      this.options.connectionConfig = new _ConnectionConfigHolder2.default({ urlServer: urlServer, urlPath: urlPath });
       return this;
     }
   }, {
@@ -791,6 +797,9 @@ var EventBusAdapter = (function (_BaseAdapter) {
     value: function connect() {
       var _this = this;
 
+      // connect promise
+      var deferred = this.$q.defer();
+      // currently valid url
       var url = '' + this.options.connectionConfig.urlServer + this.options.connectionConfig.urlPath;
       if (this.options.debugEnabled) {
         this.$log.debug('[Vert.x EB Stub] Enabled: connecting \'' + url + '\'');
@@ -805,6 +814,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
         if (angular.isFunction(_this.onopen)) {
           _this.onopen();
         }
+        deferred.resolve();
       };
       // instance onClose handler
       this.instance.onclose = function () {
@@ -833,6 +843,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
           }, _this.options.sockjsReconnectInterval);
         }
       };
+      return deferred.promise;
     }
 
     /**
@@ -851,6 +862,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      *
      * @param {boolean} [immediately=false] optionally enforce a reconnect asap instead of using the timeout
      */
+
   }, {
     key: 'reconnect',
     value: function reconnect() {
@@ -880,6 +892,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * See also:
      * - {@link vertx.EventBus#methods_close vertx.EventBus.close()}
      */
+
   }, {
     key: 'close',
     value: function close() {
@@ -904,6 +917,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @param {string} password credential's password
      * @param {function=} replyHandler optional callback
      */
+
   }, {
     key: 'login',
     value: function login(username, password, replyHandler) {
@@ -934,6 +948,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @param {function=} replyHandler optional callback
      * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
      */
+
   }, {
     key: 'send',
     value: function send(address, message, replyHandler, failureHandler) {
@@ -957,6 +972,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @param {string} address target address
      * @param {object} message payload message
      */
+
   }, {
     key: 'publish',
     value: function publish(address, message) {
@@ -980,6 +996,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @param {string} address target address
      * @param {function} handler callback handler
      */
+
   }, {
     key: 'registerHandler',
     value: function registerHandler(address, handler) {
@@ -991,7 +1008,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
         var deconstructor = function deconstructor() {
           _this2.unregisterHandler(address, handler);
         };
-        deconstructor.displayName = _configJs.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
+        deconstructor.displayName = _config.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
         return deconstructor;
       }
     }
@@ -1011,6 +1028,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @param {string} address target address
      * @param {function} handler callback handler to be removed
      */
+
   }, {
     key: 'unregisterHandler',
     value: function unregisterHandler(address, handler) {
@@ -1033,6 +1051,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      *
      * @returns {number} value of vertxbus connection states
      */
+
   }, {
     key: 'readyState',
     value: function readyState() {
@@ -1044,6 +1063,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
     }
 
     // private
+
   }, {
     key: 'getOptions',
     value: function getOptions() {
@@ -1053,59 +1073,60 @@ var EventBusAdapter = (function (_BaseAdapter) {
   }]);
 
   return EventBusAdapter;
-})(_BaseAdapter3['default']);
+})(_BaseAdapter3.default);
 
-exports['default'] = EventBusAdapter;
-module.exports = exports['default'];
+exports.default = EventBusAdapter;
 
 },{"../../config.js":1,"./../support/ConnectionConfigHolder":12,"./BaseAdapter":5}],7:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _BaseAdapter2 = require('./BaseAdapter');
 
 var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var NoopAdapter = (function (_BaseAdapter) {
   _inherits(NoopAdapter, _BaseAdapter);
 
-  function NoopAdapter(EventBus) {
+  function NoopAdapter(EventBus, $q) {
     _classCallCheck(this, NoopAdapter);
 
-    _get(Object.getPrototypeOf(NoopAdapter.prototype), 'constructor', this).call(this);
     // actual EventBus type
-    this.EventBus = EventBus;
+
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(NoopAdapter).call(this, $q));
+
+    _this.EventBus = EventBus;
+    return _this;
   }
 
   return NoopAdapter;
-})(_BaseAdapter3['default']);
+})(_BaseAdapter3.default);
 
-exports['default'] = NoopAdapter;
-module.exports = exports['default'];
+exports.default = NoopAdapter;
 
 },{"./BaseAdapter":5}],8:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
 var _config = require('../../config');
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Delegator = (function () {
   function Delegator(delegate, $log) {
@@ -1144,8 +1165,8 @@ var Delegator = (function () {
             _iteratorError = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion && _iterator['return']) {
-                _iterator['return']();
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
               }
             } finally {
               if (_didIteratorError) {
@@ -1286,17 +1307,16 @@ var Delegator = (function () {
   return Delegator;
 })();
 
-exports['default'] = Delegator;
-module.exports = exports['default'];
+exports.default = Delegator;
 
 },{"../../config":1}],9:[function(require,module,exports){
 "use strict";
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1341,39 +1361,38 @@ var BaseDelegate = (function () {
   return BaseDelegate;
 })();
 
-exports["default"] = BaseDelegate;
-module.exports = exports["default"];
+exports.default = BaseDelegate;
 
 },{}],10:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x6, _x7, _x8) { var _again = true; _function: while (_again) { var object = _x6, property = _x7, receiver = _x8; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x6 = parent; _x7 = property; _x8 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _config = require('../../../config');
 
-var _supportQueue = require('./../../support/Queue');
+var _Queue = require('./../../support/Queue');
 
-var _supportQueue2 = _interopRequireDefault(_supportQueue);
+var _Queue2 = _interopRequireDefault(_Queue);
 
-var _supportSimpleMap = require('./../../support/SimpleMap');
+var _SimpleMap = require('./../../support/SimpleMap');
 
-var _supportSimpleMap2 = _interopRequireDefault(_supportSimpleMap);
+var _SimpleMap2 = _interopRequireDefault(_SimpleMap);
 
 var _BaseDelegate2 = require('./BaseDelegate');
 
 var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /**
  * @ngdoc event
@@ -1437,6 +1456,8 @@ var EventBusDelegate = (function (_BaseDelegate) {
   _inherits(EventBusDelegate, _BaseDelegate);
 
   function EventBusDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
+    _classCallCheck(this, EventBusDelegate);
+
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
     var prefix = _ref.prefix;
@@ -1445,15 +1466,14 @@ var EventBusDelegate = (function (_BaseDelegate) {
     var loginRequired = _ref.loginRequired;
     var loginInterceptor = _ref.loginInterceptor;
 
-    _classCallCheck(this, EventBusDelegate);
+    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusDelegate).call(this));
 
-    _get(Object.getPrototypeOf(EventBusDelegate.prototype), 'constructor', this).call(this);
-    this.$rootScope = $rootScope;
-    this.$interval = $interval;
-    this.$log = $log;
-    this.$q = $q;
-    this.eventBus = eventBus;
-    this.options = {
+    _this7.$rootScope = $rootScope;
+    _this7.$interval = $interval;
+    _this7.$log = $log;
+    _this7.$q = $q;
+    _this7.eventBus = eventBus;
+    _this7.options = {
       enabled: enabled,
       debugEnabled: debugEnabled,
       prefix: prefix,
@@ -1461,19 +1481,20 @@ var EventBusDelegate = (function (_BaseDelegate) {
       messageBuffer: messageBuffer,
       loginRequired: loginRequired
     };
-    this.loginInterceptor = loginInterceptor;
-    this.connectionState = this.eventBus.EventBus.CLOSED;
-    this.states = {
+    _this7.loginInterceptor = loginInterceptor;
+    _this7.connectionState = _this7.eventBus.EventBus.CLOSED;
+    _this7.states = {
       connected: false,
       validSession: false
     };
-    this.observers = [];
+    _this7.observers = [];
     // internal store of buffered messages
-    this.messageQueue = new _supportQueue2['default'](this.options.messageBuffer);
+    _this7.messageQueue = new _Queue2.default(_this7.options.messageBuffer);
     // internal map of callbacks
-    this.callbackMap = new _supportSimpleMap2['default']();
+    _this7.callbackMap = new _SimpleMap2.default();
     // asap
-    this.initialize();
+    _this7.initialize();
+    return _this7;
   }
 
   // internal
@@ -1501,6 +1522,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
     }
 
     // internal
+
   }, {
     key: 'onEventbusOpen',
     value: function onEventbusOpen() {
@@ -1530,6 +1552,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
     }
 
     // internal
+
   }, {
     key: 'onEventbusClose',
     value: function onEventbusClose() {
@@ -1552,6 +1575,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {object} observer observer
      * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
      */
+
   }, {
     key: 'observe',
     value: function observe(observer) {
@@ -1559,6 +1583,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
     }
 
     // internal
+
   }, {
     key: 'afterEventbusConnected',
     value: function afterEventbusConnected() {
@@ -1579,8 +1604,8 @@ var EventBusDelegate = (function (_BaseDelegate) {
         _iteratorError = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator['return']) {
-            _iterator['return']();
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
           }
         } finally {
           if (_didIteratorError) {
@@ -1603,6 +1628,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {function} callback handler with params `(message, replyTo)`
      * @returns {function=} deconstructor
      */
+
   }, {
     key: 'registerHandler',
     value: function registerHandler(address, callback) {
@@ -1635,6 +1661,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {string} address target address
      * @param {function} callback handler with params `(message, replyTo)`
      */
+
   }, {
     key: 'unregisterHandler',
     value: function unregisterHandler(address, callback) {
@@ -1647,7 +1674,6 @@ var EventBusDelegate = (function (_BaseDelegate) {
       this.eventBus.unregisterHandler(address, this.callbackMap.get(callback));
       this.callbackMap.remove(callback);
     }
-
     /**
      * @ngdoc method
      * @module knalli.angular-vertxbus
@@ -1664,6 +1690,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      *                                       no replyHandler will be created
      * @returns {object} promise
      */
+
   }, {
     key: 'send',
     value: function send(address, message) {
@@ -1715,6 +1742,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {object} message payload message
      * @returns {boolean} false if cannot be send or queued
      */
+
   }, {
     key: 'publish',
     value: function publish(address, message) {
@@ -1742,6 +1770,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {number=} [timeout=5000] timeout
      * @returns {object} promise
      */
+
   }, {
     key: 'login',
     value: function login() {
@@ -1798,6 +1827,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {function} fn callback
      * @returns {boolean} false if the callback cannot be performed or queued
      */
+
   }, {
     key: 'ensureOpenConnection',
     value: function ensureOpenConnection(fn) {
@@ -1827,6 +1857,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {function} fn callback
      * @returns {boolean} false if the callback cannot be performed or queued
      */
+
   }, {
     key: 'ensureOpenAuthConnection',
     value: function ensureOpenAuthConnection(fn) {
@@ -1865,6 +1896,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
      * @returns {number} state type of vertx.EventBus
      */
+
   }, {
     key: 'getConnectionState',
     value: function getConnectionState(immediate) {
@@ -1889,6 +1921,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      *
      * @returns {boolean} connection open state
      */
+
   }, {
     key: 'isConnectionOpen',
     value: function isConnectionOpen() {
@@ -1906,6 +1939,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      *
      * @returns {boolean} state
      */
+
   }, {
     key: 'isValidSession',
     value: function isValidSession() {
@@ -1913,6 +1947,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
     }
 
     // internal
+
   }, {
     key: 'isConnected',
     value: function isConnected() {
@@ -1930,6 +1965,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      *
      * @returns {boolean} state
      */
+
   }, {
     key: 'isEnabled',
     value: function isEnabled() {
@@ -1947,6 +1983,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
      *
      * @returns {number} amount
      */
+
   }, {
     key: 'getMessageQueueLength',
     value: function getMessageQueueLength() {
@@ -1955,29 +1992,28 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }]);
 
   return EventBusDelegate;
-})(_BaseDelegate3['default']);
+})(_BaseDelegate3.default);
 
-exports['default'] = EventBusDelegate;
-module.exports = exports['default'];
+exports.default = EventBusDelegate;
 
 },{"../../../config":1,"./../../support/Queue":13,"./../../support/SimpleMap":14,"./BaseDelegate":9}],11:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _BaseDelegate2 = require('./BaseDelegate');
 
 var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var NoopDelegate = (function (_BaseDelegate) {
   _inherits(NoopDelegate, _BaseDelegate);
@@ -1985,32 +2021,31 @@ var NoopDelegate = (function (_BaseDelegate) {
   function NoopDelegate() {
     _classCallCheck(this, NoopDelegate);
 
-    _get(Object.getPrototypeOf(NoopDelegate.prototype), 'constructor', this).apply(this, arguments);
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(NoopDelegate).apply(this, arguments));
   }
 
   return NoopDelegate;
-})(_BaseDelegate3['default']);
+})(_BaseDelegate3.default);
 
-exports['default'] = NoopDelegate;
-module.exports = exports['default'];
+exports.default = NoopDelegate;
 
 },{"./BaseDelegate":9}],12:[function(require,module,exports){
 "use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ConnectionConfigHolder = (function () {
   function ConnectionConfigHolder(_ref) {
+    _classCallCheck(this, ConnectionConfigHolder);
+
     var urlServer = _ref.urlServer;
     var urlPath = _ref.urlPath;
-
-    _classCallCheck(this, ConnectionConfigHolder);
 
     this._urlServer = urlServer;
     this._urlPath = urlPath;
@@ -2031,31 +2066,31 @@ var ConnectionConfigHolder = (function () {
   return ConnectionConfigHolder;
 })();
 
-exports["default"] = ConnectionConfigHolder;
-module.exports = exports["default"];
+exports.default = ConnectionConfigHolder;
 
 },{}],13:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 /*
  Simple queue implementation
 
  FIFO: #push() + #first()
  LIFO: #push() + #last()
  */
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Queue = (function () {
   function Queue() {
-    var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
-
     _classCallCheck(this, Queue);
+
+    var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
 
     this.maxSize = maxSize;
     this.items = [];
@@ -2095,24 +2130,24 @@ var Queue = (function () {
   return Queue;
 })();
 
-exports["default"] = Queue;
-module.exports = exports["default"];
+exports.default = Queue;
 
 },{}],14:[function(require,module,exports){
-/*
- Simple Map implementation
-
- This implementation allows usage of non serializable keys for values.
- */
 "use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+ Simple Map implementation
+
+ This implementation allows usage of non serializable keys for values.
+ */
 
 var SimpleMap = (function () {
   function SimpleMap() {
@@ -2138,6 +2173,7 @@ var SimpleMap = (function () {
     }
 
     // Returns value for key, otherwise undefined.
+
   }, {
     key: "get",
     value: function get(key) {
@@ -2148,6 +2184,7 @@ var SimpleMap = (function () {
     }
 
     // Returns true if the key exists.
+
   }, {
     key: "containsKey",
     value: function containsKey(key) {
@@ -2156,6 +2193,7 @@ var SimpleMap = (function () {
     }
 
     // Returns true if the value exists.
+
   }, {
     key: "containsValue",
     value: function containsValue(value) {
@@ -2164,6 +2202,7 @@ var SimpleMap = (function () {
     }
 
     // Removes the key and its value.
+
   }, {
     key: "remove",
     value: function remove(key) {
@@ -2175,6 +2214,7 @@ var SimpleMap = (function () {
     }
 
     // Clears all keys and values.
+
   }, {
     key: "clear",
     value: function clear() {
@@ -2184,6 +2224,7 @@ var SimpleMap = (function () {
     }
 
     // Returns index of key, otherwise -1.
+
   }, {
     key: "_indexForKey",
     value: function _indexForKey(key) {
@@ -2209,27 +2250,26 @@ var SimpleMap = (function () {
   return SimpleMap;
 })();
 
-exports["default"] = SimpleMap;
-module.exports = exports["default"];
+exports.default = SimpleMap;
 
 },{}],15:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 var _config = require('./config');
 
-var _libVertxEventBusWrapperProvider = require('./lib/VertxEventBusWrapperProvider');
+var _VertxEventBusWrapperProvider = require('./lib/VertxEventBusWrapperProvider');
 
-var _libVertxEventBusWrapperProvider2 = _interopRequireDefault(_libVertxEventBusWrapperProvider);
+var _VertxEventBusWrapperProvider2 = _interopRequireDefault(_VertxEventBusWrapperProvider);
 
-var _libVertxEventBusServiceProvider = require('./lib/VertxEventBusServiceProvider');
+var _VertxEventBusServiceProvider = require('./lib/VertxEventBusServiceProvider');
 
-var _libVertxEventBusServiceProvider2 = _interopRequireDefault(_libVertxEventBusServiceProvider);
+var _VertxEventBusServiceProvider2 = _interopRequireDefault(_VertxEventBusServiceProvider);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * @ngdoc overview
@@ -2274,7 +2314,6 @@ var _libVertxEventBusServiceProvider2 = _interopRequireDefault(_libVertxEventBus
  *
  * However, if you are looking for a simple, clean and promised based high api, the service is much better you.
  */
-exports['default'] = angular.module(_config.moduleName, ['ng']).provider('vertxEventBus', _libVertxEventBusWrapperProvider2['default']).provider('vertxEventBusService', _libVertxEventBusServiceProvider2['default']).name;
-module.exports = exports['default'];
+exports.default = angular.module(_config.moduleName, ['ng']).provider('vertxEventBus', _VertxEventBusWrapperProvider2.default).provider('vertxEventBusService', _VertxEventBusServiceProvider2.default).name;
 
 },{"./config":1,"./lib/VertxEventBusServiceProvider":3,"./lib/VertxEventBusWrapperProvider":4}]},{},[2]);

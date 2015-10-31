@@ -1,3 +1,20 @@
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/knalli/angular-vertxbus/compare/3.1.0...v3.2.0) (2015-10-31)
+
+
+### Bug Fixes
+
+* **docs:** Fix invalid params descriptions ([1f85e52](https://github.com/knalli/angular-vertxbus/commit/1f85e52))
+* **test:** fix incorrect redelcaration of a block scope variable ([6aa9572](https://github.com/knalli/angular-vertxbus/commit/6aa9572))
+* **test:** fix internal babel-node scriptlets ([2acde13](https://github.com/knalli/angular-vertxbus/commit/2acde13))
+
+### Features
+
+* **adapter:** overload signature of EB.connect() returning promise ([df7cf0d](https://github.com/knalli/angular-vertxbus/commit/df7cf0d)), closes [#90](https://github.com/knalli/angular-vertxbus/issues/90)
+* **build:** add .babelrc ([ce49603](https://github.com/knalli/angular-vertxbus/commit/ce49603))
+
+
+
 <a name="3.1.0"></a>
 # [3.1.0](https://github.com/knalli/angular-vertxbus/compare/3.0.2...v3.1.0) (2015-10-25)
 
