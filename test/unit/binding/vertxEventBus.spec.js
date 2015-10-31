@@ -336,12 +336,19 @@ describe('integration of module::vertxEventBus', function () {
         expect(onopenCount).to.be(0); // should be not called!
         $log.debug('apply connection config..');
         vertxEventBus.configureConnection('http://localhost:1234', '/eventbus1');
-        vertxEventBus.connect();
+        var connectPromise = vertxEventBus.connect();
+        expect(connectPromise).not.to.be(undefined);
+        var connectPromiseResult = false;
+        connectPromise.then(() => {
+          connectPromiseResult = true
+        });
         setTimeout(function () {
+          $rootScope.$digest(); // for $q
           $log.debug('check..');
           expect(SockJS.currentMockInstance.url).to.be('http://localhost:1234/eventbus1');
           expect(onopenCount).to.be(1);
           expect(oncloseCount).to.be(0);
+          expect(connectPromiseResult ).to.be(true);
           done();
         }, 1200);
       }, 200);

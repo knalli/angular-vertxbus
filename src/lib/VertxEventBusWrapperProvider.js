@@ -202,7 +202,7 @@ let VertxEventBusWrapperProvider = function () {
    * @requires $log
    */
   /* @ngInject */
-  this.$get = ($timeout, $log) => {
+  this.$get = ($timeout, $log, $q) => {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, DEFAULTS, options);
     if (instanceOptions.enabled && vertx && vertx.EventBus) {
@@ -218,12 +218,12 @@ let VertxEventBusWrapperProvider = function () {
       delete instanceOptions.urlServer;
       delete instanceOptions.urlPath;
 
-      return new EventBusAdapter(vertx.EventBus, $timeout, $log, instanceOptions);
+      return new EventBusAdapter(vertx.EventBus, $timeout, $log, $q, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Disabled');
       }
-      return new NoopAdapter(vertx.EventBus);
+      return new NoopAdapter(vertx.EventBus, $q);
     }
   };
 

@@ -82,7 +82,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 export default class EventBusAdapter extends BaseAdapter {
 
-  constructor(EventBus, $timeout, $log, {
+  constructor(EventBus, $timeout, $log, $q, {
     enabled,
     debugEnabled,
     initialConnectEnabled,
@@ -91,11 +91,12 @@ export default class EventBusAdapter extends BaseAdapter {
     sockjsReconnectInterval,
     sockjsOptions
     }) {
-    super();
+    super($q);
     // actual EventBus type
     this.EventBus = EventBus;
     this.$timeout = $timeout;
     this.$log = $log;
+    this.$q = $q;
     this.options = {
       enabled,
       debugEnabled,
@@ -130,6 +131,9 @@ export default class EventBusAdapter extends BaseAdapter {
   }
 
   connect() {
+    // connect promise
+    let deferred = this.$q.defer();
+    // currently valid url
     let url = `${this.options.connectionConfig.urlServer}${this.options.connectionConfig.urlPath}`;
     if (this.options.debugEnabled) {
       this.$log.debug(`[Vert.x EB Stub] Enabled: connecting '${url}'`);
@@ -144,6 +148,7 @@ export default class EventBusAdapter extends BaseAdapter {
       if (angular.isFunction(this.onopen)) {
         this.onopen();
       }
+      deferred.resolve();
     };
     // instance onClose handler
     this.instance.onclose = () => {
@@ -170,6 +175,7 @@ export default class EventBusAdapter extends BaseAdapter {
         this.$timeout((() => this.connect()), this.options.sockjsReconnectInterval);
       }
     };
+    return deferred.promise;
   }
 
   /**
