@@ -256,7 +256,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean',
     'test',
-    'package'
+    'compile'
   ]);
   grunt.registerTask('release', [
     'conventionalChangelog',
