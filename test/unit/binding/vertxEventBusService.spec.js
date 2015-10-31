@@ -9,17 +9,15 @@ describe('integration of module::vertxEventBusService', function () {
     $provide.value('$log', window.console);
   }));
 
-  it('should have vertxEventBusService', function () {
-    inject(function (vertxEventBusService) {
-      expect(vertxEventBusService).not.to.be(undefined);
-    });
-  });
+  it('should have vertxEventBusService', angular.mock.inject(function (vertxEventBusService) {
+    expect(vertxEventBusService).not.to.be(undefined);
+  }));
 
   describe('vertxEventBusService', function () {
 
     var vertxEventBusService;
 
-    beforeEach(inject(function (_vertxEventBusService_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBusService_) {
       vertxEventBusService = _vertxEventBusService_;
     }));
 
@@ -122,7 +120,7 @@ describe('integration of module::vertxEventBusService', function () {
         vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_) {
+      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_) {
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
         // Mock bus is closed
@@ -167,7 +165,7 @@ describe('integration of module::vertxEventBusService', function () {
         vertxEventBusServiceProvider.useMessageBuffer(3);
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_) {
+      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_) {
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
         // Mock bus is closed
@@ -252,7 +250,7 @@ describe('integration of module::vertxEventBusService', function () {
         vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
+      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
         $rootScope = _$rootScope_;
@@ -312,7 +310,7 @@ describe('integration of module::vertxEventBusService', function () {
         vertxEventBusServiceProvider.requireLogin(true);
       }));
 
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
+      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
         $rootScope = _$rootScope_;
@@ -347,7 +345,7 @@ describe('integration of module::vertxEventBusService', function () {
         vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
       }));
 
-      beforeEach(inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+      beforeEach(angular.mock.inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
         $rootScope = _$rootScope_;
         $timeout = _$timeout_;
         vertxEventBus = _vertxEventBus_;
@@ -373,7 +371,7 @@ describe('integration of module::vertxEventBusService', function () {
 
         var $interval;
 
-        beforeEach(inject(function (_$interval_) {
+        beforeEach(angular.mock.inject(function (_$interval_) {
           $interval = _$interval_; // angular.mock.$interval
         }));
 
@@ -440,7 +438,7 @@ describe('integration of module::vertxEventBusService', function () {
 
     describe('reconnect', function () {
       var $timeout, vertxEventBus, vertxEventBusService;
-      beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_) {
         $timeout = _$timeout_;
         vertxEventBus = _vertxEventBus_;
         vertxEventBusService = _vertxEventBusService_;
@@ -501,7 +499,7 @@ describe('integration of module::vertxEventBusService', function () {
         vertxEventBusServiceProvider.useMessageBuffer(0);
       }));
 
-      beforeEach(inject(function (_vertxEventBusService_) {
+      beforeEach(angular.mock.inject(function (_vertxEventBusService_) {
         vertxEventBusService = _vertxEventBusService_;
       }));
 
@@ -545,7 +543,7 @@ describe('integration of module::vertxEventBusService', function () {
       vertxEventBusServiceProvider.useMessageBuffer(0);
     }));
 
-    beforeEach(inject(function (_vertxEventBusService_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBusService_) {
       vertxEventBusService = _vertxEventBusService_;
     }));
 
@@ -587,7 +585,7 @@ describe('integration of module::vertxEventBusService', function () {
       vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       vertxEventBusService = _vertxEventBusService_;
       $timeout = _$timeout_;
@@ -639,7 +637,7 @@ describe('integration of module::vertxEventBusService', function () {
       vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       vertxEventBusService = _vertxEventBusService_;
       $timeout = _$timeout_;

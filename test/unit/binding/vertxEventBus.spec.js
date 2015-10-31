@@ -9,11 +9,9 @@ describe('integration of module::vertxEventBus', function () {
     $provide.value('$log', window.console);
   }));
 
-  it('should have vertxEventBus', function () {
-    inject(function (vertxEventBus) {
-      expect(vertxEventBus).not.to.be(undefined);
-    });
-  });
+  it('should have vertxEventBus', angular.mock.inject(function (vertxEventBus) {
+    expect(vertxEventBus).not.to.be(undefined);
+  }));
 
   describe('vertxEventBus (w/ reconnect)', function () {
 
@@ -24,7 +22,7 @@ describe('integration of module::vertxEventBus', function () {
       vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
@@ -229,7 +227,7 @@ describe('integration of module::vertxEventBus', function () {
       vertxEventBusProvider.useDebug(true).useSockJsReconnectInterval(2000).useReconnect(false);
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
@@ -278,7 +276,7 @@ describe('integration of module::vertxEventBus', function () {
         .disableAutoConnect();
     }));
 
-    beforeEach(inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
+    beforeEach(angular.mock.inject(function (_vertxEventBus_, _$timeout_, _$rootScope_, _$log_) {
       vertxEventBus = _vertxEventBus_;
       $timeout = _$timeout_;
       $rootScope = _$rootScope_;
