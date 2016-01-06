@@ -61,7 +61,7 @@
     "gruntify-eslint": "^1.1.0",
     "istanbul": "^0.4.0",
     "jasmine-core": "^2.3.4",
-    "karma": "^0.13.11",
+    "karma": "^0.13.19",
     "karma-babel-preprocessor": "^6.0.1",
     "karma-browserify": "^4.3.0",
     "karma-chrome-launcher": "^0.2.1",
