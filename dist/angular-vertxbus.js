@@ -1,6 +1,6 @@
-/*! angular-vertxbus - v3.2.0 - 2015-10-31
+/*! angular-vertxbus - v3.2.1 - 2016-01-24
 * http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2015 Jan Philipp; Licensed MIT */
+* Copyright (c) 2016 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -227,7 +227,7 @@ var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
   this.configureLoginInterceptor = function (address, argumentsBuilder) {
     if (!argumentsBuilder) {
       // Legacy fallback: create a message like in Vert.x 2
-      argumentsBuilder = function (username, password) {
+      argumentsBuilder = function argumentsBuilder(username, password) {
         return {
           action: 'findone',
           collection: 'users',
@@ -736,8 +736,6 @@ var EventBusAdapter = (function (_BaseAdapter) {
   _inherits(EventBusAdapter, _BaseAdapter);
 
   function EventBusAdapter(EventBus, $timeout, $log, $q, _ref) {
-    _classCallCheck(this, EventBusAdapter);
-
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
     var initialConnectEnabled = _ref.initialConnectEnabled;
@@ -746,15 +744,17 @@ var EventBusAdapter = (function (_BaseAdapter) {
     var sockjsReconnectInterval = _ref.sockjsReconnectInterval;
     var sockjsOptions = _ref.sockjsOptions;
 
+    _classCallCheck(this, EventBusAdapter);
+
     // actual EventBus type
 
-    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusAdapter).call(this, $q));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusAdapter).call(this, $q));
 
-    _this3.EventBus = EventBus;
-    _this3.$timeout = $timeout;
-    _this3.$log = $log;
-    _this3.$q = $q;
-    _this3.options = {
+    _this.EventBus = EventBus;
+    _this.$timeout = $timeout;
+    _this.$log = $log;
+    _this.$q = $q;
+    _this.options = {
       enabled: enabled,
       debugEnabled: debugEnabled,
       initialConnectEnabled: initialConnectEnabled,
@@ -763,12 +763,12 @@ var EventBusAdapter = (function (_BaseAdapter) {
       sockjsReconnectInterval: sockjsReconnectInterval,
       sockjsOptions: sockjsOptions
     };
-    _this3.disconnectTimeoutEnabled = true;
+    _this.disconnectTimeoutEnabled = true;
     if (initialConnectEnabled) {
       // asap create connection
-      _this3.connect();
+      _this.connect();
     }
-    return _this3;
+    return _this;
   }
 
   /**
@@ -795,7 +795,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
   }, {
     key: 'connect',
     value: function connect() {
-      var _this = this;
+      var _this2 = this;
 
       // connect promise
       var deferred = this.$q.defer();
@@ -806,41 +806,41 @@ var EventBusAdapter = (function (_BaseAdapter) {
       }
       // Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
       // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
-      this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
+      this.instance = new this.EventBus(url, this.options.sockjsOptions);
       this.instance.onopen = function () {
-        if (_this.options.debugEnabled) {
-          _this.$log.debug('[Vert.x EB Stub] Connected');
+        if (_this2.options.debugEnabled) {
+          _this2.$log.debug('[Vert.x EB Stub] Connected');
         }
-        if (angular.isFunction(_this.onopen)) {
-          _this.onopen();
+        if (angular.isFunction(_this2.onopen)) {
+          _this2.onopen();
         }
         deferred.resolve();
       };
       // instance onClose handler
       this.instance.onclose = function () {
-        if (_this.options.debugEnabled) {
-          _this.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this.options.sockjsReconnectInterval + 'ms');
+        if (_this2.options.debugEnabled) {
+          _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
         }
-        if (angular.isFunction(_this.onclose)) {
-          _this.onclose();
+        if (angular.isFunction(_this2.onclose)) {
+          _this2.onclose();
         }
-        _this.instance = undefined;
+        _this2.instance = undefined;
 
-        if (!_this.disconnectTimeoutEnabled) {
+        if (!_this2.disconnectTimeoutEnabled) {
           // reconnect required asap
-          if (_this.options.debugEnabled) {
-            _this.$log.debug('[Vert.x EB Stub] Reconnect immediately');
+          if (_this2.options.debugEnabled) {
+            _this2.$log.debug('[Vert.x EB Stub] Reconnect immediately');
           }
-          _this.disconnectTimeoutEnabled = true;
-          _this.connect();
-        } else if (_this.options.reconnectEnabled) {
+          _this2.disconnectTimeoutEnabled = true;
+          _this2.connect();
+        } else if (_this2.options.reconnectEnabled) {
           // automatic reconnect after timeout
-          if (_this.options.debugEnabled) {
-            _this.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this.options.sockjsReconnectInterval + 'ms');
+          if (_this2.options.debugEnabled) {
+            _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
           }
-          _this.$timeout(function () {
-            return _this.connect();
-          }, _this.options.sockjsReconnectInterval);
+          _this2.$timeout(function () {
+            return _this2.connect();
+          }, _this2.options.sockjsReconnectInterval);
         }
       };
       return deferred.promise;
@@ -1000,13 +1000,13 @@ var EventBusAdapter = (function (_BaseAdapter) {
   }, {
     key: 'registerHandler',
     value: function registerHandler(address, handler) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.instance) {
         this.instance.registerHandler(address, handler);
         // and return the deregister callback
         var deconstructor = function deconstructor() {
-          _this2.unregisterHandler(address, handler);
+          _this3.unregisterHandler(address, handler);
         };
         deconstructor.displayName = _config.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
         return deconstructor;
@@ -1189,7 +1189,7 @@ var Delegator = (function () {
       var unregisterFn = null;
       if (this.delegate.isConnectionOpen()) {
         this.delegate.registerHandler(address, callback);
-        unregisterFn = function () {
+        unregisterFn = function unregisterFn() {
           return _this2.delegate.unregisterHandler(address, callback);
         };
       }
@@ -1456,8 +1456,6 @@ var EventBusDelegate = (function (_BaseDelegate) {
   _inherits(EventBusDelegate, _BaseDelegate);
 
   function EventBusDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
-    _classCallCheck(this, EventBusDelegate);
-
     var enabled = _ref.enabled;
     var debugEnabled = _ref.debugEnabled;
     var prefix = _ref.prefix;
@@ -1466,14 +1464,16 @@ var EventBusDelegate = (function (_BaseDelegate) {
     var loginRequired = _ref.loginRequired;
     var loginInterceptor = _ref.loginInterceptor;
 
-    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusDelegate).call(this));
+    _classCallCheck(this, EventBusDelegate);
 
-    _this7.$rootScope = $rootScope;
-    _this7.$interval = $interval;
-    _this7.$log = $log;
-    _this7.$q = $q;
-    _this7.eventBus = eventBus;
-    _this7.options = {
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusDelegate).call(this));
+
+    _this.$rootScope = $rootScope;
+    _this.$interval = $interval;
+    _this.$log = $log;
+    _this.$q = $q;
+    _this.eventBus = eventBus;
+    _this.options = {
       enabled: enabled,
       debugEnabled: debugEnabled,
       prefix: prefix,
@@ -1481,20 +1481,20 @@ var EventBusDelegate = (function (_BaseDelegate) {
       messageBuffer: messageBuffer,
       loginRequired: loginRequired
     };
-    _this7.loginInterceptor = loginInterceptor;
-    _this7.connectionState = _this7.eventBus.EventBus.CLOSED;
-    _this7.states = {
+    _this.loginInterceptor = loginInterceptor;
+    _this.connectionState = _this.eventBus.EventBus.CLOSED;
+    _this.states = {
       connected: false,
       validSession: false
     };
-    _this7.observers = [];
+    _this.observers = [];
     // internal store of buffered messages
-    _this7.messageQueue = new _Queue2.default(_this7.options.messageBuffer);
+    _this.messageQueue = new _Queue2.default(_this.options.messageBuffer);
     // internal map of callbacks
-    _this7.callbackMap = new _SimpleMap2.default();
+    _this.callbackMap = new _SimpleMap2.default();
     // asap
-    _this7.initialize();
-    return _this7;
+    _this.initialize();
+    return _this;
   }
 
   // internal
@@ -1502,18 +1502,18 @@ var EventBusDelegate = (function (_BaseDelegate) {
   _createClass(EventBusDelegate, [{
     key: 'initialize',
     value: function initialize() {
-      var _this = this;
+      var _this2 = this;
 
       this.eventBus.onopen = function () {
-        return _this.onEventbusOpen();
+        return _this2.onEventbusOpen();
       };
       this.eventBus.onclose = function () {
-        return _this.onEventbusClose();
+        return _this2.onEventbusClose();
       };
 
       // Update the current connection state periodically.
       var connectionIntervalCheck = function connectionIntervalCheck() {
-        return _this.getConnectionState(true);
+        return _this2.getConnectionState(true);
       };
       connectionIntervalCheck.displayName = 'connectionIntervalCheck';
       this.$interval(function () {
@@ -1632,7 +1632,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }, {
     key: 'registerHandler',
     value: function registerHandler(address, callback) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!angular.isFunction(callback)) {
         return;
@@ -1642,7 +1642,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
       }
       var callbackWrapper = function callbackWrapper(message, replyTo) {
         callback(message, replyTo);
-        _this2.$rootScope.$digest();
+        _this3.$rootScope.$digest();
       };
       callbackWrapper.displayName = _config.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
       this.callbackMap.put(callback, callbackWrapper);
@@ -1694,7 +1694,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }, {
     key: 'send',
     value: function send(address, message) {
-      var _this3 = this;
+      var _this4 = this;
 
       var timeout = arguments.length <= 2 || arguments[2] === undefined ? 10000 : arguments[2];
       var expectReply = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
@@ -1704,21 +1704,21 @@ var EventBusDelegate = (function (_BaseDelegate) {
         if (expectReply) {
           (function () {
             // Register timeout for promise rejecting
-            var timer = _this3.$interval(function () {
-              if (_this3.options.debugEnabled) {
-                _this3.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
+            var timer = _this4.$interval(function () {
+              if (_this4.options.debugEnabled) {
+                _this4.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
               }
               deferred.reject();
             }, timeout, 1);
             // Send message
             // TODO after dropping support for Vert.x < v3, this can be enriched with failureHandler
-            _this3.eventBus.send(address, message, function (reply) {
-              _this3.$interval.cancel(timer); // because it's resolved
+            _this4.eventBus.send(address, message, function (reply) {
+              _this4.$interval.cancel(timer); // because it's resolved
               deferred.resolve(reply);
             });
           })();
         } else {
-          _this3.eventBus.send(address, message);
+          _this4.eventBus.send(address, message);
           deferred.resolve(); // we don't care
         }
       };
@@ -1746,10 +1746,10 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }, {
     key: 'publish',
     value: function publish(address, message) {
-      var _this4 = this;
+      var _this5 = this;
 
       return this.ensureOpenAuthConnection(function () {
-        return _this4.eventBus.publish(address, message);
+        return _this5.eventBus.publish(address, message);
       });
     }
 
@@ -1776,7 +1776,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
     value: function login() {
       var username = arguments.length <= 0 || arguments[0] === undefined ? this.options.username : arguments[0];
 
-      var _this5 = this;
+      var _this6 = this;
 
       var password = arguments.length <= 1 || arguments[1] === undefined ? this.options.password : arguments[1];
       var timeout = arguments.length <= 2 || arguments[2] === undefined ? 5000 : arguments[2];
@@ -1785,13 +1785,13 @@ var EventBusDelegate = (function (_BaseDelegate) {
       var next = function next(reply) {
         reply = reply || {};
         if (reply.status === 'ok') {
-          _this5.states.validSession = true;
+          _this6.states.validSession = true;
           deferred.resolve(reply);
-          _this5.$rootScope.$broadcast(_this5.options.prefix + 'system.login.succeeded', { status: reply.status });
+          _this6.$rootScope.$broadcast(_this6.options.prefix + 'system.login.succeeded', { status: reply.status });
         } else {
-          _this5.states.validSession = false;
+          _this6.states.validSession = false;
           deferred.reject(reply);
-          _this5.$rootScope.$broadcast(_this5.options.prefix + 'system.login.failed', { status: reply.status });
+          _this6.$rootScope.$broadcast(_this6.options.prefix + 'system.login.failed', { status: reply.status });
         }
       };
       next.displayName = _config.moduleName + '.service.delegate.live.login.next';
@@ -1799,7 +1799,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
       if (this.loginInterceptor) {
         // reference to a direct sender
         var send = function send(address, message, reply) {
-          _this5.eventBus.send(address, message, reply);
+          _this6.eventBus.send(address, message, reply);
         };
         this.loginInterceptor(send, username, password, next);
       } else {
@@ -1861,20 +1861,20 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }, {
     key: 'ensureOpenAuthConnection',
     value: function ensureOpenAuthConnection(fn) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (!this.options.loginRequired) {
         // easy: no login required
         return this.ensureOpenConnection(fn);
       } else {
         var fnWrapper = function fnWrapper() {
-          if (_this6.states.validSession) {
+          if (_this7.states.validSession) {
             fn();
             return true;
           } else {
             // ignore this message
-            if (_this6.options.debugEnabled) {
-              _this6.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
+            if (_this7.options.debugEnabled) {
+              _this7.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
             }
             return false;
           }
@@ -2042,10 +2042,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var ConnectionConfigHolder = (function () {
   function ConnectionConfigHolder(_ref) {
-    _classCallCheck(this, ConnectionConfigHolder);
-
     var urlServer = _ref.urlServer;
     var urlPath = _ref.urlPath;
+
+    _classCallCheck(this, ConnectionConfigHolder);
 
     this._urlServer = urlServer;
     this._urlPath = urlPath;
@@ -2088,9 +2088,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Queue = (function () {
   function Queue() {
-    _classCallCheck(this, Queue);
-
     var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
+
+    _classCallCheck(this, Queue);
 
     this.maxSize = maxSize;
     this.items = [];

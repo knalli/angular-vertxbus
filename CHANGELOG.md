@@ -1,3 +1,17 @@
+<a name="3.2.1"></a>
+## [3.2.1](https://github.com/knalli/angular-vertxbus/compare/3.2.0...v3.2.1) (2016-01-24)
+
+
+### Bug Fixes
+
+* **adapter:** fix invalid delegating of SockJS.options ([43b93aa](https://github.com/knalli/angular-vertxbus/commit/43b93aa)), closes [#107](https://github.com/knalli/angular-vertxbus/issues/107)
+
+### Features
+
+* **build:** update test scope "AJS 1.5" using rc0 ([10ef138](https://github.com/knalli/angular-vertxbus/commit/10ef138))
+
+
+
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/knalli/angular-vertxbus/compare/3.1.0...v3.2.0) (2015-10-31)
 
