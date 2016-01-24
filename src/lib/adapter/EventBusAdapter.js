@@ -140,7 +140,7 @@ export default class EventBusAdapter extends BaseAdapter {
     }
     // Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
     // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
-    this.instance = new this.EventBus(url, undefined, this.options.sockjsOptions);
+    this.instance = new this.EventBus(url, this.options.sockjsOptions);
     this.instance.onopen = () => {
       if (this.options.debugEnabled) {
         this.$log.debug('[Vert.x EB Stub] Connected');
