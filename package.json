@@ -63,7 +63,7 @@
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.11",
     "karma-babel-preprocessor": "^6.0.1",
-    "karma-browserify": "^4.3.0",
+    "karma-browserify": "^5.0.1",
     "karma-chrome-launcher": "^0.2.1",
     "karma-coverage": "^0.5.2",
     "karma-expect": "~1.1.0",
