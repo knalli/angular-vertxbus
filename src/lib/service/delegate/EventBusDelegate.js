@@ -260,6 +260,9 @@ export default class EventBusDelegate extends BaseDelegate {
           } else {
             deferred.resolve(reply);
           }
+        }, (err) => {
+          this.$interval.cancel(timer); // because it's resolved
+          deferred.reject(err);
         });
       } else {
         this.eventBus.send(address, message);
