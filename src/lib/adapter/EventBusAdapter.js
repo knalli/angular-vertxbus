@@ -164,6 +164,12 @@ export default class EventBusAdapter extends BaseAdapter {
         this.$timeout((() => this.connect()), this.options.sockjsReconnectInterval);
       }
     };
+    // instance onError handler
+    this.instance.onerror = (message) => {
+      if (angular.isFunction(this.onerror)) {
+        this.onerror(message);
+      }
+    };
     return deferred.promise;
   }
 
