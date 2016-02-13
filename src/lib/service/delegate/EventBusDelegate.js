@@ -253,10 +253,13 @@ export default class EventBusDelegate extends BaseDelegate {
           deferred.reject();
         }), timeout, 1);
         // Send message
-        // TODO after dropping support for Vert.x < v3, this can be enriched with failureHandler
-        this.eventBus.send(address, message, (reply) => {
+        this.eventBus.send(address, message, (err, reply) => {
           this.$interval.cancel(timer); // because it's resolved
-          deferred.resolve(reply);
+          if (err) {
+            deferred.reject(err);
+          } else {
+            deferred.resolve(reply);
+          }
         });
       } else {
         this.eventBus.send(address, message);

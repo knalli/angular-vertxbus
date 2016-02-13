@@ -139,19 +139,45 @@ describe('integration of module::vertxEventBus', function () {
         var abcCalled, xyzCalled;
         setTimeout(function () {
           var abcHandler = function (err, message) {
-            abcCalled = message.body.data;
+            abcCalled = message.message.data;
           }, xyzHandler = function (err, message) {
-            xyzCalled = message.body.data;
+            xyzCalled = message.message.data;
           };
           vertxEventBus.registerHandler('abc', abcHandler);
           vertxEventBus.registerHandler('xyz', xyzHandler);
           SockJS.currentMockInstance.onmessage({
             data : JSON.stringify({
               address : 'xyz',
-              body : {
+              message : {
                 data : '1x'
               },
               replyAddress : undefined
+            })
+          });
+          expect(abcCalled).to.be(undefined);
+          expect(xyzCalled).to.be('1x');
+          done();
+        }, 200);
+      });
+      it('should be called as error', function (done) {
+        var abcCalled, xyzCalled;
+        setTimeout(function () {
+          var abcHandler = function (err, message) {
+            abcCalled = message.message.data;
+          }, xyzHandler = function (err) {
+            xyzCalled = err.message.data;
+          };
+          vertxEventBus.registerHandler('abc', abcHandler);
+          vertxEventBus.registerHandler('xyz', xyzHandler);
+          SockJS.currentMockInstance.onmessage({
+            data : JSON.stringify({
+              address : 'xyz',
+              type: 'err',
+              failureCode: 4711,
+              failureType: 'whatever',
+              message : {
+                data : '1x'
+              }
             })
           });
           expect(abcCalled).to.be(undefined);
@@ -177,7 +203,7 @@ describe('integration of module::vertxEventBus', function () {
           SockJS.currentMockInstance.onmessage({
             data : JSON.stringify({
               address : 'xyz',
-              body : {
+              message : {
                 data : '1x'
               },
               replyAddress : undefined
@@ -207,7 +233,7 @@ describe('integration of module::vertxEventBus', function () {
           SockJS.currentMockInstance.onmessage({
             data : JSON.stringify({
               address : 'xyz',
-              body : {
+              message : {
                 data : '1x'
               },
               replyAddress : undefined

@@ -41,38 +41,30 @@ class SockJS {
     }
   }
 
-  send(message) {
-    let json = JSON.parse(message);
-    if (json.type !== 'send') {
+  send(event) {
+    let message = this._unwrapFromEvent(event);
+    if (message.type !== 'send') {
       return;
     }
-    let data = null;
-    try {
-      data = this._unwrapFromEvent(message);
-    } catch (err) {
-      return;
-    }
-    this.log(`[MOCK] SockJS.send(${message})`);
-    if (data.address === 'vertx.basicauthmanager.login') {
-      let reply = this.nextLoginState
-        ? this._buildLoginReplyAsSuccess(data.body.username, data.body.password)
-        : this._buildLoginReplyAsFail(data.body.username, data.body.password);
-      this.onmessage(this._wrapToEvent(data.replyAddress, reply));
-    } else if (data.replyAddress) {
-      this.log(`[MOCK] Sending reply to ${data.replyAddress}`);
-      this.onmessage(this._wrapToEvent(data.replyAddress, data.mockReply || {data: 'reply'}));
+    this.log(`[MOCK] SockJS.send(${event})`);
+    if (message.replyAddress) {
+      this.log(`[MOCK] Sending reply to ${message.replyAddress}`);
+      var mockReply = message.body.mockReply || {data: 'reply'};
+      var reply = this._wrapToEvent(message.replyAddress, mockReply, undefined, mockReply.type);
+      this.onmessage(reply);
     }
   }
 
-  _unwrapFromEvent(msg) {
-    return JSON.parse(msg);
+  _unwrapFromEvent(event) {
+    return JSON.parse(event);
   }
 
-  _wrapToEvent(address, body, replyAddress) {
+  _wrapToEvent(address, body, replyAddress, type) {
     return {
       data : JSON.stringify({
+        type: type,
         address : address,
-        body : body,
+        message : body,
         replyAddress : replyAddress
       })
     };

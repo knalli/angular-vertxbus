@@ -471,7 +471,7 @@ describe('integration of module::vertxEventBusService', function () {
         SockJS.currentMockInstance.onmessage({
           data : JSON.stringify({
             address : 'xyz',
-            body : {
+            message : {
               data : '1x'
             }
           })
@@ -528,6 +528,46 @@ describe('integration of module::vertxEventBusService', function () {
         setTimeout(function () {
           expect(results.then).to.be(1);
           expect(results.catch).to.be(0);
+          expect(results.finally).to.be(1);
+          done();
+        }, 500);
+      }, 200);
+    });
+
+    it('should return a promise which will be rejected (failure in message)', function (done) {
+      setTimeout(function () {
+        var results = {
+          'then' : 0,
+          'catch' : 0,
+          'finally' : 0
+        };
+        var promise = vertxEventBusService.send('xyz', {
+          data : 123,
+          mockReply: {
+            type: 'err',
+            failureCode: 4711,
+            failureType: 'whatever'
+          }
+        });
+        expect(promise).to.not.be(undefined);
+        // looks like a promise?
+        expect(typeof promise).to.be('object');
+        expect(typeof promise.then).to.be('function');
+        expect(typeof promise.catch).to.be('function');
+        expect(typeof promise.finally).to.be('function');
+        promise.then(function () {
+          results.then++;
+        });
+        promise.catch(function () {
+          results.catch++;
+        });
+        promise.finally(function () {
+          results.finally++;
+        });
+        $rootScope.$apply();
+        setTimeout(function () {
+          expect(results.then).to.be(0);
+          expect(results.catch).to.be(1);
           expect(results.finally).to.be(1);
           done();
         }, 500);
