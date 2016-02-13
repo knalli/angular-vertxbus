@@ -157,33 +157,6 @@ service.send('myaddress', data)
 
 For each connect or disconnect, a global broadcast will be emitted (on `$rootScope` with `'vertx-eventbus.system.connected'`, `'vertx-eventbus.system.disconnected'`)
 
-### Setup for using same callback with different addresses
-
-In some scenarios you will want to use a single callback definition to many different addresses.  To do this you will
-have to follow this pattern.
-
-Create a javascript object that defines your callback.  Do not attempt to use `.prototype` as the methods defined
-as such will always point to the same memory allocation - so will always be found identical when adding to the internal
-array.
-```javascript
-function FunctionHolder(){
-  "use strict";
-  return {
-      handler: function (message) {
-          // do stuff here
-      }
-  }
-};
-```
-
-Then when adding the listeners, you will create a new instance of your object and use your defined function.
-```javascript
-var funcHolder = new FunctionHolder();
-vertxEventBusService.addListener('address', funcHolder.handler);
-```
-
-**NOTE: this functionality is only available after version 0.8.0.**
-
 ## Tests
 
 ### Unit tests
