@@ -8,18 +8,9 @@
     .useDebug(true)
     .useUrlServer('http://localhost:8080');
     vertxEventBusServiceProvider.useDebug(true);
-    vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
   })
   .run(function ($rootScope, vertxEventBus, vertxEventBusService, $interval) {
     $rootScope.sessionIsValid = false;
-    $rootScope.$on('vertx-eventbus.system.login.succeeded', function (event, data) {
-      console.log('Vert.x Login succeeded (status)', data);
-      $rootScope.sessionIsValid = (data && data.status === 'ok');
-    });
-    $rootScope.$on('vertx-eventbus.system.login.failed', function (event, data) {
-      console.log('Vert.x Login failed (status)', data);
-      $rootScope.sessionIsValid = false;
-    });
 
     $rootScope.moduleStats = {
       wrapper: {},
@@ -42,16 +33,6 @@
     };
   })
   .controller('MyController', function($scope, vertxEventBusService) {
-    $scope.login = function (username, password) {
-      vertxEventBusService.login(username, password)
-        .then(function (reply) {
-          $scope.reply = reply;
-        })
-        ['catch'](function (reply) {
-          $scope.reply = reply;
-        });
-    };
-
     var holder = {};
     $scope.timeServiceActive = false;
     $scope.registerTimeService = function () {
@@ -72,7 +53,6 @@
       $scope.timeServiceActive = false;
     };
 
-    var holder = {};
     $scope.timeServiceActive = false;
     $scope.registerTimeService = function () {
       holder.timeServiceDeconstructor = vertxEventBusService.on('what-time-is-it', function (data) {

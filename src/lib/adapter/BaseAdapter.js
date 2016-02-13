@@ -17,9 +17,6 @@ export default class BaseAdapter {
   close() {
   }
 
-  login() {
-  }
-
   send() {
   }
 

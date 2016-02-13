@@ -47,8 +47,7 @@ module.exports = function(config) {
       'node_modules/babel-polyfill/dist/polyfill.js',
       injectByScope(scope, 'angular/angular.js'),
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
-      'test/unit/mock/sockjs.js',
-      injectByScope(scope, 'vertx3-eventbus-client/vertxbus.js'),
+      injectByScope(scope, 'vertx3-eventbus-client/vertx-eventbus.js'),
       'src/lib/**/*.js',
       'src/module.js',
       'test/**/*.spec.js'
@@ -70,9 +69,12 @@ module.exports = function(config) {
     preprocessors: (function () {
       var config = {
         'src/**/*.js': [ 'browserify' ],
+        'test/unit/binding/**/*.js': [ 'browserify' ],
         'test/unit/lib/**/*.js': [ 'browserify' ],
         'test/unit/mock/sockjs.js': [ 'browserify' ]
       };
+
+      config[injectByScope(scope, 'vertx3-eventbus-client/vertx-eventbus.js')] = ['browserify'];
 
       if (isDefaultScope(scope)) {
         config['src/**/*.js'].push('coverage');
@@ -85,7 +87,7 @@ module.exports = function(config) {
     browserify: {
       debug: true,
       extensions: ['.js'],
-      transform: [ 'babelify' ]
+      transform: [ 'babelify', 'browserify-shim' ]
     },
 
     coverageReporter: isDefaultScope(scope) ? {

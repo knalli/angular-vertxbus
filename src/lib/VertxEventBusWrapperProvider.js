@@ -188,7 +188,6 @@ let VertxEventBusWrapperProvider = function () {
    *
    * The stub supports theses Vert.x Event Bus APIs:
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_close close()}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_login login(username, password, replyHandler)}
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_send send(address, message, handler)}
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_publish publish(address, message)}
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_registerHandler registerHandler(adress, handler)}
@@ -202,10 +201,13 @@ let VertxEventBusWrapperProvider = function () {
    * @requires $log
    */
   /* @ngInject */
-  this.$get = ($timeout, $log, $q) => {
+  this.$get = ($timeout, $log, $q, $injector) => {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, DEFAULTS, options);
-    if (instanceOptions.enabled && vertx && vertx.EventBus) {
+    if (!window.EventBus && $injector.has('__knalli__angularVertxbus__EventBus')) {
+      window.EventBus = $injector.get('__knalli__angularVertxbus__EventBus');
+    }
+    if (instanceOptions.enabled && EventBus) {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Enabled');
       }
@@ -218,12 +220,12 @@ let VertxEventBusWrapperProvider = function () {
       delete instanceOptions.urlServer;
       delete instanceOptions.urlPath;
 
-      return new EventBusAdapter(vertx.EventBus, $timeout, $log, $q, instanceOptions);
+      return new EventBusAdapter(EventBus, $timeout, $log, $q, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Disabled');
       }
-      return new NoopAdapter(vertx.EventBus, $q);
+      return new NoopAdapter(EventBus, $q);
     }
   };
 

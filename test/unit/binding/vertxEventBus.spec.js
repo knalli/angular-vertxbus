@@ -1,12 +1,16 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
 /* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
+var EventBus = require('./../../../bower_components/vertx3-eventbus-client/vertx-eventbus.js');
+var SockJS = require('sockjs-client');
+
 describe('integration of module::vertxEventBus', function () {
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
     $provide.value('$log', window.console);
+    $provide.value('__knalli__angularVertxbus__EventBus', EventBus);
   }));
 
   it('should have vertxEventBus', angular.mock.inject(function (vertxEventBus) {
@@ -134,24 +138,50 @@ describe('integration of module::vertxEventBus', function () {
       it('should be called', function (done) {
         var abcCalled, xyzCalled;
         setTimeout(function () {
-          var abcHandler = function (message) {
-            abcCalled = message;
-          }, xyzHandler = function (message) {
-            xyzCalled = message;
+          var abcHandler = function (err, message) {
+            abcCalled = message.message.data;
+          }, xyzHandler = function (err, message) {
+            xyzCalled = message.message.data;
           };
           vertxEventBus.registerHandler('abc', abcHandler);
           vertxEventBus.registerHandler('xyz', xyzHandler);
           SockJS.currentMockInstance.onmessage({
             data : JSON.stringify({
               address : 'xyz',
-              body : {
+              message : {
                 data : '1x'
               },
               replyAddress : undefined
             })
           });
           expect(abcCalled).to.be(undefined);
-          expect(xyzCalled).to.eql({data : '1x'});
+          expect(xyzCalled).to.be('1x');
+          done();
+        }, 200);
+      });
+      it('should be called as error', function (done) {
+        var abcCalled, xyzCalled;
+        setTimeout(function () {
+          var abcHandler = function (err, message) {
+            abcCalled = message.message.data;
+          }, xyzHandler = function (err) {
+            xyzCalled = err.message.data;
+          };
+          vertxEventBus.registerHandler('abc', abcHandler);
+          vertxEventBus.registerHandler('xyz', xyzHandler);
+          SockJS.currentMockInstance.onmessage({
+            data : JSON.stringify({
+              address : 'xyz',
+              type: 'err',
+              failureCode: 4711,
+              failureType: 'whatever',
+              message : {
+                data : '1x'
+              }
+            })
+          });
+          expect(abcCalled).to.be(undefined);
+          expect(xyzCalled).to.be('1x');
           done();
         }, 200);
       });
@@ -161,10 +191,10 @@ describe('integration of module::vertxEventBus', function () {
       it('should be not called', function (done) {
         var abcCalled, xyzCalled;
         setTimeout(function () {
-          var abcHandler = function (message) {
-            abcCalled = message;
-          }, xyzHandler = function (message) {
-            xyzCalled = message;
+          var abcHandler = function (err, message) {
+            abcCalled = message.data;
+          }, xyzHandler = function (err, message) {
+            xyzCalled = message.data;
           };
           var abcFunct = vertxEventBus.registerHandler('abc', abcHandler);
           var xyzFunct = vertxEventBus.registerHandler('xyz', xyzHandler);
@@ -173,7 +203,7 @@ describe('integration of module::vertxEventBus', function () {
           SockJS.currentMockInstance.onmessage({
             data : JSON.stringify({
               address : 'xyz',
-              body : {
+              message : {
                 data : '1x'
               },
               replyAddress : undefined
@@ -190,10 +220,10 @@ describe('integration of module::vertxEventBus', function () {
       it('should not be called', function (done) {
         var abcCalled, xyzCalled;
         setTimeout(function () {
-          var abcHandler = function (message) {
-            abcCalled = message;
-          }, xyzHandler = function (message) {
-            xyzCalled = message;
+          var abcHandler = function (err, message) {
+            abcCalled = message.data;
+          }, xyzHandler = function (err, message) {
+            xyzCalled = message.data;
           };
           vertxEventBus.registerHandler('abc', abcHandler);
           vertxEventBus.registerHandler('xyz', xyzHandler);
@@ -203,7 +233,7 @@ describe('integration of module::vertxEventBus', function () {
           SockJS.currentMockInstance.onmessage({
             data : JSON.stringify({
               address : 'xyz',
-              body : {
+              message : {
                 data : '1x'
               },
               replyAddress : undefined

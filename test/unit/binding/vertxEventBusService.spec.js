@@ -1,12 +1,16 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
 /* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
+var EventBus = require('./../../../bower_components/vertx3-eventbus-client/vertx-eventbus.js');
+var SockJS = require('sockjs-client');
+
 describe('integration of module::vertxEventBusService', function () {
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
     $provide.value('$log', window.console);
+    $provide.value('__knalli__angularVertxbus__EventBus', EventBus);
   }));
 
   it('should have vertxEventBusService', angular.mock.inject(function (vertxEventBusService) {
@@ -242,102 +246,6 @@ describe('integration of module::vertxEventBusService', function () {
       });
     });
 
-    describe('should broadcast event', function () {
-      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
-
-      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
-        vertxEventBusServiceProvider.useMessageBuffer(0);
-        vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
-      }));
-
-      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
-        vertxEventBus = _vertxEventBus_;
-        vertxEventBusService = _vertxEventBusService_;
-        $rootScope = _$rootScope_;
-        $timeout = _$timeout_;
-        $log = _$log_;
-        vertxEventBus.readyState = function () {
-          return vertxEventBus.EventBus.OPEN;
-        };
-      }));
-
-      it('"system connected"', function (done) {
-        $rootScope.$on('vertx-eventbus.system.connected', function () {
-          result = true;
-          done();
-        });
-        setTimeout(function () {
-          expect(result).to.be(true);
-        }, 1000);
-      });
-
-      it('"system login succeeded"', function (done) {
-        var result;
-        $rootScope.$on('vertx-eventbus.system.login.succeeded', function () {
-          result = true;
-          done();
-        });
-        setTimeout(function () {
-          vertxEventBusService.login('username', 'password');
-          setTimeout(function () {
-            expect(result).to.be(true);
-          }, 1000);
-        }, 1000);
-      });
-
-      it('"system login failed"', function (done) {
-        var result;
-        SockJS.currentMockInstance.nextLoginState = false;
-        $rootScope.$on('vertx-eventbus.system.login.failed', function () {
-          result = true;
-          SockJS.currentMockInstance.nextLoginState = true;
-          done();
-        });
-        setTimeout(function () {
-          vertxEventBusService.login('username', 'password');
-          setTimeout(function () {
-            expect(result).to.be(true);
-          }, 1000);
-        }, 1000);
-      });
-    });
-
-    describe('should not send message', function () {
-      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
-
-      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
-        vertxEventBusServiceProvider.useMessageBuffer(0);
-        vertxEventBusServiceProvider.requireLogin(true);
-      }));
-
-      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
-        vertxEventBus = _vertxEventBus_;
-        vertxEventBusService = _vertxEventBusService_;
-        $rootScope = _$rootScope_;
-        $timeout = _$timeout_;
-        $log = _$log_;
-        SockJS.currentMockInstance.$log = $log;
-        vertxEventBus.readyState = function () {
-          return vertxEventBus.EventBus.OPEN;
-        };
-        vertxEventBus.send = function (address, message, replyHandler) {
-          $log.debug('XY', address, message, replyHandler);
-          result = true;
-        };
-      }));
-
-      it('when login is required', function (done) {
-        setTimeout(function () {
-          vertxEventBusService.send('xyz', 'blabla');
-        }, 500);
-        setTimeout(function () {
-          // should not be true (because this would mean the message was sent)
-          expect(result).to.be(undefined);
-          done();
-        }, 1000);
-      });
-    });
-
     describe('when the service is not connected correctly (stalled connection)', function () {
       var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
@@ -563,10 +471,9 @@ describe('integration of module::vertxEventBusService', function () {
         SockJS.currentMockInstance.onmessage({
           data : JSON.stringify({
             address : 'xyz',
-            body : {
+            message : {
               data : '1x'
-            },
-            replyAddress : undefined
+            }
           })
         });
         expect(abcCalled).to.be(undefined);
@@ -621,6 +528,46 @@ describe('integration of module::vertxEventBusService', function () {
         setTimeout(function () {
           expect(results.then).to.be(1);
           expect(results.catch).to.be(0);
+          expect(results.finally).to.be(1);
+          done();
+        }, 500);
+      }, 200);
+    });
+
+    it('should return a promise which will be rejected (failure in message)', function (done) {
+      setTimeout(function () {
+        var results = {
+          'then' : 0,
+          'catch' : 0,
+          'finally' : 0
+        };
+        var promise = vertxEventBusService.send('xyz', {
+          data : 123,
+          mockReply: {
+            type: 'err',
+            failureCode: 4711,
+            failureType: 'whatever'
+          }
+        });
+        expect(promise).to.not.be(undefined);
+        // looks like a promise?
+        expect(typeof promise).to.be('object');
+        expect(typeof promise.then).to.be('function');
+        expect(typeof promise.catch).to.be('function');
+        expect(typeof promise.finally).to.be('function');
+        promise.then(function () {
+          results.then++;
+        });
+        promise.catch(function () {
+          results.catch++;
+        });
+        promise.finally(function () {
+          results.finally++;
+        });
+        $rootScope.$apply();
+        setTimeout(function () {
+          expect(results.then).to.be(0);
+          expect(results.catch).to.be(1);
           expect(results.finally).to.be(1);
           done();
         }, 500);

@@ -39,6 +39,6 @@
   },
   "globals": {
     "angular": false,
-    "vertx": false
+    "EventBus": false
   }
 }
