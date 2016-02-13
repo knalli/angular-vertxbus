@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v3.2.1 - 2016-01-24
+/*! angular-vertxbus - v4.0.0 - 2016-02-13
 * http://github.com/knalli/angular-vertxbus
 * Copyright (c) 2016 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -58,7 +58,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var DEFAULTS = {
   enabled: true,
   debugEnabled: false,
-  loginRequired: false,
   prefix: 'vertx-eventbus.',
   sockjsStateInterval: 10000,
   messageBuffer: 10000
@@ -130,25 +129,6 @@ var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
   /**
    * @ngdoc method
    * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#requireLogin
-   *
-   *
-   * @description
-   * Defines whether a login is being required or not.
-   *
-   * @param {boolean} [value=false] defines requirement of a valid session
-   * @returns {object} this
-   */
-  this.requireLogin = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.loginRequired : arguments[0];
-
-    options.loginRequired = value === true;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
    * @name .#useSockJsStateInterval
    *
    *
@@ -184,63 +164,6 @@ var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
 
     options.messageBuffer = value;
     return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#useLoginInterceptor
-   *
-   * @description
-   * Defines a login interceptor corresponding for the option `loginRequired`.
-   *
-   * The argument must be a valid function reference with four arguments
-   * - send (an at runtime injected function for actual sending: i.e. `send(address, message, next)`
-   * - username (the used username)
-   * - password (the used password)
-   * - next (the callback function reference)
-   *
-   * @param {function} a function with params `(send, username, password, next)`
-   * @returns {object} this
-   */
-  this.useLoginInterceptor = function (value) {
-    options.loginInterceptor = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#configureLoginInterceptor
-   *
-   * @description
-   * Configures and defines a login interceptor corresponding for the option #requireLogin().
-   *
-   * This utilizes #useLoginInterceptor and is available as a convenient method.
-   *
-   * At default, the created request will look similar like vertx.basicauthmanager.login.
-   *
-   * @param {string} the address to send
-   * @param {function=} optional a builder for creating the message body
-   * @returns {object} this
-   */
-  this.configureLoginInterceptor = function (address, argumentsBuilder) {
-    if (!argumentsBuilder) {
-      // Legacy fallback: create a message like in Vert.x 2
-      argumentsBuilder = function argumentsBuilder(username, password) {
-        return {
-          action: 'findone',
-          collection: 'users',
-          matcher: {
-            username: username,
-            password: password
-          }
-        };
-      };
-    }
-    return _this.useLoginInterceptor(function (send, username, password, next) {
-      send(address, argumentsBuilder(username, password), next);
-    });
   };
 
   /**
@@ -322,11 +245,11 @@ var DEFAULTS = {
   enabled: true,
   debugEnabled: false,
   initialConnectEnabled: true,
-  urlServer: location.protocol + '//' + location.hostname + ((function () {
+  urlServer: location.protocol + '//' + location.hostname + (function () {
     if (location.port) {
       return ':' + location.port;
     }
-  })() || ''),
+  }() || ''),
   urlPath: '/eventbus',
   reconnectEnabled: true,
   sockjsReconnectInterval: 10000,
@@ -511,7 +434,6 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
    *
    * The stub supports theses Vert.x Event Bus APIs:
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_close close()}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_login login(username, password, replyHandler)}
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_send send(address, message, handler)}
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_publish publish(address, message)}
    *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_registerHandler registerHandler(adress, handler)}
@@ -525,10 +447,13 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
    * @requires $log
    */
   /* @ngInject */
-  this.$get = function ($timeout, $log, $q) {
+  this.$get = function ($timeout, $log, $q, $injector) {
     // Current options (merged defaults with application-wide settings)
     var instanceOptions = angular.extend({}, DEFAULTS, options);
-    if (instanceOptions.enabled && vertx && vertx.EventBus) {
+    if (!window.EventBus && $injector.has('__knalli__angularVertxbus__EventBus')) {
+      window.EventBus = $injector.get('__knalli__angularVertxbus__EventBus');
+    }
+    if (instanceOptions.enabled && EventBus) {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Enabled');
       }
@@ -541,15 +466,15 @@ var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
       delete instanceOptions.urlServer;
       delete instanceOptions.urlPath;
 
-      return new _EventBusAdapter2.default(vertx.EventBus, $timeout, $log, $q, instanceOptions);
+      return new _EventBusAdapter2.default(EventBus, $timeout, $log, $q, instanceOptions);
     } else {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Disabled');
       }
-      return new _NoopAdapter2.default(vertx.EventBus, $q);
+      return new _NoopAdapter2.default(EventBus, $q);
     }
   };
-  this.$get.$inject = ["$timeout", "$log", "$q"];
+  this.$get.$inject = ["$timeout", "$log", "$q", "$injector"];
 };
 
 exports.default = VertxEventBusWrapperProvider;
@@ -557,15 +482,15 @@ exports.default = VertxEventBusWrapperProvider;
 },{"./adapter/EventBusAdapter":6,"./adapter/NoopAdapter":7,"./support/ConnectionConfigHolder":12}],5:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BaseAdapter = (function () {
+var BaseAdapter = function () {
   function BaseAdapter($q) {
     _classCallCheck(this, BaseAdapter);
 
@@ -586,9 +511,6 @@ var BaseAdapter = (function () {
   }, {
     key: "close",
     value: function close() {}
-  }, {
-    key: "login",
-    value: function login() {}
   }, {
     key: "send",
     value: function send() {}
@@ -624,18 +546,18 @@ var BaseAdapter = (function () {
   }]);
 
   return BaseAdapter;
-})();
+}();
 
 exports.default = BaseAdapter;
 
 },{}],6:[function(require,module,exports){
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _config = require('../../config.js');
 
@@ -658,34 +580,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * @ngdoc service
  * @module vertx
- * @name vertx.EventBus
+ * @name EventBus
  *
  * @description
- * This is the interface of `vertx.EventBus`. It is not included.
+ * This is the interface of `EventBus`. It is not included.
  */
 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#close
  */
 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
- * @name .#login
- *
- * @param {string} username credential's username
- * @param {string} password credential's password
- * @param {function=} replyHandler optional callback
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#send
  *
  * @param {string} address target address
@@ -696,7 +607,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#publish
  *
  * @param {string} address target address
@@ -706,7 +617,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#registerHandler
  *
  * @param {string} address target address
@@ -716,7 +627,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#unregisterHandler
  *
  * @param {string} address target address
@@ -726,13 +637,31 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
- * @name .#readyState
+ * @propertyOf EventBus
+ * @name .#onopen
  *
- * @returns {number} value of vertxbus connection states
+ * Defines the callback called on opening the connection.
  */
 
-var EventBusAdapter = (function (_BaseAdapter) {
+/**
+ * @ngdoc method
+ * @module vertx
+ * @propertyOf EventBus
+ * @name .#onclose
+ *
+ * Defines the callback called on closing the connection.
+ */
+
+/**
+ * @ngdoc method
+ * @module vertx
+ * @propertyOf EventBus
+ * @name .#onerror
+ *
+ * Defines the callback called on any error.
+ */
+
+var EventBusAdapter = function (_BaseAdapter) {
   _inherits(EventBusAdapter, _BaseAdapter);
 
   function EventBusAdapter(EventBus, $timeout, $log, $q, _ref) {
@@ -783,6 +712,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
    * @param {string} urlServer see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlServer vertxEventBusProvider.useUrlServer()}
    * @param {string} [urlPath=/eventbus] see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlPath vertxEventBusProvider.useUrlPath()}
    */
+
 
   _createClass(EventBusAdapter, [{
     key: 'configureConnection',
@@ -843,6 +773,12 @@ var EventBusAdapter = (function (_BaseAdapter) {
           }, _this2.options.sockjsReconnectInterval);
         }
       };
+      // instance onError handler
+      this.instance.onerror = function (message) {
+        if (angular.isFunction(_this2.onerror)) {
+          _this2.onerror(message);
+        }
+      };
       return deferred.promise;
     }
 
@@ -868,7 +804,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
     value: function reconnect() {
       var immediately = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
-      if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
+      if (this.instance && this.instance.state === this.EventBus.OPEN) {
         if (immediately) {
           this.disconnectTimeoutEnabled = false;
         }
@@ -890,7 +826,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * Note: If automatic reconnection is active, a new connection will be established after the {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useReconnect reconnect timeout}.
      *
      * See also:
-     * - {@link vertx.EventBus#methods_close vertx.EventBus.close()}
+     * - {@link EventBus#methods_close EventBus.close()}
      */
 
   }, {
@@ -905,43 +841,13 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @ngdoc method
      * @module knalli.angular-vertxbus
      * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#login
-     *
-     * @description
-     * Sends a login request against the vertxbus
-     *
-     * See also:
-     * - {@link vertx.EventBus#methods_login vertx.EventBus.login()}
-     *
-     * @param {string} username credential's username
-     * @param {string} password credential's password
-     * @param {function=} replyHandler optional callback
-     */
-
-  }, {
-    key: 'login',
-    value: function login(username, password, replyHandler) {
-      if (this.instance) {
-        if (!this.instance.login) {
-          this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor');
-          replyHandler();
-          return;
-        }
-        this.instance.login(username, password, replyHandler);
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
      * @name .#send
      *
      * @description
      * Sends a message
      *
      * See also:
-     * - {@link vertx.EventBus#methods_send vertx.EventBus.send()}
+     * - {@link EventBus#methods_send EventBus.send()}
      *
      * @param {string} address target address
      * @param {object} message payload message
@@ -967,7 +873,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * Publishes a message
      *
      * See also:
-     * - {@link vertx.EventBus#methods_publish vertx.EventBus.publish()}
+     * - {@link EventBus#methods_publish EventBus.publish()}
      *
      * @param {string} address target address
      * @param {object} message payload message
@@ -991,7 +897,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * Registers a listener
      *
      * See also:
-     * - {@link vertx.EventBus#methods_registerHandler vertx.EventBus.registerHandler()}
+     * - {@link EventBus#methods_registerHandler EventBus.registerHandler()}
      *
      * @param {string} address target address
      * @param {function} handler callback handler
@@ -1023,7 +929,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * Removes a registered a listener
      *
      * See also:
-     * - {@link vertx.EventBus#methods_unregisterHandler vertx.EventBus.unregisterHandler()}
+     * - {@link EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
      *
      * @param {string} address target address
      * @param {function} handler callback handler to be removed
@@ -1032,7 +938,7 @@ var EventBusAdapter = (function (_BaseAdapter) {
   }, {
     key: 'unregisterHandler',
     value: function unregisterHandler(address, handler) {
-      if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
+      if (this.instance && this.instance.state === this.EventBus.OPEN) {
         this.instance.unregisterHandler(address, handler);
       }
     }
@@ -1046,34 +952,36 @@ var EventBusAdapter = (function (_BaseAdapter) {
      * @description
      * Returns the current connection state
      *
-     * See also:
-     * - {@link vertx.EventBus#methods_readyState vertx.EventBus.readyState()}
-     *
-     * @returns {number} value of vertxbus connection states
+     * @returns {number} value of vertx-eventbus connection states
      */
 
   }, {
     key: 'readyState',
     value: function readyState() {
       if (this.instance) {
-        return this.instance.readyState();
+        return this.instance.state;
       } else {
         return this.EventBus.CLOSED;
       }
     }
-
-    // private
-
   }, {
     key: 'getOptions',
+
+
+    // private
     value: function getOptions() {
       // clone options
       return angular.extend({}, this.options);
     }
+  }, {
+    key: 'state',
+    get: function get() {
+      return this.readyState();
+    }
   }]);
 
   return EventBusAdapter;
-})(_BaseAdapter3.default);
+}(_BaseAdapter3.default);
 
 exports.default = EventBusAdapter;
 
@@ -1096,7 +1004,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var NoopAdapter = (function (_BaseAdapter) {
+var NoopAdapter = function (_BaseAdapter) {
   _inherits(NoopAdapter, _BaseAdapter);
 
   function NoopAdapter(EventBus, $q) {
@@ -1111,24 +1019,24 @@ var NoopAdapter = (function (_BaseAdapter) {
   }
 
   return NoopAdapter;
-})(_BaseAdapter3.default);
+}(_BaseAdapter3.default);
 
 exports.default = NoopAdapter;
 
 },{"./BaseAdapter":5}],8:[function(require,module,exports){
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _config = require('../../config');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Delegator = (function () {
+var Delegator = function () {
   function Delegator(delegate, $log) {
     var _this = this;
 
@@ -1256,6 +1164,7 @@ var Delegator = (function () {
     value: function send(address, message) {
       var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
+
       // FALLBACK: signature change since 2.0
       if (!angular.isObject(options)) {
         this.$log.error(_config.moduleName + ': Signature of vertxEventBusService.send() has been changed!');
@@ -1305,22 +1214,22 @@ var Delegator = (function () {
   }]);
 
   return Delegator;
-})();
+}();
 
 exports.default = Delegator;
 
 },{"../../config":1}],9:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BaseDelegate = (function () {
+var BaseDelegate = function () {
   function BaseDelegate() {
     _classCallCheck(this, BaseDelegate);
   }
@@ -1359,18 +1268,18 @@ var BaseDelegate = (function () {
   }]);
 
   return BaseDelegate;
-})();
+}();
 
 exports.default = BaseDelegate;
 
 },{}],10:[function(require,module,exports){
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _config = require('../../../config');
 
@@ -1452,7 +1361,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @param {boolean} data.status must be not`'ok'`
  */
 
-var EventBusDelegate = (function (_BaseDelegate) {
+var EventBusDelegate = function (_BaseDelegate) {
   _inherits(EventBusDelegate, _BaseDelegate);
 
   function EventBusDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
@@ -1498,6 +1407,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }
 
   // internal
+
 
   _createClass(EventBusDelegate, [{
     key: 'initialize',
@@ -1640,8 +1550,10 @@ var EventBusDelegate = (function (_BaseDelegate) {
       if (this.options.debugEnabled) {
         this.$log.debug('[Vert.x EB Service] Register handler for ' + address);
       }
-      var callbackWrapper = function callbackWrapper(message, replyTo) {
-        callback(message, replyTo);
+      var callbackWrapper = function callbackWrapper(err, _ref2, replyTo) {
+        var body = _ref2.body;
+
+        callback(body, replyTo);
         _this3.$rootScope.$digest();
       };
       callbackWrapper.displayName = _config.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
@@ -1711,10 +1623,16 @@ var EventBusDelegate = (function (_BaseDelegate) {
               deferred.reject();
             }, timeout, 1);
             // Send message
-            // TODO after dropping support for Vert.x < v3, this can be enriched with failureHandler
-            _this4.eventBus.send(address, message, function (reply) {
+            _this4.eventBus.send(address, message, function (err, reply) {
               _this4.$interval.cancel(timer); // because it's resolved
-              deferred.resolve(reply);
+              if (err) {
+                deferred.reject(err);
+              } else {
+                deferred.resolve(reply);
+              }
+            }, function (err) {
+              _this4.$interval.cancel(timer); // because it's resolved
+              deferred.reject(err);
             });
           })();
         } else {
@@ -1751,66 +1669,6 @@ var EventBusDelegate = (function (_BaseDelegate) {
       return this.ensureOpenAuthConnection(function () {
         return _this5.eventBus.publish(address, message);
       });
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#login
-     *
-     * @description
-     * Sends a login request.
-     *
-     * See also
-     * - {@link knalli.angular-vertxbus.vertxEventBus#methods_login vertxEventBus.login()}
-     *
-     * @param {string} username credential's username
-     * @param {string} password credential's password
-     * @param {number=} [timeout=5000] timeout
-     * @returns {object} promise
-     */
-
-  }, {
-    key: 'login',
-    value: function login() {
-      var username = arguments.length <= 0 || arguments[0] === undefined ? this.options.username : arguments[0];
-
-      var _this6 = this;
-
-      var password = arguments.length <= 1 || arguments[1] === undefined ? this.options.password : arguments[1];
-      var timeout = arguments.length <= 2 || arguments[2] === undefined ? 5000 : arguments[2];
-
-      var deferred = this.$q.defer();
-      var next = function next(reply) {
-        reply = reply || {};
-        if (reply.status === 'ok') {
-          _this6.states.validSession = true;
-          deferred.resolve(reply);
-          _this6.$rootScope.$broadcast(_this6.options.prefix + 'system.login.succeeded', { status: reply.status });
-        } else {
-          _this6.states.validSession = false;
-          deferred.reject(reply);
-          _this6.$rootScope.$broadcast(_this6.options.prefix + 'system.login.failed', { status: reply.status });
-        }
-      };
-      next.displayName = _config.moduleName + '.service.delegate.live.login.next';
-
-      if (this.loginInterceptor) {
-        // reference to a direct sender
-        var send = function send(address, message, reply) {
-          _this6.eventBus.send(address, message, reply);
-        };
-        this.loginInterceptor(send, username, password, next);
-      } else {
-        // Legacy way like Vert.x 2
-        this.eventBus.login(username, password, next);
-      }
-
-      this.$interval(function () {
-        return deferred.reject();
-      }, timeout, 1);
-      return deferred.promise;
     }
 
     /**
@@ -1861,20 +1719,20 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }, {
     key: 'ensureOpenAuthConnection',
     value: function ensureOpenAuthConnection(fn) {
-      var _this7 = this;
+      var _this6 = this;
 
       if (!this.options.loginRequired) {
         // easy: no login required
         return this.ensureOpenConnection(fn);
       } else {
         var fnWrapper = function fnWrapper() {
-          if (_this7.states.validSession) {
+          if (_this6.states.validSession) {
             fn();
             return true;
           } else {
             // ignore this message
-            if (_this7.options.debugEnabled) {
-              _this7.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
+            if (_this6.options.debugEnabled) {
+              _this6.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
             }
             return false;
           }
@@ -1902,7 +1760,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
     value: function getConnectionState(immediate) {
       if (this.options.enabled) {
         if (immediate) {
-          this.connectionState = this.eventBus.readyState();
+          this.connectionState = this.eventBus.state;
         }
       } else {
         this.connectionState = this.eventBus.EventBus.CLOSED;
@@ -1992,7 +1850,7 @@ var EventBusDelegate = (function (_BaseDelegate) {
   }]);
 
   return EventBusDelegate;
-})(_BaseDelegate3.default);
+}(_BaseDelegate3.default);
 
 exports.default = EventBusDelegate;
 
@@ -2015,7 +1873,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var NoopDelegate = (function (_BaseDelegate) {
+var NoopDelegate = function (_BaseDelegate) {
   _inherits(NoopDelegate, _BaseDelegate);
 
   function NoopDelegate() {
@@ -2025,22 +1883,22 @@ var NoopDelegate = (function (_BaseDelegate) {
   }
 
   return NoopDelegate;
-})(_BaseDelegate3.default);
+}(_BaseDelegate3.default);
 
 exports.default = NoopDelegate;
 
 },{"./BaseDelegate":9}],12:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ConnectionConfigHolder = (function () {
+var ConnectionConfigHolder = function () {
   function ConnectionConfigHolder(_ref) {
     var urlServer = _ref.urlServer;
     var urlPath = _ref.urlPath;
@@ -2064,18 +1922,18 @@ var ConnectionConfigHolder = (function () {
   }]);
 
   return ConnectionConfigHolder;
-})();
+}();
 
 exports.default = ConnectionConfigHolder;
 
 },{}],13:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2086,7 +1944,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  LIFO: #push() + #last()
  */
 
-var Queue = (function () {
+var Queue = function () {
   function Queue() {
     var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
 
@@ -2128,18 +1986,18 @@ var Queue = (function () {
   }]);
 
   return Queue;
-})();
+}();
 
 exports.default = Queue;
 
 },{}],14:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2149,7 +2007,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  This implementation allows usage of non serializable keys for values.
  */
 
-var SimpleMap = (function () {
+var SimpleMap = function () {
   function SimpleMap() {
     _classCallCheck(this, SimpleMap);
 
@@ -2158,6 +2016,7 @@ var SimpleMap = (function () {
 
   // Stores the value under the key.
   // Chainable
+
 
   _createClass(SimpleMap, [{
     key: "put",
@@ -2248,7 +2107,7 @@ var SimpleMap = (function () {
   }]);
 
   return SimpleMap;
-})();
+}();
 
 exports.default = SimpleMap;
 

@@ -1,3 +1,25 @@
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/knalli/angular-vertxbus/compare/3.2.1...v4.0.0) (2016-02-13)
+
+
+### Features
+
+* upgrade baseline to Vert.x 3.2 (breaking changes) ([e06515b](https://github.com/knalli/angular-vertxbus/commit/e06515b))
+* **adapter:** add support for `EventBus.onerror` ([5e93cde](https://github.com/knalli/angular-vertxbus/commit/5e93cde))
+* **service:** add support for `failureHandler` on send ([bbec54c](https://github.com/knalli/angular-vertxbus/commit/bbec54c))
+* **service:** add support for new `type=err` messages ([54c4b2b](https://github.com/knalli/angular-vertxbus/commit/54c4b2b))
+
+
+### BREAKING CHANGES
+
+* Due insuffcient support and breaking things, the feature `login` has been removed completely. It will come back supporting login on connect providers as well (i.e. JWT over BasicAuth).
+* Due upgrading to Vert.x 3.2 (incl. 3.1), several things changed internally. Be aware of https://github.com/vert-x3/wiki/wiki/3.2.0-Breaking-changes
+* Since Vert.x 3.1, the dependency has changed `vertx3bus` => `vertx-eventbus`. Also the file name itself has changed.
+* Since Vert.x 3.1, the `EventBus` is a global now. No `vertx.` anymore.
+* Since Vert.x 3.1, the message payload of a receiving message has changed being closer to NodeJS apis. The `vertxEventBusService` will handle this correct without a change, but `vertxEventBus` has changed the signature being compliant: `register('address', callback({address, message}))` => `register(callback(err, {address, message}))`
+
+
+
 <a name="3.2.1"></a>
 ## [3.2.1](https://github.com/knalli/angular-vertxbus/compare/3.2.0...v3.2.1) (2016-01-24)
 
