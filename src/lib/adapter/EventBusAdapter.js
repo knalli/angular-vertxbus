@@ -23,17 +23,6 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  * @ngdoc method
  * @module vertx
  * @methodOf vertx.EventBus
- * @name .#login
- *
- * @param {string} username credential's username
- * @param {string} password credential's password
- * @param {function=} replyHandler optional callback
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf vertx.EventBus
  * @name .#send
  *
  * @param {string} address target address
@@ -195,7 +184,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * @param {boolean} [immediately=false] optionally enforce a reconnect asap instead of using the timeout
    */
   reconnect(immediately = false) {
-    if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
+    if (this.instance && this.instance.state === this.EventBus.OPEN) {
       if (immediately) {
         this.disconnectTimeoutEnabled = false;
       }
@@ -222,33 +211,6 @@ export default class EventBusAdapter extends BaseAdapter {
   close() {
     if (this.instance) {
       this.instance.close();
-    }
-  }
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBus
-   * @name .#login
-   *
-   * @description
-   * Sends a login request against the vertxbus
-   *
-   * See also:
-   * - {@link vertx.EventBus#methods_login vertx.EventBus.login()}
-   *
-   * @param {string} username credential's username
-   * @param {string} password credential's password
-   * @param {function=} replyHandler optional callback
-   */
-  login(username, password, replyHandler) {
-    if (this.instance) {
-      if (!this.instance.login) {
-        this.$log.error('[Vert.x EB Stub] Attempted to call vertx.EventBus.login(), but that was not found. Are you using v3 already? Have a look at vertx.EventBusServiceProvider.useLoginInterceptor');
-        replyHandler();
-        return;
-      }
-      this.instance.login(username, password, replyHandler);
     }
   }
 
@@ -339,7 +301,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * @param {function} handler callback handler to be removed
    */
   unregisterHandler(address, handler) {
-    if (this.instance && this.instance.readyState() === this.EventBus.OPEN) {
+    if (this.instance && this.instance.state === this.EventBus.OPEN) {
       this.instance.unregisterHandler(address, handler);
     }
   }
@@ -360,10 +322,14 @@ export default class EventBusAdapter extends BaseAdapter {
    */
   readyState() {
     if (this.instance) {
-      return this.instance.readyState();
+      return this.instance.state;
     } else {
       return this.EventBus.CLOSED;
     }
+  }
+
+  get state() {
+    return this.readyState();
   }
 
   // private

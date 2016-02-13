@@ -1,12 +1,16 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
 /* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
+var EventBus = require('./../../../bower_components/vertx3-eventbus-client/vertx-eventbus.js');
+var SockJS = require('sockjs-client');
+
 describe('integration of module::vertxEventBusService', function () {
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
     $provide.value('$log', window.console);
+    $provide.value('__knalli__angularVertxbus__EventBus', EventBus);
   }));
 
   it('should have vertxEventBusService', angular.mock.inject(function (vertxEventBusService) {
@@ -242,102 +246,6 @@ describe('integration of module::vertxEventBusService', function () {
       });
     });
 
-    describe('should broadcast event', function () {
-      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
-
-      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
-        vertxEventBusServiceProvider.useMessageBuffer(0);
-        vertxEventBusServiceProvider.configureLoginInterceptor('vertx.basicauthmanager.login');
-      }));
-
-      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
-        vertxEventBus = _vertxEventBus_;
-        vertxEventBusService = _vertxEventBusService_;
-        $rootScope = _$rootScope_;
-        $timeout = _$timeout_;
-        $log = _$log_;
-        vertxEventBus.readyState = function () {
-          return vertxEventBus.EventBus.OPEN;
-        };
-      }));
-
-      it('"system connected"', function (done) {
-        $rootScope.$on('vertx-eventbus.system.connected', function () {
-          result = true;
-          done();
-        });
-        setTimeout(function () {
-          expect(result).to.be(true);
-        }, 1000);
-      });
-
-      it('"system login succeeded"', function (done) {
-        var result;
-        $rootScope.$on('vertx-eventbus.system.login.succeeded', function () {
-          result = true;
-          done();
-        });
-        setTimeout(function () {
-          vertxEventBusService.login('username', 'password');
-          setTimeout(function () {
-            expect(result).to.be(true);
-          }, 1000);
-        }, 1000);
-      });
-
-      it('"system login failed"', function (done) {
-        var result;
-        SockJS.currentMockInstance.nextLoginState = false;
-        $rootScope.$on('vertx-eventbus.system.login.failed', function () {
-          result = true;
-          SockJS.currentMockInstance.nextLoginState = true;
-          done();
-        });
-        setTimeout(function () {
-          vertxEventBusService.login('username', 'password');
-          setTimeout(function () {
-            expect(result).to.be(true);
-          }, 1000);
-        }, 1000);
-      });
-    });
-
-    describe('should not send message', function () {
-      var vertxEventBus, vertxEventBusService, $rootScope, $timeout, $log, result;
-
-      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusProvider, vertxEventBusServiceProvider) {
-        vertxEventBusServiceProvider.useMessageBuffer(0);
-        vertxEventBusServiceProvider.requireLogin(true);
-      }));
-
-      beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$rootScope_, _$timeout_, _$log_) {
-        vertxEventBus = _vertxEventBus_;
-        vertxEventBusService = _vertxEventBusService_;
-        $rootScope = _$rootScope_;
-        $timeout = _$timeout_;
-        $log = _$log_;
-        SockJS.currentMockInstance.$log = $log;
-        vertxEventBus.readyState = function () {
-          return vertxEventBus.EventBus.OPEN;
-        };
-        vertxEventBus.send = function (address, message, replyHandler) {
-          $log.debug('XY', address, message, replyHandler);
-          result = true;
-        };
-      }));
-
-      it('when login is required', function (done) {
-        setTimeout(function () {
-          vertxEventBusService.send('xyz', 'blabla');
-        }, 500);
-        setTimeout(function () {
-          // should not be true (because this would mean the message was sent)
-          expect(result).to.be(undefined);
-          done();
-        }, 1000);
-      });
-    });
-
     describe('when the service is not connected correctly (stalled connection)', function () {
       var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
 
@@ -565,8 +473,7 @@ describe('integration of module::vertxEventBusService', function () {
             address : 'xyz',
             body : {
               data : '1x'
-            },
-            replyAddress : undefined
+            }
           })
         });
         expect(abcCalled).to.be(undefined);

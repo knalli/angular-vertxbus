@@ -194,8 +194,8 @@ export default class EventBusDelegate extends BaseDelegate {
     if (this.options.debugEnabled) {
       this.$log.debug(`[Vert.x EB Service] Register handler for ${address}`);
     }
-    var callbackWrapper = (message, replyTo) => {
-      callback(message, replyTo);
+    var callbackWrapper = (err, {body}, replyTo) => {
+      callback(body, replyTo);
       this.$rootScope.$digest();
     };
     callbackWrapper.displayName = `${moduleName}.service.delegate.live.registerHandler.callbackWrapper`;
@@ -291,54 +291,6 @@ export default class EventBusDelegate extends BaseDelegate {
    * @ngdoc method
    * @module knalli.angular-vertxbus
    * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#login
-   *
-   * @description
-   * Sends a login request.
-   *
-   * See also
-   * - {@link knalli.angular-vertxbus.vertxEventBus#methods_login vertxEventBus.login()}
-   *
-   * @param {string} username credential's username
-   * @param {string} password credential's password
-   * @param {number=} [timeout=5000] timeout
-   * @returns {object} promise
-   */
-  login(username = this.options.username, password = this.options.password, timeout = 5000) {
-    let deferred = this.$q.defer();
-    let next = (reply) => {
-      reply = reply || {};
-      if (reply.status === 'ok') {
-        this.states.validSession = true;
-        deferred.resolve(reply);
-        this.$rootScope.$broadcast(`${this.options.prefix}system.login.succeeded`, {status: reply.status});
-      } else {
-        this.states.validSession = false;
-        deferred.reject(reply);
-        this.$rootScope.$broadcast(`${this.options.prefix}system.login.failed`, {status: reply.status});
-      }
-    };
-    next.displayName = `${moduleName}.service.delegate.live.login.next`;
-
-    if (this.loginInterceptor) {
-      // reference to a direct sender
-      let send = (address, message, reply) => {
-        this.eventBus.send(address, message, reply);
-      };
-      this.loginInterceptor(send, username, password, next);
-    } else {
-      // Legacy way like Vert.x 2
-      this.eventBus.login(username, password, next);
-    }
-
-    this.$interval((() => deferred.reject()), timeout, 1);
-    return deferred.promise;
-  }
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
    * @name .#ensureOpenConnection
    *
    * @description
@@ -413,7 +365,7 @@ export default class EventBusDelegate extends BaseDelegate {
   getConnectionState(immediate) {
     if (this.options.enabled) {
       if (immediate) {
-        this.connectionState = this.eventBus.readyState();
+        this.connectionState = this.eventBus.state;
       }
     } else {
       this.connectionState = this.eventBus.EventBus.CLOSED;

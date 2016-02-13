@@ -86,18 +86,19 @@ class SockJS {
     };
   }
 
-;
-
   _buildLoginReplyAsFail(username, password) {
     return {
       status : 'fail'
     };
   }
 
-;
+  onmessage() {
+    console.warn('No SockJS.onmessage() defined!');
+  }
+
 }
 
 SockJS.mockInstances = [];
 SockJS.currentMockInstance = null;
 
-global.SockJS = SockJS; // mocks global available SockJS
+module.exports = SockJS;

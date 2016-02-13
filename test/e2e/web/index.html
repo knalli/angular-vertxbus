@@ -6,24 +6,12 @@
 <body ng-app="app">
 
   <div ng-controller="MyController">
-    <form ng-init="register={username:'invalid-username',password:'password'}" ng-submit="login(register.username, register.password)">
-      <label for="username">Username</label>
-      <input type="text" id="username" ng-model="register.username"/>
-      <label for="password">Password</label>
-      <input type="password" id="password" ng-model="register.password"/>
-      <input type="submit" value="Login" >
-      <input type="button" value="Demo: Valid user login" ng-click="login('valid', register.password)">
-      <br><br>
+    <form>
       <input type="button" value="Register for TimeService" ng-click="registerTimeService()">
       <input type="button" value="Deregister for TimeService" ng-click="deregisterTimeService()" ng-disabled="!timeServiceActive">
       <input type="button" value="Deregister for TimeService (2x)" ng-click="deregisterTimeService2x()" ng-disabled="!timeServiceActive">
       <input type="text" size="50" disabled ng-model="currentDateTime">
     </form>
-  </div>
-
-  <div>
-    <span ng-show="sessionIsValid">Valid Session</span>
-    <span ng-hide="sessionIsValid">Invalid Session</span>
   </div>
 
   <fieldset>
@@ -43,7 +31,7 @@
   </fieldset>
 
   <script src="bower_components/sockjs-client/dist/sockjs.js"></script>
-  <script src="bower_components/vertx3-eventbus-client/vertxbus.js"></script>
+  <script src="bower_components/vertx3-eventbus-client/vertx-eventbus.js"></script>
   <script src="bower_components/angular/angular.js"></script>
   <script src="dist/angular-vertxbus.js"></script>
   <script src="app.js"></script>
