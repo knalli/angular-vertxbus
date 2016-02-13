@@ -64,7 +64,7 @@ angular.module('app', ['knalli.angular-vertxbus'])
 ### Consume messages
 
 ```javascript
-vertxEventBusService.on('myaddress', function(message) {
+vertxEventBusService.on('myaddress', function(err, message) {
   console.log('Received a message: ', message);
 });
 ```
@@ -94,6 +94,15 @@ vertxEventBusService.send('myaddress', {data: 123}, {timeout: 3000})
   .catch(function() {
     console.warn('No message within 3 seconds');
   });
+
+// If the reply is an error, this will be the payload
+vertxEventBusService.send('myaddress', {data: 123})
+  .then(function(reply) {
+    console.log('A reply received: ', reply);
+  })
+  .catch(function(err) {
+    console.warn(err);
+  });
 ```
 
 ## Advanced configuration
@@ -119,40 +128,41 @@ and [vertxEventBusServiceProvider](https://knalli.github.io/angular-vertxbus.doc
 
 The module contains two items: the stub holder `vertxEventBus` for the Vert.x EventBus and a more comfortbale high level service `vertxEventBusService`.
 
-*The stub* is required because the Vert.x Event Bus cannot handle a reconnect. The reason is the underlaying SockJS which cannot handle a reconnect, too. A reconnect means to create a new instance of `SockJS`, therefore a new instanve of `vertx.EventBus`. The stub ensures only one single instance exists. Otherwise a global module was not possible.
+*The stub* is required because the Vert.x Event Bus cannot handle a reconnect. The reason is the underlaying SockJS which cannot handle a reconnect, too. A reconnect means to create a new instance of `SockJS`, therefore a new instance of `EventBus`. The stub ensures only one single instance exists. Otherwise a global module was not possible.
 
-More or less the stub supports the same API calls like the original `vertx.EventBus`.
+More or less the stub supports the same API calls like the original `EventBus`.
 
 Based on the stub, the *high level service* `vertxEventBusService` detects disconnects, handles reconnects and ensures re-registrations of subscriptions. Furthermore, the service provides some neat aliases for the usage of handlers.
 
 ```javascript
-// Same as vertx.EventBus.registerHandler()
+// Same as EventBus.registerHandler()
 service.registerHandler('myaddress', callback);
 service.on('myaddress', callback);
 service.addListener('myaddress', callback);
 
-// Same as vertx.EventBus.unregisterHandler()
+// Same as EventBus.unregisterHandler()
 service.unregisterHandler('myaddress', callback);
 service.un('myaddress', callback);
 service.removeListener('myaddress', callback);
 
-// Same as vertx.EventBus.send()
+// Same as EventBus.send()
 service.send('myaddress', data)
 
-// Same as vertx.EventBus.publish
+// Same as EventBus.publish
 service.publish('myaddress', data)
 service.emit('myaddress', data)
 
-// Same as vertx.readyState()
+// Same as EventBus.readyState()
 service.readyState()
 ```
 
 In addition to this, when sending a message with an expected reply:
 
 ```javascript
-// Same as vertx.EventBus.send() but with a promise
+// Same as EventBus.send() but with a promise
 service.send('myaddress', data)
-  .then(function(replyMessage) {})
+  .then(function(reply) {})
+  .catch(function(err) {})
 ```
 
 For each connect or disconnect, a global broadcast will be emitted (on `$rootScope` with `'vertx-eventbus.system.connected'`, `'vertx-eventbus.system.disconnected'`)

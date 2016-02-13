@@ -6,23 +6,23 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 /**
  * @ngdoc service
  * @module vertx
- * @name vertx.EventBus
+ * @name EventBus
  *
  * @description
- * This is the interface of `vertx.EventBus`. It is not included.
+ * This is the interface of `EventBus`. It is not included.
  */
 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#close
  */
 
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#send
  *
  * @param {string} address target address
@@ -33,7 +33,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#publish
  *
  * @param {string} address target address
@@ -43,7 +43,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#registerHandler
  *
  * @param {string} address target address
@@ -53,7 +53,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
+ * @methodOf EventBus
  * @name .#unregisterHandler
  *
  * @param {string} address target address
@@ -63,10 +63,28 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 /**
  * @ngdoc method
  * @module vertx
- * @methodOf vertx.EventBus
- * @name .#readyState
+ * @propertyOf EventBus
+ * @name .#onopen
  *
- * @returns {number} value of vertxbus connection states
+ * Defines the callback called on opening the connection.
+ */
+
+/**
+ * @ngdoc method
+ * @module vertx
+ * @propertyOf EventBus
+ * @name .#onclose
+ *
+ * Defines the callback called on closing the connection.
+ */
+
+/**
+ * @ngdoc method
+ * @module vertx
+ * @propertyOf EventBus
+ * @name .#onerror
+ *
+ * Defines the callback called on any error.
  */
 
 export default class EventBusAdapter extends BaseAdapter {
@@ -212,7 +230,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * Note: If automatic reconnection is active, a new connection will be established after the {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useReconnect reconnect timeout}.
    *
    * See also:
-   * - {@link vertx.EventBus#methods_close vertx.EventBus.close()}
+   * - {@link EventBus#methods_close EventBus.close()}
    */
   close() {
     if (this.instance) {
@@ -230,7 +248,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * Sends a message
    *
    * See also:
-   * - {@link vertx.EventBus#methods_send vertx.EventBus.send()}
+   * - {@link EventBus#methods_send EventBus.send()}
    *
    * @param {string} address target address
    * @param {object} message payload message
@@ -253,7 +271,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * Publishes a message
    *
    * See also:
-   * - {@link vertx.EventBus#methods_publish vertx.EventBus.publish()}
+   * - {@link EventBus#methods_publish EventBus.publish()}
    *
    * @param {string} address target address
    * @param {object} message payload message
@@ -274,7 +292,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * Registers a listener
    *
    * See also:
-   * - {@link vertx.EventBus#methods_registerHandler vertx.EventBus.registerHandler()}
+   * - {@link EventBus#methods_registerHandler EventBus.registerHandler()}
    *
    * @param {string} address target address
    * @param {function} handler callback handler
@@ -301,7 +319,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * Removes a registered a listener
    *
    * See also:
-   * - {@link vertx.EventBus#methods_unregisterHandler vertx.EventBus.unregisterHandler()}
+   * - {@link EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
    *
    * @param {string} address target address
    * @param {function} handler callback handler to be removed
@@ -321,10 +339,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * @description
    * Returns the current connection state
    *
-   * See also:
-   * - {@link vertx.EventBus#methods_readyState vertx.EventBus.readyState()}
-   *
-   * @returns {number} value of vertxbus connection states
+   * @returns {number} value of vertx-eventbus connection states
    */
   readyState() {
     if (this.instance) {
