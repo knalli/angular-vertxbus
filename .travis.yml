@@ -9,7 +9,7 @@ addons:
 
 before_install:
   - npm install -qg npm
-  - npm install -qg grunt-cli codeclimate-test-reporter
+  - npm install -qg codeclimate-test-reporter
 
 before_script:
   - export DISPLAY=:99.0

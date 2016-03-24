@@ -1,16 +1,21 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
 /* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
-var EventBus = require('./../../../bower_components/vertx3-eventbus-client/vertx-eventbus.js');
 var SockJS = require('sockjs-client');
+require('../../../src/module.js');
 
 describe('integration of module::vertxEventBus', function () {
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
-    $provide.value('$log', window.console);
-    $provide.value('__knalli__angularVertxbus__EventBus', EventBus);
+    $provide.value('$log', {
+      log: function () {},
+      debug: function () {},
+      info: function () {},
+      warn: function () {},
+      error: function () {}
+    });
   }));
 
   it('should have vertxEventBus', angular.mock.inject(function (vertxEventBus) {

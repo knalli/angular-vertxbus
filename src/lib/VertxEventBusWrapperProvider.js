@@ -2,6 +2,8 @@ import EventBusAdapter from './adapter/EventBusAdapter';
 import NoopAdapter from './adapter/NoopAdapter';
 import ConnectionConfigHolder from './support/ConnectionConfigHolder';
 
+import EventBus from 'vertx-eventbus';
+
 /**
  * @ngdoc service
  * @module knalli.angular-vertxbus
@@ -201,12 +203,9 @@ let VertxEventBusWrapperProvider = function () {
    * @requires $log
    */
   /* @ngInject */
-  this.$get = ($timeout, $log, $q, $injector) => {
+  this.$get = ($timeout, $log, $q) => {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, DEFAULTS, options);
-    if (!window.EventBus && $injector.has('__knalli__angularVertxbus__EventBus')) {
-      window.EventBus = $injector.get('__knalli__angularVertxbus__EventBus');
-    }
     if (instanceOptions.enabled && EventBus) {
       if (instanceOptions.debugEnabled) {
         $log.debug('[Vert.x EB Stub] Enabled');
