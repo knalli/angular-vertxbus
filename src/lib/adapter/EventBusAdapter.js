@@ -253,12 +253,18 @@ export default class EventBusAdapter extends BaseAdapter {
    *
    * @param {string} address target address
    * @param {object} message payload message
+   * @param {object=} headers
    * @param {function=} replyHandler optional callback
    * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
    */
-  send(address, message, replyHandler, failureHandler) {
+  send(address, message, headers, replyHandler, failureHandler) {
     if (this.instance) {
-      this.instance.send(address, message, replyHandler, failureHandler);
+      if (angular.isFunction(headers)) {
+        failureHandler = replyHandler;
+        replyHandler = headers;
+        headers = undefined;
+      }
+      this.instance.send(address, message, headers, replyHandler, failureHandler);
     }
   }
 
@@ -276,10 +282,11 @@ export default class EventBusAdapter extends BaseAdapter {
    *
    * @param {string} address target address
    * @param {object} message payload message
+   * @param {object=} headers optional headers
    */
-  publish(address, message) {
+  publish(address, message, headers) {
     if (this.instance) {
-      this.instance.publish(address, message);
+      this.instance.publish(address, message, headers);
     }
   }
 
@@ -296,14 +303,19 @@ export default class EventBusAdapter extends BaseAdapter {
    * - {@link global.EventBus#methods_registerHandler EventBus.registerHandler()}
    *
    * @param {string} address target address
+   * @param {object} headers optional headers
    * @param {function} handler callback handler
    */
-  registerHandler(address, handler) {
+  registerHandler(address, headers, handler) {
     if (this.instance) {
-      this.instance.registerHandler(address, handler);
+      if (angular.isFunction(headers) && !handler) {
+        handler = headers;
+        headers = undefined;
+      }
+      this.instance.registerHandler(address, headers, handler);
       // and return the deregister callback
       let deconstructor = () => {
-        this.unregisterHandler(address, handler);
+        this.unregisterHandler(address, headers, handler);
       };
       deconstructor.displayName = `${moduleName}.wrapper.eventbus.registerHandler.deconstructor`;
       return deconstructor;
@@ -323,11 +335,16 @@ export default class EventBusAdapter extends BaseAdapter {
    * - {@link global.EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
    *
    * @param {string} address target address
+   * @param {object} headers optional headers
    * @param {function} handler callback handler to be removed
    */
-  unregisterHandler(address, handler) {
+  unregisterHandler(address, headers, handler) {
     if (this.instance && this.instance.state === this.EventBus.OPEN) {
-      this.instance.unregisterHandler(address, handler);
+      if (angular.isFunction(headers) && !handler) {
+        handler = headers;
+        headers = undefined;
+      }
+      this.instance.unregisterHandler(address, headers, handler);
     }
   }
 

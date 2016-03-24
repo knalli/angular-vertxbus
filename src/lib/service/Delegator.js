@@ -15,22 +15,27 @@ export default class Delegator {
     for (let address in this.handlers) {
       let callbacks = this.handlers[address];
       if (callbacks && callbacks.length) {
-        for (let callback of callbacks) {
-          this.delegate.registerHandler(address, callback);
+        for (let {headers, callback} of callbacks) {
+          this.delegate.registerHandler(address, headers, callback);
         }
       }
     }
   }
 
-  registerHandler(address, callback) {
+  registerHandler(address, headers, callback) {
+    if (angular.isFunction(headers) && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
     if (!this.handlers[address]) {
       this.handlers[address] = [];
     }
-    this.handlers[address].push(callback);
+    var handler = {headers, callback};
+    this.handlers[address].push(handler);
     var unregisterFn = null;
     if (this.delegate.isConnectionOpen()) {
-      this.delegate.registerHandler(address, callback);
-      unregisterFn = () => this.delegate.unregisterHandler(address, callback);
+      this.delegate.registerHandler(address, headers, callback);
+      unregisterFn = () => this.delegate.unregisterHandler(address, headers, callback);
     }
     // and return the deregister callback
     var deconstructor = () => {
@@ -40,7 +45,7 @@ export default class Delegator {
       }
       // Remove from internal map
       if (this.handlers[address]) {
-        var index = this.handlers[address].indexOf(callback);
+        var index = this.handlers[address].indexOf(handler);
         if (index > -1) {
           this.handlers[address].splice(index, 1);
         }
@@ -52,17 +57,29 @@ export default class Delegator {
     deconstructor.displayName = `${moduleName}.service.registerHandler.deconstructor`;
     return deconstructor;
   }
-  on(address, callback) {
-    return this.registerHandler(address, callback);
+  on(address, headers, callback) {
+    if (typeof headers === 'function' && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
+    return this.registerHandler(address, headers, callback);
   }
-  addListener(address, callback) {
-    return this.registerHandler(address, callback);
+  addListener(address, headers, callback) {
+    if (typeof headers === 'function' && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
+    return this.registerHandler(address, headers, callback);
   }
 
-  unregisterHandler(address, callback) {
+  unregisterHandler(address, headers, callback) {
+    if (typeof headers === 'function' && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
     // Remove from internal map
     if (this.handlers[address]) {
-      var index = this.handlers[address].indexOf(callback);
+      var index = this.handlers[address].indexOf({headers, callback});
       if (index > -1) {
         this.handlers[address].splice(index, 1);
       }
@@ -72,14 +89,22 @@ export default class Delegator {
     }
     // Remove from real instance
     if (this.delegate.isConnectionOpen()) {
-      this.delegate.unregisterHandler(address, callback);
+      this.delegate.unregisterHandler(address, headers, callback);
     }
   }
-  un(address, callback) {
-    return this.unregisterHandler(address, callback);
+  un(address, headers, callback) {
+    if (typeof headers === 'function' && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
+    return this.unregisterHandler(address, headers, callback);
   }
-  removeListener(address, callback) {
-    return this.unregisterHandler(address, callback);
+  removeListener(address, headers, callback) {
+    if (typeof headers === 'function' && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
+    return this.unregisterHandler(address, headers, callback);
   }
 
   send(address, message, options = {}) {
