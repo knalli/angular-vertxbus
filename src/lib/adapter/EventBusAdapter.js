@@ -27,6 +27,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {object} message payload message
+ * @param {object=} headers headers
  * @param {function=} replyHandler optional callback
  * @param {function=} failureHandler optional callback
  */
@@ -39,6 +40,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {object} message payload message
+ * @param {object=} headers headers
  */
 
 /**
@@ -49,6 +51,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {function} handler callback handler
+ * @param {object=} headers headers
  */
 
 /**
@@ -59,6 +62,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {function} handler callback handler to be removed
+ * @param {object=} headers headers
  */
 
 /**
