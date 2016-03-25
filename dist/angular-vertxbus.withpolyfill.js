@@ -1,54 +1,87 @@
-/*! angular-vertxbus - v4.0.0 - 2016-02-13
-* http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2016 Jan Philipp; Licensed MIT */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (global){
+/* eslint max-len: 0 */
+
 "use strict";
 
-_dereq_(189);
+_dereq_(289);
 
 _dereq_(2);
+
+// Should be removed in the next major release:
+
+_dereq_(3);
 
 if (global._babelPolyfill) {
   throw new Error("only one instance of babel-polyfill is allowed");
 }
 global._babelPolyfill = true;
+
+var DEFINE_PROPERTY = "defineProperty";
+function define(O, key, value) {
+  O[key] || Object[DEFINE_PROPERTY](O, key, {
+    writable: true,
+    configurable: true,
+    value: value
+  });
+}
+
+define(String.prototype, "padLeft", "".padStart);
+define(String.prototype, "padRight", "".padEnd);
+
+"pop,reverse,shift,keys,values,entries,indexOf,every,some,forEach,map,filter,find,findIndex,includes,join,slice,concat,push,splice,unshift,sort,lastIndexOf,reduce,reduceRight,copyWithin,fill".split(",").forEach(function (key) {
+  [][key] && define(Array, key, Function.call.bind([][key]));
+});
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"189":189,"2":2}],2:[function(_dereq_,module,exports){
-module.exports = _dereq_(190);
-},{"190":190}],3:[function(_dereq_,module,exports){
+},{"2":2,"289":289,"3":3}],2:[function(_dereq_,module,exports){
+module.exports = _dereq_(290);
+},{"290":290}],3:[function(_dereq_,module,exports){
+_dereq_(117);
+module.exports = _dereq_(23).RegExp.escape;
+},{"117":117,"23":23}],4:[function(_dereq_,module,exports){
 module.exports = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
   return it;
 };
-},{}],4:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
+var cof = _dereq_(18);
+module.exports = function(it, msg){
+  if(typeof it != 'number' && cof(it) != 'Number')throw TypeError(msg);
+  return +it;
+};
+},{"18":18}],6:[function(_dereq_,module,exports){
 // 22.1.3.31 Array.prototype[@@unscopables]
-var UNSCOPABLES = _dereq_(84)('unscopables')
+var UNSCOPABLES = _dereq_(114)('unscopables')
   , ArrayProto  = Array.prototype;
-if(ArrayProto[UNSCOPABLES] == undefined)_dereq_(32)(ArrayProto, UNSCOPABLES, {});
+if(ArrayProto[UNSCOPABLES] == undefined)_dereq_(39)(ArrayProto, UNSCOPABLES, {});
 module.exports = function(key){
   ArrayProto[UNSCOPABLES][key] = true;
 };
-},{"32":32,"84":84}],5:[function(_dereq_,module,exports){
-var isObject = _dereq_(39);
+},{"114":114,"39":39}],7:[function(_dereq_,module,exports){
+module.exports = function(it, Constructor, name, forbiddenField){
+  if(!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)){
+    throw TypeError(name + ': incorrect invocation!');
+  } return it;
+};
+},{}],8:[function(_dereq_,module,exports){
+var isObject = _dereq_(48);
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
-},{"39":39}],6:[function(_dereq_,module,exports){
+},{"48":48}],9:[function(_dereq_,module,exports){
 // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
 'use strict';
-var toObject = _dereq_(81)
-  , toIndex  = _dereq_(77)
-  , toLength = _dereq_(80);
+var toObject = _dereq_(108)
+  , toIndex  = _dereq_(104)
+  , toLength = _dereq_(107);
 
 module.exports = [].copyWithin || function copyWithin(target/*= 0*/, start/*= 0, end = @length*/){
   var O     = toObject(this)
     , len   = toLength(O.length)
     , to    = toIndex(target, len)
     , from  = toIndex(start, len)
-    , $$    = arguments
-    , end   = $$.length > 2 ? $$[2] : undefined
+    , end   = arguments.length > 2 ? arguments[2] : undefined
     , count = Math.min((end === undefined ? len : toIndex(end, len)) - from, len - to)
     , inc   = 1;
   if(from < to && to < from + count){
@@ -63,29 +96,37 @@ module.exports = [].copyWithin || function copyWithin(target/*= 0*/, start/*= 0,
     from += inc;
   } return O;
 };
-},{"77":77,"80":80,"81":81}],7:[function(_dereq_,module,exports){
+},{"104":104,"107":107,"108":108}],10:[function(_dereq_,module,exports){
 // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
 'use strict';
-var toObject = _dereq_(81)
-  , toIndex  = _dereq_(77)
-  , toLength = _dereq_(80);
-module.exports = [].fill || function fill(value /*, start = 0, end = @length */){
+var toObject = _dereq_(108)
+  , toIndex  = _dereq_(104)
+  , toLength = _dereq_(107);
+module.exports = function fill(value /*, start = 0, end = @length */){
   var O      = toObject(this)
     , length = toLength(O.length)
-    , $$     = arguments
-    , $$len  = $$.length
-    , index  = toIndex($$len > 1 ? $$[1] : undefined, length)
-    , end    = $$len > 2 ? $$[2] : undefined
+    , aLen   = arguments.length
+    , index  = toIndex(aLen > 1 ? arguments[1] : undefined, length)
+    , end    = aLen > 2 ? arguments[2] : undefined
     , endPos = end === undefined ? length : toIndex(end, length);
   while(endPos > index)O[index++] = value;
   return O;
 };
-},{"77":77,"80":80,"81":81}],8:[function(_dereq_,module,exports){
+},{"104":104,"107":107,"108":108}],11:[function(_dereq_,module,exports){
+var forOf = _dereq_(36);
+
+module.exports = function(iter, ITERATOR){
+  var result = [];
+  forOf(iter, false, result.push, result, ITERATOR);
+  return result;
+};
+
+},{"36":36}],12:[function(_dereq_,module,exports){
 // false -> Array#indexOf
 // true  -> Array#includes
-var toIObject = _dereq_(79)
-  , toLength  = _dereq_(80)
-  , toIndex   = _dereq_(77);
+var toIObject = _dereq_(106)
+  , toLength  = _dereq_(107)
+  , toIndex   = _dereq_(104);
 module.exports = function(IS_INCLUDES){
   return function($this, el, fromIndex){
     var O      = toIObject($this)
@@ -102,7 +143,7 @@ module.exports = function(IS_INCLUDES){
     } return !IS_INCLUDES && -1;
   };
 };
-},{"77":77,"79":79,"80":80}],9:[function(_dereq_,module,exports){
+},{"104":104,"106":106,"107":107}],13:[function(_dereq_,module,exports){
 // 0 -> Array#forEach
 // 1 -> Array#map
 // 2 -> Array#filter
@@ -110,25 +151,26 @@ module.exports = function(IS_INCLUDES){
 // 4 -> Array#every
 // 5 -> Array#find
 // 6 -> Array#findIndex
-var ctx      = _dereq_(18)
-  , IObject  = _dereq_(35)
-  , toObject = _dereq_(81)
-  , toLength = _dereq_(80)
-  , asc      = _dereq_(10);
-module.exports = function(TYPE){
+var ctx      = _dereq_(24)
+  , IObject  = _dereq_(44)
+  , toObject = _dereq_(108)
+  , toLength = _dereq_(107)
+  , asc      = _dereq_(15);
+module.exports = function(TYPE, $create){
   var IS_MAP        = TYPE == 1
     , IS_FILTER     = TYPE == 2
     , IS_SOME       = TYPE == 3
     , IS_EVERY      = TYPE == 4
     , IS_FIND_INDEX = TYPE == 6
-    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX;
+    , NO_HOLES      = TYPE == 5 || IS_FIND_INDEX
+    , create        = $create || asc;
   return function($this, callbackfn, that){
     var O      = toObject($this)
       , self   = IObject(O)
       , f      = ctx(callbackfn, that, 3)
       , length = toLength(self.length)
       , index  = 0
-      , result = IS_MAP ? asc($this, length) : IS_FILTER ? asc($this, 0) : undefined
+      , result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined
       , val, res;
     for(;length > index; index++)if(NO_HOLES || index in self){
       val = self[index];
@@ -146,11 +188,40 @@ module.exports = function(TYPE){
     return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
   };
 };
-},{"10":10,"18":18,"35":35,"80":80,"81":81}],10:[function(_dereq_,module,exports){
+},{"107":107,"108":108,"15":15,"24":24,"44":44}],14:[function(_dereq_,module,exports){
+var aFunction = _dereq_(4)
+  , toObject  = _dereq_(108)
+  , IObject   = _dereq_(44)
+  , toLength  = _dereq_(107);
+
+module.exports = function(that, callbackfn, aLen, memo, isRight){
+  aFunction(callbackfn);
+  var O      = toObject(that)
+    , self   = IObject(O)
+    , length = toLength(O.length)
+    , index  = isRight ? length - 1 : 0
+    , i      = isRight ? -1 : 1;
+  if(aLen < 2)for(;;){
+    if(index in self){
+      memo = self[index];
+      index += i;
+      break;
+    }
+    index += i;
+    if(isRight ? index < 0 : length <= index){
+      throw TypeError('Reduce of empty array with no initial value');
+    }
+  }
+  for(;isRight ? index >= 0 : length > index; index += i)if(index in self){
+    memo = callbackfn(memo, self[index], index, O);
+  }
+  return memo;
+};
+},{"107":107,"108":108,"4":4,"44":44}],15:[function(_dereq_,module,exports){
 // 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-var isObject = _dereq_(39)
-  , isArray  = _dereq_(37)
-  , SPECIES  = _dereq_(84)('species');
+var isObject = _dereq_(48)
+  , isArray  = _dereq_(46)
+  , SPECIES  = _dereq_(114)('species');
 module.exports = function(original, length){
   var C;
   if(isArray(original)){
@@ -163,62 +234,77 @@ module.exports = function(original, length){
     }
   } return new (C === undefined ? Array : C)(length);
 };
-},{"37":37,"39":39,"84":84}],11:[function(_dereq_,module,exports){
+},{"114":114,"46":46,"48":48}],16:[function(_dereq_,module,exports){
+'use strict';
+var aFunction  = _dereq_(4)
+  , isObject   = _dereq_(48)
+  , invoke     = _dereq_(43)
+  , arraySlice = [].slice
+  , factories  = {};
+
+var construct = function(F, len, args){
+  if(!(len in factories)){
+    for(var n = [], i = 0; i < len; i++)n[i] = 'a[' + i + ']';
+    factories[len] = Function('F,a', 'return new F(' + n.join(',') + ')');
+  } return factories[len](F, args);
+};
+
+module.exports = Function.bind || function bind(that /*, args... */){
+  var fn       = aFunction(this)
+    , partArgs = arraySlice.call(arguments, 1);
+  var bound = function(/* args... */){
+    var args = partArgs.concat(arraySlice.call(arguments));
+    return this instanceof bound ? construct(fn, args.length, args) : invoke(fn, args, that);
+  };
+  if(isObject(fn.prototype))bound.prototype = fn.prototype;
+  return bound;
+};
+},{"4":4,"43":43,"48":48}],17:[function(_dereq_,module,exports){
 // getting tag from 19.1.3.6 Object.prototype.toString()
-var cof = _dereq_(12)
-  , TAG = _dereq_(84)('toStringTag')
+var cof = _dereq_(18)
+  , TAG = _dereq_(114)('toStringTag')
   // ES3 wrong here
   , ARG = cof(function(){ return arguments; }()) == 'Arguments';
+
+// fallback for IE11 Script Access Denied error
+var tryGet = function(it, key){
+  try {
+    return it[key];
+  } catch(e){ /* empty */ }
+};
 
 module.exports = function(it){
   var O, T, B;
   return it === undefined ? 'Undefined' : it === null ? 'Null'
     // @@toStringTag case
-    : typeof (T = (O = Object(it))[TAG]) == 'string' ? T
+    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
     // builtinTag case
     : ARG ? cof(O)
     // ES3 arguments fallback
     : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
 };
-},{"12":12,"84":84}],12:[function(_dereq_,module,exports){
+},{"114":114,"18":18}],18:[function(_dereq_,module,exports){
 var toString = {}.toString;
 
 module.exports = function(it){
   return toString.call(it).slice(8, -1);
 };
-},{}],13:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 'use strict';
-var $            = _dereq_(47)
-  , hide         = _dereq_(32)
-  , redefineAll  = _dereq_(61)
-  , ctx          = _dereq_(18)
-  , strictNew    = _dereq_(70)
-  , defined      = _dereq_(19)
-  , forOf        = _dereq_(28)
-  , $iterDefine  = _dereq_(43)
-  , step         = _dereq_(45)
-  , ID           = _dereq_(83)('id')
-  , $has         = _dereq_(31)
-  , isObject     = _dereq_(39)
-  , setSpecies   = _dereq_(66)
-  , DESCRIPTORS  = _dereq_(20)
-  , isExtensible = Object.isExtensible || isObject
-  , SIZE         = DESCRIPTORS ? '_s' : 'size'
-  , id           = 0;
-
-var fastKey = function(it, create){
-  // return primitive with prefix
-  if(!isObject(it))return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-  if(!$has(it, ID)){
-    // can't set id to frozen object
-    if(!isExtensible(it))return 'F';
-    // not necessary to add id
-    if(!create)return 'E';
-    // add missing object id
-    hide(it, ID, ++id);
-  // return object id with prefix
-  } return 'O' + it[ID];
-};
+var dP          = _dereq_(66).f
+  , create      = _dereq_(65)
+  , hide        = _dereq_(39)
+  , redefineAll = _dereq_(85)
+  , ctx         = _dereq_(24)
+  , anInstance  = _dereq_(7)
+  , defined     = _dereq_(26)
+  , forOf       = _dereq_(36)
+  , $iterDefine = _dereq_(52)
+  , step        = _dereq_(54)
+  , setSpecies  = _dereq_(90)
+  , DESCRIPTORS = _dereq_(27)
+  , fastKey     = _dereq_(61).fastKey
+  , SIZE        = DESCRIPTORS ? '_s' : 'size';
 
 var getEntry = function(that, key){
   // fast case
@@ -233,11 +319,11 @@ var getEntry = function(that, key){
 module.exports = {
   getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
     var C = wrapper(function(that, iterable){
-      strictNew(that, C, NAME);
-      that._i = $.create(null); // index
-      that._f = undefined;      // first entry
-      that._l = undefined;      // last entry
-      that[SIZE] = 0;           // size
+      anInstance(that, C, NAME, '_i');
+      that._i = create(null); // index
+      that._f = undefined;    // first entry
+      that._l = undefined;    // last entry
+      that[SIZE] = 0;         // size
       if(iterable != undefined)forOf(iterable, IS_MAP, that[ADDER], that);
     });
     redefineAll(C.prototype, {
@@ -272,6 +358,7 @@ module.exports = {
       // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
       // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
       forEach: function forEach(callbackfn /*, that = undefined */){
+        anInstance(this, C, 'forEach');
         var f = ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3)
           , entry;
         while(entry = entry ? entry.n : this._f){
@@ -286,7 +373,7 @@ module.exports = {
         return !!getEntry(this, key);
       }
     });
-    if(DESCRIPTORS)$.setDesc(C.prototype, 'size', {
+    if(DESCRIPTORS)dP(C.prototype, 'size', {
       get: function(){
         return defined(this[SIZE]);
       }
@@ -346,56 +433,52 @@ module.exports = {
     setSpecies(NAME);
   }
 };
-},{"18":18,"19":19,"20":20,"28":28,"31":31,"32":32,"39":39,"43":43,"45":45,"47":47,"61":61,"66":66,"70":70,"83":83}],14:[function(_dereq_,module,exports){
+},{"24":24,"26":26,"27":27,"36":36,"39":39,"52":52,"54":54,"61":61,"65":65,"66":66,"7":7,"85":85,"90":90}],20:[function(_dereq_,module,exports){
 // https://github.com/DavidBruant/Map-Set.prototype.toJSON
-var forOf   = _dereq_(28)
-  , classof = _dereq_(11);
+var classof = _dereq_(17)
+  , from    = _dereq_(11);
 module.exports = function(NAME){
   return function toJSON(){
     if(classof(this) != NAME)throw TypeError(NAME + "#toJSON isn't generic");
-    var arr = [];
-    forOf(this, false, arr.push, arr);
-    return arr;
+    return from(this);
   };
 };
-},{"11":11,"28":28}],15:[function(_dereq_,module,exports){
+},{"11":11,"17":17}],21:[function(_dereq_,module,exports){
 'use strict';
-var hide              = _dereq_(32)
-  , redefineAll       = _dereq_(61)
-  , anObject          = _dereq_(5)
-  , isObject          = _dereq_(39)
-  , strictNew         = _dereq_(70)
-  , forOf             = _dereq_(28)
-  , createArrayMethod = _dereq_(9)
-  , $has              = _dereq_(31)
-  , WEAK              = _dereq_(83)('weak')
-  , isExtensible      = Object.isExtensible || isObject
+var redefineAll       = _dereq_(85)
+  , getWeak           = _dereq_(61).getWeak
+  , anObject          = _dereq_(8)
+  , isObject          = _dereq_(48)
+  , anInstance        = _dereq_(7)
+  , forOf             = _dereq_(36)
+  , createArrayMethod = _dereq_(13)
+  , $has              = _dereq_(38)
   , arrayFind         = createArrayMethod(5)
   , arrayFindIndex    = createArrayMethod(6)
   , id                = 0;
 
-// fallback for frozen keys
-var frozenStore = function(that){
-  return that._l || (that._l = new FrozenStore);
+// fallback for uncaught frozen keys
+var uncaughtFrozenStore = function(that){
+  return that._l || (that._l = new UncaughtFrozenStore);
 };
-var FrozenStore = function(){
+var UncaughtFrozenStore = function(){
   this.a = [];
 };
-var findFrozen = function(store, key){
+var findUncaughtFrozen = function(store, key){
   return arrayFind(store.a, function(it){
     return it[0] === key;
   });
 };
-FrozenStore.prototype = {
+UncaughtFrozenStore.prototype = {
   get: function(key){
-    var entry = findFrozen(this, key);
+    var entry = findUncaughtFrozen(this, key);
     if(entry)return entry[1];
   },
   has: function(key){
-    return !!findFrozen(this, key);
+    return !!findUncaughtFrozen(this, key);
   },
   set: function(key, value){
-    var entry = findFrozen(this, key);
+    var entry = findUncaughtFrozen(this, key);
     if(entry)entry[1] = value;
     else this.a.push([key, value]);
   },
@@ -411,9 +494,9 @@ FrozenStore.prototype = {
 module.exports = {
   getConstructor: function(wrapper, NAME, IS_MAP, ADDER){
     var C = wrapper(function(that, iterable){
-      strictNew(that, C, NAME);
+      anInstance(that, C, NAME, '_i');
       that._i = id++;      // collection id
-      that._l = undefined; // leak store for frozen objects
+      that._l = undefined; // leak store for uncaught frozen objects
       if(iterable != undefined)forOf(iterable, IS_MAP, that[ADDER], that);
     });
     redefineAll(C.prototype, {
@@ -421,42 +504,43 @@ module.exports = {
       // 23.4.3.3 WeakSet.prototype.delete(value)
       'delete': function(key){
         if(!isObject(key))return false;
-        if(!isExtensible(key))return frozenStore(this)['delete'](key);
-        return $has(key, WEAK) && $has(key[WEAK], this._i) && delete key[WEAK][this._i];
+        var data = getWeak(key);
+        if(data === true)return uncaughtFrozenStore(this)['delete'](key);
+        return data && $has(data, this._i) && delete data[this._i];
       },
       // 23.3.3.4 WeakMap.prototype.has(key)
       // 23.4.3.4 WeakSet.prototype.has(value)
       has: function has(key){
         if(!isObject(key))return false;
-        if(!isExtensible(key))return frozenStore(this).has(key);
-        return $has(key, WEAK) && $has(key[WEAK], this._i);
+        var data = getWeak(key);
+        if(data === true)return uncaughtFrozenStore(this).has(key);
+        return data && $has(data, this._i);
       }
     });
     return C;
   },
   def: function(that, key, value){
-    if(!isExtensible(anObject(key))){
-      frozenStore(that).set(key, value);
-    } else {
-      $has(key, WEAK) || hide(key, WEAK, {});
-      key[WEAK][that._i] = value;
-    } return that;
+    var data = getWeak(anObject(key), true);
+    if(data === true)uncaughtFrozenStore(that).set(key, value);
+    else data[that._i] = value;
+    return that;
   },
-  frozenStore: frozenStore,
-  WEAK: WEAK
+  ufstore: uncaughtFrozenStore
 };
-},{"28":28,"31":31,"32":32,"39":39,"5":5,"61":61,"70":70,"83":83,"9":9}],16:[function(_dereq_,module,exports){
+},{"13":13,"36":36,"38":38,"48":48,"61":61,"7":7,"8":8,"85":85}],22:[function(_dereq_,module,exports){
 'use strict';
-var global         = _dereq_(30)
-  , $export        = _dereq_(23)
-  , redefine       = _dereq_(62)
-  , redefineAll    = _dereq_(61)
-  , forOf          = _dereq_(28)
-  , strictNew      = _dereq_(70)
-  , isObject       = _dereq_(39)
-  , fails          = _dereq_(25)
-  , $iterDetect    = _dereq_(44)
-  , setToStringTag = _dereq_(67);
+var global            = _dereq_(37)
+  , $export           = _dereq_(31)
+  , redefine          = _dereq_(86)
+  , redefineAll       = _dereq_(85)
+  , meta              = _dereq_(61)
+  , forOf             = _dereq_(36)
+  , anInstance        = _dereq_(7)
+  , isObject          = _dereq_(48)
+  , fails             = _dereq_(33)
+  , $iterDetect       = _dereq_(53)
+  , setToStringTag    = _dereq_(91)
+  , inheritIfRequired = _dereq_(42);
 
 module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
   var Base  = global[NAME]
@@ -483,6 +567,7 @@ module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
     // create collection constructor
     C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
     redefineAll(C.prototype, methods);
+    meta.NEED = true;
   } else {
     var instance             = new C
       // early implementations not supports chaining
@@ -492,20 +577,23 @@ module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
       // most early implementations doesn't supports iterables, most modern - not close it correctly
       , ACCEPT_ITERABLES     = $iterDetect(function(iter){ new C(iter); }) // eslint-disable-line no-new
       // for early implementations -0 and +0 not the same
-      , BUGGY_ZERO;
+      , BUGGY_ZERO = !IS_WEAK && fails(function(){
+        // V8 ~ Chromium 42- fails only with 5+ elements
+        var $instance = new C()
+          , index     = 5;
+        while(index--)$instance[ADDER](index, index);
+        return !$instance.has(-0);
+      });
     if(!ACCEPT_ITERABLES){ 
       C = wrapper(function(target, iterable){
-        strictNew(target, C, NAME);
-        var that = new Base;
+        anInstance(target, C, NAME);
+        var that = inheritIfRequired(new Base, target, C);
         if(iterable != undefined)forOf(iterable, IS_MAP, that[ADDER], that);
         return that;
       });
       C.prototype = proto;
       proto.constructor = C;
     }
-    IS_WEAK || instance.forEach(function(val, key){
-      BUGGY_ZERO = 1 / key === -Infinity;
-    });
     if(THROWS_ON_PRIMITIVES || BUGGY_ZERO){
       fixMethod('delete');
       fixMethod('has');
@@ -525,12 +613,12 @@ module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
 
   return C;
 };
-},{"23":23,"25":25,"28":28,"30":30,"39":39,"44":44,"61":61,"62":62,"67":67,"70":70}],17:[function(_dereq_,module,exports){
-var core = module.exports = {version: '1.2.6'};
+},{"31":31,"33":33,"36":36,"37":37,"42":42,"48":48,"53":53,"61":61,"7":7,"85":85,"86":86,"91":91}],23:[function(_dereq_,module,exports){
+var core = module.exports = {version: '2.2.1'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],18:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 // optional / simple context binding
-var aFunction = _dereq_(3);
+var aFunction = _dereq_(4);
 module.exports = function(fn, that, length){
   aFunction(fn);
   if(that === undefined)return fn;
@@ -549,46 +637,62 @@ module.exports = function(fn, that, length){
     return fn.apply(that, arguments);
   };
 };
-},{"3":3}],19:[function(_dereq_,module,exports){
+},{"4":4}],25:[function(_dereq_,module,exports){
+'use strict';
+var anObject    = _dereq_(8)
+  , toPrimitive = _dereq_(109)
+  , NUMBER      = 'number';
+
+module.exports = function(hint){
+  if(hint !== 'string' && hint !== NUMBER && hint !== 'default')throw TypeError('Incorrect hint');
+  return toPrimitive(anObject(this), hint != NUMBER);
+};
+},{"109":109,"8":8}],26:[function(_dereq_,module,exports){
 // 7.2.1 RequireObjectCoercible(argument)
 module.exports = function(it){
   if(it == undefined)throw TypeError("Can't call method on  " + it);
   return it;
 };
-},{}],20:[function(_dereq_,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 // Thank's IE8 for his funny defineProperty
-module.exports = !_dereq_(25)(function(){
+module.exports = !_dereq_(33)(function(){
   return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"25":25}],21:[function(_dereq_,module,exports){
-var isObject = _dereq_(39)
-  , document = _dereq_(30).document
+},{"33":33}],28:[function(_dereq_,module,exports){
+var isObject = _dereq_(48)
+  , document = _dereq_(37).document
   // in old IE typeof document.createElement is 'object'
   , is = isObject(document) && isObject(document.createElement);
 module.exports = function(it){
   return is ? document.createElement(it) : {};
 };
-},{"30":30,"39":39}],22:[function(_dereq_,module,exports){
+},{"37":37,"48":48}],29:[function(_dereq_,module,exports){
+// IE 8- don't enum bug keys
+module.exports = (
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+).split(',');
+},{}],30:[function(_dereq_,module,exports){
 // all enumerable object keys, includes symbols
-var $ = _dereq_(47);
+var getKeys = _dereq_(75)
+  , gOPS    = _dereq_(72)
+  , pIE     = _dereq_(76);
 module.exports = function(it){
-  var keys       = $.getKeys(it)
-    , getSymbols = $.getSymbols;
+  var result     = getKeys(it)
+    , getSymbols = gOPS.f;
   if(getSymbols){
     var symbols = getSymbols(it)
-      , isEnum  = $.isEnum
+      , isEnum  = pIE.f
       , i       = 0
       , key;
-    while(symbols.length > i)if(isEnum.call(it, key = symbols[i++]))keys.push(key);
-  }
-  return keys;
+    while(symbols.length > i)if(isEnum.call(it, key = symbols[i++]))result.push(key);
+  } return result;
 };
-},{"47":47}],23:[function(_dereq_,module,exports){
-var global    = _dereq_(30)
-  , core      = _dereq_(17)
-  , hide      = _dereq_(32)
-  , redefine  = _dereq_(62)
-  , ctx       = _dereq_(18)
+},{"72":72,"75":75,"76":76}],31:[function(_dereq_,module,exports){
+var global    = _dereq_(37)
+  , core      = _dereq_(23)
+  , hide      = _dereq_(39)
+  , redefine  = _dereq_(86)
+  , ctx       = _dereq_(24)
   , PROTOTYPE = 'prototype';
 
 var $export = function(type, name, source){
@@ -604,13 +708,13 @@ var $export = function(type, name, source){
   if(IS_GLOBAL)source = name;
   for(key in source){
     // contains in native
-    own = !IS_FORCED && target && key in target;
+    own = !IS_FORCED && target && target[key] !== undefined;
     // export native or passed
     out = (own ? target : source)[key];
     // bind timers to global for call from export context
     exp = IS_BIND && own ? ctx(out, global) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
     // extend global
-    if(target && !own)redefine(target, key, out);
+    if(target)redefine(target, key, out, type & $export.U);
     // export
     if(exports[key] != out)hide(exports, key, exp);
     if(IS_PROTO && expProto[key] != out)expProto[key] = out;
@@ -618,15 +722,17 @@ var $export = function(type, name, source){
 };
 global.core = core;
 // type bitmap
-$export.F = 1;  // forced
-$export.G = 2;  // global
-$export.S = 4;  // static
-$export.P = 8;  // proto
-$export.B = 16; // bind
-$export.W = 32; // wrap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library` 
 module.exports = $export;
-},{"17":17,"18":18,"30":30,"32":32,"62":62}],24:[function(_dereq_,module,exports){
-var MATCH = _dereq_(84)('match');
+},{"23":23,"24":24,"37":37,"39":39,"86":86}],32:[function(_dereq_,module,exports){
+var MATCH = _dereq_(114)('match');
 module.exports = function(KEY){
   var re = /./;
   try {
@@ -638,7 +744,7 @@ module.exports = function(KEY){
     } catch(f){ /* empty */ }
   } return true;
 };
-},{"84":84}],25:[function(_dereq_,module,exports){
+},{"114":114}],33:[function(_dereq_,module,exports){
 module.exports = function(exec){
   try {
     return !!exec();
@@ -646,37 +752,39 @@ module.exports = function(exec){
     return true;
   }
 };
-},{}],26:[function(_dereq_,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 'use strict';
-var hide     = _dereq_(32)
-  , redefine = _dereq_(62)
-  , fails    = _dereq_(25)
-  , defined  = _dereq_(19)
-  , wks      = _dereq_(84);
+var hide     = _dereq_(39)
+  , redefine = _dereq_(86)
+  , fails    = _dereq_(33)
+  , defined  = _dereq_(26)
+  , wks      = _dereq_(114);
 
 module.exports = function(KEY, length, exec){
   var SYMBOL   = wks(KEY)
-    , original = ''[KEY];
+    , fns      = exec(defined, SYMBOL, ''[KEY])
+    , strfn    = fns[0]
+    , rxfn     = fns[1];
   if(fails(function(){
     var O = {};
     O[SYMBOL] = function(){ return 7; };
     return ''[KEY](O) != 7;
   })){
-    redefine(String.prototype, KEY, exec(defined, SYMBOL, original));
+    redefine(String.prototype, KEY, strfn);
     hide(RegExp.prototype, SYMBOL, length == 2
       // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
       // 21.2.5.11 RegExp.prototype[@@split](string, limit)
-      ? function(string, arg){ return original.call(string, this, arg); }
+      ? function(string, arg){ return rxfn.call(string, this, arg); }
       // 21.2.5.6 RegExp.prototype[@@match](string)
       // 21.2.5.9 RegExp.prototype[@@search](string)
-      : function(string){ return original.call(string, this); }
+      : function(string){ return rxfn.call(string, this); }
     );
   }
 };
-},{"19":19,"25":25,"32":32,"62":62,"84":84}],27:[function(_dereq_,module,exports){
+},{"114":114,"26":26,"33":33,"39":39,"86":86}],35:[function(_dereq_,module,exports){
 'use strict';
 // 21.2.5.3 get RegExp.prototype.flags
-var anObject = _dereq_(5);
+var anObject = _dereq_(8);
 module.exports = function(){
   var that   = anObject(this)
     , result = '';
@@ -687,15 +795,15 @@ module.exports = function(){
   if(that.sticky)     result += 'y';
   return result;
 };
-},{"5":5}],28:[function(_dereq_,module,exports){
-var ctx         = _dereq_(18)
-  , call        = _dereq_(41)
-  , isArrayIter = _dereq_(36)
-  , anObject    = _dereq_(5)
-  , toLength    = _dereq_(80)
-  , getIterFn   = _dereq_(85);
-module.exports = function(iterable, entries, fn, that){
-  var iterFn = getIterFn(iterable)
+},{"8":8}],36:[function(_dereq_,module,exports){
+var ctx         = _dereq_(24)
+  , call        = _dereq_(50)
+  , isArrayIter = _dereq_(45)
+  , anObject    = _dereq_(8)
+  , toLength    = _dereq_(107)
+  , getIterFn   = _dereq_(115);
+module.exports = function(iterable, entries, fn, that, ITERATOR){
+  var iterFn = ITERATOR ? function(){ return iterable; } : getIterFn(iterable)
     , f      = ctx(fn, that, entries ? 2 : 1)
     , index  = 0
     , length, step, iterator;
@@ -707,49 +815,41 @@ module.exports = function(iterable, entries, fn, that){
     call(iterator, f, step.value, entries);
   }
 };
-},{"18":18,"36":36,"41":41,"5":5,"80":80,"85":85}],29:[function(_dereq_,module,exports){
-// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject = _dereq_(79)
-  , getNames  = _dereq_(47).getNames
-  , toString  = {}.toString;
-
-var windowNames = typeof window == 'object' && Object.getOwnPropertyNames
-  ? Object.getOwnPropertyNames(window) : [];
-
-var getWindowNames = function(it){
-  try {
-    return getNames(it);
-  } catch(e){
-    return windowNames.slice();
-  }
-};
-
-module.exports.get = function getOwnPropertyNames(it){
-  if(windowNames && toString.call(it) == '[object Window]')return getWindowNames(it);
-  return getNames(toIObject(it));
-};
-},{"47":47,"79":79}],30:[function(_dereq_,module,exports){
+},{"107":107,"115":115,"24":24,"45":45,"50":50,"8":8}],37:[function(_dereq_,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
 if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],31:[function(_dereq_,module,exports){
+},{}],38:[function(_dereq_,module,exports){
 var hasOwnProperty = {}.hasOwnProperty;
 module.exports = function(it, key){
   return hasOwnProperty.call(it, key);
 };
-},{}],32:[function(_dereq_,module,exports){
-var $          = _dereq_(47)
-  , createDesc = _dereq_(60);
-module.exports = _dereq_(20) ? function(object, key, value){
-  return $.setDesc(object, key, createDesc(1, value));
+},{}],39:[function(_dereq_,module,exports){
+var dP         = _dereq_(66)
+  , createDesc = _dereq_(84);
+module.exports = _dereq_(27) ? function(object, key, value){
+  return dP.f(object, key, createDesc(1, value));
 } : function(object, key, value){
   object[key] = value;
   return object;
 };
-},{"20":20,"47":47,"60":60}],33:[function(_dereq_,module,exports){
-module.exports = _dereq_(30).document && document.documentElement;
-},{"30":30}],34:[function(_dereq_,module,exports){
+},{"27":27,"66":66,"84":84}],40:[function(_dereq_,module,exports){
+module.exports = _dereq_(37).document && document.documentElement;
+},{"37":37}],41:[function(_dereq_,module,exports){
+module.exports = !_dereq_(27) && !_dereq_(33)(function(){
+  return Object.defineProperty(_dereq_(28)('div'), 'a', {get: function(){ return 7; }}).a != 7;
+});
+},{"27":27,"28":28,"33":33}],42:[function(_dereq_,module,exports){
+var isObject       = _dereq_(48)
+  , setPrototypeOf = _dereq_(89).set;
+module.exports = function(that, target, C){
+  var P, S = target.constructor;
+  if(S !== C && typeof S == 'function' && (P = S.prototype) !== C.prototype && isObject(P) && setPrototypeOf){
+    setPrototypeOf(that, P);
+  } return that;
+};
+},{"48":48,"89":89}],43:[function(_dereq_,module,exports){
 // fast apply, http://jsperf.lnkit.com/fast-apply/5
 module.exports = function(fn, args, that){
   var un = that === undefined;
@@ -766,50 +866,50 @@ module.exports = function(fn, args, that){
                       : fn.call(that, args[0], args[1], args[2], args[3]);
   } return              fn.apply(that, args);
 };
-},{}],35:[function(_dereq_,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
-var cof = _dereq_(12);
+var cof = _dereq_(18);
 module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
   return cof(it) == 'String' ? it.split('') : Object(it);
 };
-},{"12":12}],36:[function(_dereq_,module,exports){
+},{"18":18}],45:[function(_dereq_,module,exports){
 // check on default Array iterator
-var Iterators  = _dereq_(46)
-  , ITERATOR   = _dereq_(84)('iterator')
+var Iterators  = _dereq_(55)
+  , ITERATOR   = _dereq_(114)('iterator')
   , ArrayProto = Array.prototype;
 
 module.exports = function(it){
   return it !== undefined && (Iterators.Array === it || ArrayProto[ITERATOR] === it);
 };
-},{"46":46,"84":84}],37:[function(_dereq_,module,exports){
+},{"114":114,"55":55}],46:[function(_dereq_,module,exports){
 // 7.2.2 IsArray(argument)
-var cof = _dereq_(12);
-module.exports = Array.isArray || function(arg){
+var cof = _dereq_(18);
+module.exports = Array.isArray || function isArray(arg){
   return cof(arg) == 'Array';
 };
-},{"12":12}],38:[function(_dereq_,module,exports){
+},{"18":18}],47:[function(_dereq_,module,exports){
 // 20.1.2.3 Number.isInteger(number)
-var isObject = _dereq_(39)
+var isObject = _dereq_(48)
   , floor    = Math.floor;
 module.exports = function isInteger(it){
   return !isObject(it) && isFinite(it) && floor(it) === it;
 };
-},{"39":39}],39:[function(_dereq_,module,exports){
+},{"48":48}],48:[function(_dereq_,module,exports){
 module.exports = function(it){
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
-},{}],40:[function(_dereq_,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 // 7.2.8 IsRegExp(argument)
-var isObject = _dereq_(39)
-  , cof      = _dereq_(12)
-  , MATCH    = _dereq_(84)('match');
+var isObject = _dereq_(48)
+  , cof      = _dereq_(18)
+  , MATCH    = _dereq_(114)('match');
 module.exports = function(it){
   var isRegExp;
   return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : cof(it) == 'RegExp');
 };
-},{"12":12,"39":39,"84":84}],41:[function(_dereq_,module,exports){
+},{"114":114,"18":18,"48":48}],50:[function(_dereq_,module,exports){
 // call something on iterator step with safe closing on error
-var anObject = _dereq_(5);
+var anObject = _dereq_(8);
 module.exports = function(iterator, fn, value, entries){
   try {
     return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -820,32 +920,32 @@ module.exports = function(iterator, fn, value, entries){
     throw e;
   }
 };
-},{"5":5}],42:[function(_dereq_,module,exports){
+},{"8":8}],51:[function(_dereq_,module,exports){
 'use strict';
-var $              = _dereq_(47)
-  , descriptor     = _dereq_(60)
-  , setToStringTag = _dereq_(67)
+var create         = _dereq_(65)
+  , descriptor     = _dereq_(84)
+  , setToStringTag = _dereq_(91)
   , IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-_dereq_(32)(IteratorPrototype, _dereq_(84)('iterator'), function(){ return this; });
+_dereq_(39)(IteratorPrototype, _dereq_(114)('iterator'), function(){ return this; });
 
 module.exports = function(Constructor, NAME, next){
-  Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
+  Constructor.prototype = create(IteratorPrototype, {next: descriptor(1, next)});
   setToStringTag(Constructor, NAME + ' Iterator');
 };
-},{"32":32,"47":47,"60":60,"67":67,"84":84}],43:[function(_dereq_,module,exports){
+},{"114":114,"39":39,"65":65,"84":84,"91":91}],52:[function(_dereq_,module,exports){
 'use strict';
-var LIBRARY        = _dereq_(49)
-  , $export        = _dereq_(23)
-  , redefine       = _dereq_(62)
-  , hide           = _dereq_(32)
-  , has            = _dereq_(31)
-  , Iterators      = _dereq_(46)
-  , $iterCreate    = _dereq_(42)
-  , setToStringTag = _dereq_(67)
-  , getProto       = _dereq_(47).getProto
-  , ITERATOR       = _dereq_(84)('iterator')
+var LIBRARY        = _dereq_(57)
+  , $export        = _dereq_(31)
+  , redefine       = _dereq_(86)
+  , hide           = _dereq_(39)
+  , has            = _dereq_(38)
+  , Iterators      = _dereq_(55)
+  , $iterCreate    = _dereq_(51)
+  , setToStringTag = _dereq_(91)
+  , getPrototypeOf = _dereq_(73)
+  , ITERATOR       = _dereq_(114)('iterator')
   , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
   , FF_ITERATOR    = '@@iterator'
   , KEYS           = 'keys'
@@ -868,19 +968,23 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED
     , proto      = Base.prototype
     , $native    = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT]
     , $default   = $native || getMethod(DEFAULT)
-    , methods, key;
+    , $entries   = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined
+    , $anyNative = NAME == 'Array' ? proto.entries || $native : $native
+    , methods, key, IteratorPrototype;
   // Fix native
-  if($native){
-    var IteratorPrototype = getProto($default.call(new Base));
-    // Set @@toStringTag to native iterators
-    setToStringTag(IteratorPrototype, TAG, true);
-    // FF fix
-    if(!LIBRARY && has(proto, FF_ITERATOR))hide(IteratorPrototype, ITERATOR, returnThis);
-    // fix Array#{values, @@iterator}.name in V8 / FF
-    if(DEF_VALUES && $native.name !== VALUES){
-      VALUES_BUG = true;
-      $default = function values(){ return $native.call(this); };
+  if($anyNative){
+    IteratorPrototype = getPrototypeOf($anyNative.call(new Base));
+    if(IteratorPrototype !== Object.prototype){
+      // Set @@toStringTag to native iterators
+      setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if(!LIBRARY && !has(IteratorPrototype, ITERATOR))hide(IteratorPrototype, ITERATOR, returnThis);
     }
+  }
+  // fix Array#{values, @@iterator}.name in V8 / FF
+  if(DEF_VALUES && $native && $native.name !== VALUES){
+    VALUES_BUG = true;
+    $default = function values(){ return $native.call(this); };
   }
   // Define iterator
   if((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])){
@@ -891,9 +995,9 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED
   Iterators[TAG]  = returnThis;
   if(DEFAULT){
     methods = {
-      values:  DEF_VALUES  ? $default : getMethod(VALUES),
-      keys:    IS_SET      ? $default : getMethod(KEYS),
-      entries: !DEF_VALUES ? $default : getMethod('entries')
+      values:  DEF_VALUES ? $default : getMethod(VALUES),
+      keys:    IS_SET     ? $default : getMethod(KEYS),
+      entries: $entries
     };
     if(FORCED)for(key in methods){
       if(!(key in proto))redefine(proto, key, methods[key]);
@@ -901,8 +1005,8 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED
   }
   return methods;
 };
-},{"23":23,"31":31,"32":32,"42":42,"46":46,"47":47,"49":49,"62":62,"67":67,"84":84}],44:[function(_dereq_,module,exports){
-var ITERATOR     = _dereq_(84)('iterator')
+},{"114":114,"31":31,"38":38,"39":39,"51":51,"55":55,"57":57,"73":73,"86":86,"91":91}],53:[function(_dereq_,module,exports){
+var ITERATOR     = _dereq_(114)('iterator')
   , SAFE_CLOSING = false;
 
 try {
@@ -923,75 +1027,161 @@ module.exports = function(exec, skipClosing){
   } catch(e){ /* empty */ }
   return safe;
 };
-},{"84":84}],45:[function(_dereq_,module,exports){
+},{"114":114}],54:[function(_dereq_,module,exports){
 module.exports = function(done, value){
   return {value: value, done: !!done};
 };
-},{}],46:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 module.exports = {};
-},{}],47:[function(_dereq_,module,exports){
-var $Object = Object;
-module.exports = {
-  create:     $Object.create,
-  getProto:   $Object.getPrototypeOf,
-  isEnum:     {}.propertyIsEnumerable,
-  getDesc:    $Object.getOwnPropertyDescriptor,
-  setDesc:    $Object.defineProperty,
-  setDescs:   $Object.defineProperties,
-  getKeys:    $Object.keys,
-  getNames:   $Object.getOwnPropertyNames,
-  getSymbols: $Object.getOwnPropertySymbols,
-  each:       [].forEach
-};
-},{}],48:[function(_dereq_,module,exports){
-var $         = _dereq_(47)
-  , toIObject = _dereq_(79);
+},{}],56:[function(_dereq_,module,exports){
+var getKeys   = _dereq_(75)
+  , toIObject = _dereq_(106);
 module.exports = function(object, el){
   var O      = toIObject(object)
-    , keys   = $.getKeys(O)
+    , keys   = getKeys(O)
     , length = keys.length
     , index  = 0
     , key;
   while(length > index)if(O[key = keys[index++]] === el)return key;
 };
-},{"47":47,"79":79}],49:[function(_dereq_,module,exports){
+},{"106":106,"75":75}],57:[function(_dereq_,module,exports){
 module.exports = false;
-},{}],50:[function(_dereq_,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 // 20.2.2.14 Math.expm1(x)
 module.exports = Math.expm1 || function expm1(x){
   return (x = +x) == 0 ? x : x > -1e-6 && x < 1e-6 ? x + x * x / 2 : Math.exp(x) - 1;
 };
-},{}],51:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 // 20.2.2.20 Math.log1p(x)
 module.exports = Math.log1p || function log1p(x){
   return (x = +x) > -1e-8 && x < 1e-8 ? x - x * x / 2 : Math.log(1 + x);
 };
-},{}],52:[function(_dereq_,module,exports){
+},{}],60:[function(_dereq_,module,exports){
 // 20.2.2.28 Math.sign(x)
 module.exports = Math.sign || function sign(x){
   return (x = +x) == 0 || x != x ? x : x < 0 ? -1 : 1;
 };
-},{}],53:[function(_dereq_,module,exports){
-var global    = _dereq_(30)
-  , macrotask = _dereq_(76).set
+},{}],61:[function(_dereq_,module,exports){
+var META     = _dereq_(113)('meta')
+  , isObject = _dereq_(48)
+  , has      = _dereq_(38)
+  , setDesc  = _dereq_(66).f
+  , id       = 0;
+var isExtensible = Object.isExtensible || function(){
+  return true;
+};
+var FREEZE = !_dereq_(33)(function(){
+  return isExtensible(Object.preventExtensions({}));
+});
+var setMeta = function(it){
+  setDesc(it, META, {value: {
+    i: 'O' + ++id, // object ID
+    w: {}          // weak collections IDs
+  }});
+};
+var fastKey = function(it, create){
+  // return primitive with prefix
+  if(!isObject(it))return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+  if(!has(it, META)){
+    // can't set metadata to uncaught frozen object
+    if(!isExtensible(it))return 'F';
+    // not necessary to add metadata
+    if(!create)return 'E';
+    // add missing metadata
+    setMeta(it);
+  // return object ID
+  } return it[META].i;
+};
+var getWeak = function(it, create){
+  if(!has(it, META)){
+    // can't set metadata to uncaught frozen object
+    if(!isExtensible(it))return true;
+    // not necessary to add metadata
+    if(!create)return false;
+    // add missing metadata
+    setMeta(it);
+  // return hash weak collections IDs
+  } return it[META].w;
+};
+// add metadata on freeze-family methods calling
+var onFreeze = function(it){
+  if(FREEZE && meta.NEED && isExtensible(it) && !has(it, META))setMeta(it);
+  return it;
+};
+var meta = module.exports = {
+  KEY:      META,
+  NEED:     false,
+  fastKey:  fastKey,
+  getWeak:  getWeak,
+  onFreeze: onFreeze
+};
+},{"113":113,"33":33,"38":38,"48":48,"66":66}],62:[function(_dereq_,module,exports){
+var Map     = _dereq_(147)
+  , $export = _dereq_(31)
+  , shared  = _dereq_(93)('metadata')
+  , store   = shared.store || (shared.store = new (_dereq_(253)));
+
+var getOrCreateMetadataMap = function(target, targetKey, create){
+  var targetMetadata = store.get(target);
+  if(!targetMetadata){
+    if(!create)return undefined;
+    store.set(target, targetMetadata = new Map);
+  }
+  var keyMetadata = targetMetadata.get(targetKey);
+  if(!keyMetadata){
+    if(!create)return undefined;
+    targetMetadata.set(targetKey, keyMetadata = new Map);
+  } return keyMetadata;
+};
+var ordinaryHasOwnMetadata = function(MetadataKey, O, P){
+  var metadataMap = getOrCreateMetadataMap(O, P, false);
+  return metadataMap === undefined ? false : metadataMap.has(MetadataKey);
+};
+var ordinaryGetOwnMetadata = function(MetadataKey, O, P){
+  var metadataMap = getOrCreateMetadataMap(O, P, false);
+  return metadataMap === undefined ? undefined : metadataMap.get(MetadataKey);
+};
+var ordinaryDefineOwnMetadata = function(MetadataKey, MetadataValue, O, P){
+  getOrCreateMetadataMap(O, P, true).set(MetadataKey, MetadataValue);
+};
+var ordinaryOwnMetadataKeys = function(target, targetKey){
+  var metadataMap = getOrCreateMetadataMap(target, targetKey, false)
+    , keys        = [];
+  if(metadataMap)metadataMap.forEach(function(_, key){ keys.push(key); });
+  return keys;
+};
+var toMetaKey = function(it){
+  return it === undefined || typeof it == 'symbol' ? it : String(it);
+};
+var exp = function(O){
+  $export($export.S, 'Reflect', O);
+};
+
+module.exports = {
+  store: store,
+  map: getOrCreateMetadataMap,
+  has: ordinaryHasOwnMetadata,
+  get: ordinaryGetOwnMetadata,
+  set: ordinaryDefineOwnMetadata,
+  keys: ordinaryOwnMetadataKeys,
+  key: toMetaKey,
+  exp: exp
+};
+},{"147":147,"253":253,"31":31,"93":93}],63:[function(_dereq_,module,exports){
+var global    = _dereq_(37)
+  , macrotask = _dereq_(103).set
   , Observer  = global.MutationObserver || global.WebKitMutationObserver
   , process   = global.process
   , Promise   = global.Promise
-  , isNode    = _dereq_(12)(process) == 'process'
+  , isNode    = _dereq_(18)(process) == 'process'
   , head, last, notify;
 
 var flush = function(){
-  var parent, domain, fn;
-  if(isNode && (parent = process.domain)){
-    process.domain = null;
-    parent.exit();
-  }
+  var parent, fn;
+  if(isNode && (parent = process.domain))parent.exit();
   while(head){
-    domain = head.domain;
-    fn     = head.fn;
-    if(domain)domain.enter();
+    fn = head.fn;
     fn(); // <- currently we use it only for Promise - try / catch not required
-    if(domain)domain.exit();
     head = head.next;
   } last = undefined;
   if(parent)parent.enter();
@@ -1004,11 +1194,11 @@ if(isNode){
   };
 // browsers with MutationObserver
 } else if(Observer){
-  var toggle = 1
+  var toggle = true
     , node   = document.createTextNode('');
   new Observer(flush).observe(node, {characterData: true}); // eslint-disable-line no-new
   notify = function(){
-    node.data = toggle = -toggle;
+    node.data = toggle = !toggle;
   };
 // environments with maybe non-completely correct, but existent Promise
 } else if(Promise && Promise.resolve){
@@ -1028,67 +1218,237 @@ if(isNode){
   };
 }
 
-module.exports = function asap(fn){
-  var task = {fn: fn, next: undefined, domain: isNode && process.domain};
+module.exports = function(fn){
+  var task = {fn: fn, next: undefined};
   if(last)last.next = task;
   if(!head){
     head = task;
     notify();
   } last = task;
 };
-},{"12":12,"30":30,"76":76}],54:[function(_dereq_,module,exports){
+},{"103":103,"18":18,"37":37}],64:[function(_dereq_,module,exports){
+'use strict';
 // 19.1.2.1 Object.assign(target, source, ...)
-var $        = _dereq_(47)
-  , toObject = _dereq_(81)
-  , IObject  = _dereq_(35);
+var getKeys  = _dereq_(75)
+  , gOPS     = _dereq_(72)
+  , pIE      = _dereq_(76)
+  , toObject = _dereq_(108)
+  , IObject  = _dereq_(44)
+  , $assign  = Object.assign;
 
 // should work with symbols and should have deterministic property order (V8 bug)
-module.exports = _dereq_(25)(function(){
-  var a = Object.assign
-    , A = {}
+module.exports = !$assign || _dereq_(33)(function(){
+  var A = {}
     , B = {}
     , S = Symbol()
     , K = 'abcdefghijklmnopqrst';
   A[S] = 7;
   K.split('').forEach(function(k){ B[k] = k; });
-  return a({}, A)[S] != 7 || Object.keys(a({}, B)).join('') != K;
+  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
 }) ? function assign(target, source){ // eslint-disable-line no-unused-vars
   var T     = toObject(target)
-    , $$    = arguments
-    , $$len = $$.length
+    , aLen  = arguments.length
     , index = 1
-    , getKeys    = $.getKeys
-    , getSymbols = $.getSymbols
-    , isEnum     = $.isEnum;
-  while($$len > index){
-    var S      = IObject($$[index++])
+    , getSymbols = gOPS.f
+    , isEnum     = pIE.f;
+  while(aLen > index){
+    var S      = IObject(arguments[index++])
       , keys   = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S)
       , length = keys.length
       , j      = 0
       , key;
     while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
+  } return T;
+} : $assign;
+},{"108":108,"33":33,"44":44,"72":72,"75":75,"76":76}],65:[function(_dereq_,module,exports){
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+var anObject    = _dereq_(8)
+  , dPs         = _dereq_(67)
+  , enumBugKeys = _dereq_(29)
+  , IE_PROTO    = _dereq_(92)('IE_PROTO')
+  , Empty       = function(){ /* empty */ }
+  , PROTOTYPE   = 'prototype';
+
+// Create object with fake `null` prototype: use iframe Object with cleared prototype
+var createDict = function(){
+  // Thrash, waste and sodomy: IE GC bug
+  var iframe = _dereq_(28)('iframe')
+    , i      = enumBugKeys.length
+    , gt     = '>'
+    , iframeDocument;
+  iframe.style.display = 'none';
+  _dereq_(40).appendChild(iframe);
+  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
+  // createDict = iframe.contentWindow.Object;
+  // html.removeChild(iframe);
+  iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.write('<script>document.F=Object</script' + gt);
+  iframeDocument.close();
+  createDict = iframeDocument.F;
+  while(i--)delete createDict[PROTOTYPE][enumBugKeys[i]];
+  return createDict();
+};
+
+module.exports = Object.create || function create(O, Properties){
+  var result;
+  if(O !== null){
+    Empty[PROTOTYPE] = anObject(O);
+    result = new Empty;
+    Empty[PROTOTYPE] = null;
+    // add "__proto__" for Object.getPrototypeOf polyfill
+    result[IE_PROTO] = O;
+  } else result = createDict();
+  return Properties === undefined ? result : dPs(result, Properties);
+};
+},{"28":28,"29":29,"40":40,"67":67,"8":8,"92":92}],66:[function(_dereq_,module,exports){
+var anObject       = _dereq_(8)
+  , IE8_DOM_DEFINE = _dereq_(41)
+  , toPrimitive    = _dereq_(109)
+  , dP             = Object.defineProperty;
+
+exports.f = _dereq_(27) ? Object.defineProperty : function defineProperty(O, P, Attributes){
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if(IE8_DOM_DEFINE)try {
+    return dP(O, P, Attributes);
+  } catch(e){ /* empty */ }
+  if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
+  if('value' in Attributes)O[P] = Attributes.value;
+  return O;
+};
+},{"109":109,"27":27,"41":41,"8":8}],67:[function(_dereq_,module,exports){
+var dP       = _dereq_(66)
+  , anObject = _dereq_(8)
+  , getKeys  = _dereq_(75);
+
+module.exports = _dereq_(27) ? Object.defineProperties : function defineProperties(O, Properties){
+  anObject(O);
+  var keys   = getKeys(Properties)
+    , length = keys.length
+    , i = 0
+    , P;
+  while(length > i)dP.f(O, P = keys[i++], Properties[P]);
+  return O;
+};
+},{"27":27,"66":66,"75":75,"8":8}],68:[function(_dereq_,module,exports){
+// Forced replacement prototype accessors methods
+module.exports = _dereq_(57)|| !_dereq_(33)(function(){
+  var K = Math.random();
+  // In FF throws only define methods
+  __defineSetter__.call(null, K, function(){ /* empty */});
+  delete _dereq_(37)[K];
+});
+},{"33":33,"37":37,"57":57}],69:[function(_dereq_,module,exports){
+var pIE            = _dereq_(76)
+  , createDesc     = _dereq_(84)
+  , toIObject      = _dereq_(106)
+  , toPrimitive    = _dereq_(109)
+  , has            = _dereq_(38)
+  , IE8_DOM_DEFINE = _dereq_(41)
+  , gOPD           = Object.getOwnPropertyDescriptor;
+
+exports.f = _dereq_(27) ? gOPD : function getOwnPropertyDescriptor(O, P){
+  O = toIObject(O);
+  P = toPrimitive(P, true);
+  if(IE8_DOM_DEFINE)try {
+    return gOPD(O, P);
+  } catch(e){ /* empty */ }
+  if(has(O, P))return createDesc(!pIE.f.call(O, P), O[P]);
+};
+},{"106":106,"109":109,"27":27,"38":38,"41":41,"76":76,"84":84}],70:[function(_dereq_,module,exports){
+// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+var toIObject = _dereq_(106)
+  , gOPN      = _dereq_(71).f
+  , toString  = {}.toString;
+
+var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+  ? Object.getOwnPropertyNames(window) : [];
+
+var getWindowNames = function(it){
+  try {
+    return gOPN(it);
+  } catch(e){
+    return windowNames.slice();
   }
-  return T;
-} : Object.assign;
-},{"25":25,"35":35,"47":47,"81":81}],55:[function(_dereq_,module,exports){
+};
+
+module.exports.f = function getOwnPropertyNames(it){
+  return windowNames && toString.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
+};
+
+},{"106":106,"71":71}],71:[function(_dereq_,module,exports){
+// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+var $keys      = _dereq_(74)
+  , hiddenKeys = _dereq_(29).concat('length', 'prototype');
+
+exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
+  return $keys(O, hiddenKeys);
+};
+},{"29":29,"74":74}],72:[function(_dereq_,module,exports){
+exports.f = Object.getOwnPropertySymbols;
+},{}],73:[function(_dereq_,module,exports){
+// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
+var has         = _dereq_(38)
+  , toObject    = _dereq_(108)
+  , IE_PROTO    = _dereq_(92)('IE_PROTO')
+  , ObjectProto = Object.prototype;
+
+module.exports = Object.getPrototypeOf || function(O){
+  O = toObject(O);
+  if(has(O, IE_PROTO))return O[IE_PROTO];
+  if(typeof O.constructor == 'function' && O instanceof O.constructor){
+    return O.constructor.prototype;
+  } return O instanceof Object ? ObjectProto : null;
+};
+},{"108":108,"38":38,"92":92}],74:[function(_dereq_,module,exports){
+var has          = _dereq_(38)
+  , toIObject    = _dereq_(106)
+  , arrayIndexOf = _dereq_(12)(false)
+  , IE_PROTO     = _dereq_(92)('IE_PROTO');
+
+module.exports = function(object, names){
+  var O      = toIObject(object)
+    , i      = 0
+    , result = []
+    , key;
+  for(key in O)if(key != IE_PROTO)has(O, key) && result.push(key);
+  // Don't enum bug & hidden keys
+  while(names.length > i)if(has(O, key = names[i++])){
+    ~arrayIndexOf(result, key) || result.push(key);
+  }
+  return result;
+};
+},{"106":106,"12":12,"38":38,"92":92}],75:[function(_dereq_,module,exports){
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys       = _dereq_(74)
+  , enumBugKeys = _dereq_(29);
+
+module.exports = Object.keys || function keys(O){
+  return $keys(O, enumBugKeys);
+};
+},{"29":29,"74":74}],76:[function(_dereq_,module,exports){
+exports.f = {}.propertyIsEnumerable;
+},{}],77:[function(_dereq_,module,exports){
 // most Object methods by ES6 should accept primitives
-var $export = _dereq_(23)
-  , core    = _dereq_(17)
-  , fails   = _dereq_(25);
+var $export = _dereq_(31)
+  , core    = _dereq_(23)
+  , fails   = _dereq_(33);
 module.exports = function(KEY, exec){
   var fn  = (core.Object || {})[KEY] || Object[KEY]
     , exp = {};
   exp[KEY] = exec(fn);
   $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
 };
-},{"17":17,"23":23,"25":25}],56:[function(_dereq_,module,exports){
-var $         = _dereq_(47)
-  , toIObject = _dereq_(79)
-  , isEnum    = $.isEnum;
+},{"23":23,"31":31,"33":33}],78:[function(_dereq_,module,exports){
+var getKeys   = _dereq_(75)
+  , toIObject = _dereq_(106)
+  , isEnum    = _dereq_(76).f;
 module.exports = function(isEntries){
   return function(it){
     var O      = toIObject(it)
-      , keys   = $.getKeys(O)
+      , keys   = getKeys(O)
       , length = keys.length
       , i      = 0
       , result = []
@@ -1098,21 +1458,41 @@ module.exports = function(isEntries){
     } return result;
   };
 };
-},{"47":47,"79":79}],57:[function(_dereq_,module,exports){
+},{"106":106,"75":75,"76":76}],79:[function(_dereq_,module,exports){
 // all object keys, includes non-enumerable and symbols
-var $        = _dereq_(47)
-  , anObject = _dereq_(5)
-  , Reflect  = _dereq_(30).Reflect;
+var gOPN     = _dereq_(71)
+  , gOPS     = _dereq_(72)
+  , anObject = _dereq_(8)
+  , Reflect  = _dereq_(37).Reflect;
 module.exports = Reflect && Reflect.ownKeys || function ownKeys(it){
-  var keys       = $.getNames(anObject(it))
-    , getSymbols = $.getSymbols;
+  var keys       = gOPN.f(anObject(it))
+    , getSymbols = gOPS.f;
   return getSymbols ? keys.concat(getSymbols(it)) : keys;
 };
-},{"30":30,"47":47,"5":5}],58:[function(_dereq_,module,exports){
+},{"37":37,"71":71,"72":72,"8":8}],80:[function(_dereq_,module,exports){
+var $parseFloat = _dereq_(37).parseFloat
+  , $trim       = _dereq_(101).trim;
+
+module.exports = 1 / $parseFloat(_dereq_(102) + '-0') !== -Infinity ? function parseFloat(str){
+  var string = $trim(String(str), 3)
+    , result = $parseFloat(string);
+  return result === 0 && string.charAt(0) == '-' ? -0 : result;
+} : $parseFloat;
+},{"101":101,"102":102,"37":37}],81:[function(_dereq_,module,exports){
+var $parseInt = _dereq_(37).parseInt
+  , $trim     = _dereq_(101).trim
+  , ws        = _dereq_(102)
+  , hex       = /^[\-+]?0[xX]/;
+
+module.exports = $parseInt(ws + '08') !== 8 || $parseInt(ws + '0x16') !== 22 ? function parseInt(str, radix){
+  var string = $trim(String(str), 3);
+  return $parseInt(string, (radix >>> 0) || (hex.test(string) ? 16 : 10));
+} : $parseInt;
+},{"101":101,"102":102,"37":37}],82:[function(_dereq_,module,exports){
 'use strict';
-var path      = _dereq_(59)
-  , invoke    = _dereq_(34)
-  , aFunction = _dereq_(3);
+var path      = _dereq_(83)
+  , invoke    = _dereq_(43)
+  , aFunction = _dereq_(4);
 module.exports = function(/* ...pargs */){
   var fn     = aFunction(this)
     , length = arguments.length
@@ -1122,20 +1502,19 @@ module.exports = function(/* ...pargs */){
     , holder = false;
   while(length > i)if((pargs[i] = arguments[i++]) === _)holder = true;
   return function(/* ...args */){
-    var that  = this
-      , $$    = arguments
-      , $$len = $$.length
+    var that = this
+      , aLen = arguments.length
       , j = 0, k = 0, args;
-    if(!holder && !$$len)return invoke(fn, pargs, that);
+    if(!holder && !aLen)return invoke(fn, pargs, that);
     args = pargs.slice();
-    if(holder)for(;length > j; j++)if(args[j] === _)args[j] = $$[k++];
-    while($$len > k)args.push($$[k++]);
+    if(holder)for(;length > j; j++)if(args[j] === _)args[j] = arguments[k++];
+    while(aLen > k)args.push(arguments[k++]);
     return invoke(fn, args, that);
   };
 };
-},{"3":3,"34":34,"59":59}],59:[function(_dereq_,module,exports){
-module.exports = _dereq_(30);
-},{"30":30}],60:[function(_dereq_,module,exports){
+},{"4":4,"43":43,"83":83}],83:[function(_dereq_,module,exports){
+module.exports = _dereq_(37);
+},{"37":37}],84:[function(_dereq_,module,exports){
 module.exports = function(bitmap, value){
   return {
     enumerable  : !(bitmap & 1),
@@ -1144,41 +1523,46 @@ module.exports = function(bitmap, value){
     value       : value
   };
 };
-},{}],61:[function(_dereq_,module,exports){
-var redefine = _dereq_(62);
-module.exports = function(target, src){
-  for(var key in src)redefine(target, key, src[key]);
+},{}],85:[function(_dereq_,module,exports){
+var redefine = _dereq_(86);
+module.exports = function(target, src, safe){
+  for(var key in src)redefine(target, key, src[key], safe);
   return target;
 };
-},{"62":62}],62:[function(_dereq_,module,exports){
-// add fake Function#toString
-// for correct work wrapped methods / constructors with methods like LoDash isNative
-var global    = _dereq_(30)
-  , hide      = _dereq_(32)
-  , SRC       = _dereq_(83)('src')
+},{"86":86}],86:[function(_dereq_,module,exports){
+var global    = _dereq_(37)
+  , hide      = _dereq_(39)
+  , has       = _dereq_(38)
+  , SRC       = _dereq_(113)('src')
   , TO_STRING = 'toString'
   , $toString = Function[TO_STRING]
   , TPL       = ('' + $toString).split(TO_STRING);
 
-_dereq_(17).inspectSource = function(it){
+_dereq_(23).inspectSource = function(it){
   return $toString.call(it);
 };
 
 (module.exports = function(O, key, val, safe){
-  if(typeof val == 'function'){
-    val.hasOwnProperty(SRC) || hide(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
-    val.hasOwnProperty('name') || hide(val, 'name', key);
-  }
+  var isFunction = typeof val == 'function';
+  if(isFunction)has(val, 'name') || hide(val, 'name', key);
+  if(O[key] === val)return;
+  if(isFunction)has(val, SRC) || hide(val, SRC, O[key] ? '' + O[key] : TPL.join(String(key)));
   if(O === global){
     O[key] = val;
   } else {
-    if(!safe)delete O[key];
-    hide(O, key, val);
+    if(!safe){
+      delete O[key];
+      hide(O, key, val);
+    } else {
+      if(O[key])O[key] = val;
+      else hide(O, key, val);
+    }
   }
+// add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
 })(Function.prototype, TO_STRING, function toString(){
   return typeof this == 'function' && this[SRC] || $toString.call(this);
 });
-},{"17":17,"30":30,"32":32,"83":83}],63:[function(_dereq_,module,exports){
+},{"113":113,"23":23,"37":37,"38":38,"39":39}],87:[function(_dereq_,module,exports){
 module.exports = function(regExp, replace){
   var replacer = replace === Object(replace) ? function(part){
     return replace[part];
@@ -1187,17 +1571,16 @@ module.exports = function(regExp, replace){
     return String(it).replace(regExp, replacer);
   };
 };
-},{}],64:[function(_dereq_,module,exports){
+},{}],88:[function(_dereq_,module,exports){
 // 7.2.9 SameValue(x, y)
 module.exports = Object.is || function is(x, y){
   return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
 };
-},{}],65:[function(_dereq_,module,exports){
+},{}],89:[function(_dereq_,module,exports){
 // Works with __proto__ only. Old v8 can't work with null proto objects.
 /* eslint-disable no-proto */
-var getDesc  = _dereq_(47).getDesc
-  , isObject = _dereq_(39)
-  , anObject = _dereq_(5);
+var isObject = _dereq_(48)
+  , anObject = _dereq_(8);
 var check = function(O, proto){
   anObject(O);
   if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
@@ -1206,7 +1589,7 @@ module.exports = {
   set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
     function(test, buggy, set){
       try {
-        set = _dereq_(18)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+        set = _dereq_(24)(Function.call, _dereq_(69).f(Object.prototype, '__proto__').set, 2);
         set(test, []);
         buggy = !(test instanceof Array);
       } catch(e){ buggy = true; }
@@ -1219,52 +1602,61 @@ module.exports = {
     }({}, false) : undefined),
   check: check
 };
-},{"18":18,"39":39,"47":47,"5":5}],66:[function(_dereq_,module,exports){
+},{"24":24,"48":48,"69":69,"8":8}],90:[function(_dereq_,module,exports){
 'use strict';
-var global      = _dereq_(30)
-  , $           = _dereq_(47)
-  , DESCRIPTORS = _dereq_(20)
-  , SPECIES     = _dereq_(84)('species');
+var global      = _dereq_(37)
+  , dP          = _dereq_(66)
+  , DESCRIPTORS = _dereq_(27)
+  , SPECIES     = _dereq_(114)('species');
 
 module.exports = function(KEY){
   var C = global[KEY];
-  if(DESCRIPTORS && C && !C[SPECIES])$.setDesc(C, SPECIES, {
+  if(DESCRIPTORS && C && !C[SPECIES])dP.f(C, SPECIES, {
     configurable: true,
     get: function(){ return this; }
   });
 };
-},{"20":20,"30":30,"47":47,"84":84}],67:[function(_dereq_,module,exports){
-var def = _dereq_(47).setDesc
-  , has = _dereq_(31)
-  , TAG = _dereq_(84)('toStringTag');
+},{"114":114,"27":27,"37":37,"66":66}],91:[function(_dereq_,module,exports){
+var def = _dereq_(66).f
+  , has = _dereq_(38)
+  , TAG = _dereq_(114)('toStringTag');
 
 module.exports = function(it, tag, stat){
   if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
 };
-},{"31":31,"47":47,"84":84}],68:[function(_dereq_,module,exports){
-var global = _dereq_(30)
+},{"114":114,"38":38,"66":66}],92:[function(_dereq_,module,exports){
+var shared = _dereq_(93)('keys')
+  , uid    = _dereq_(113);
+module.exports = function(key){
+  return shared[key] || (shared[key] = uid(key));
+};
+},{"113":113,"93":93}],93:[function(_dereq_,module,exports){
+var global = _dereq_(37)
   , SHARED = '__core-js_shared__'
   , store  = global[SHARED] || (global[SHARED] = {});
 module.exports = function(key){
   return store[key] || (store[key] = {});
 };
-},{"30":30}],69:[function(_dereq_,module,exports){
+},{"37":37}],94:[function(_dereq_,module,exports){
 // 7.3.20 SpeciesConstructor(O, defaultConstructor)
-var anObject  = _dereq_(5)
-  , aFunction = _dereq_(3)
-  , SPECIES   = _dereq_(84)('species');
+var anObject  = _dereq_(8)
+  , aFunction = _dereq_(4)
+  , SPECIES   = _dereq_(114)('species');
 module.exports = function(O, D){
   var C = anObject(O).constructor, S;
   return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
 };
-},{"3":3,"5":5,"84":84}],70:[function(_dereq_,module,exports){
-module.exports = function(it, Constructor, name){
-  if(!(it instanceof Constructor))throw TypeError(name + ": use the 'new' operator!");
-  return it;
+},{"114":114,"4":4,"8":8}],95:[function(_dereq_,module,exports){
+var fails = _dereq_(33);
+
+module.exports = function(method, arg){
+  return !!method && fails(function(){
+    arg ? method.call(null, function(){}, 1) : method.call(null);
+  });
 };
-},{}],71:[function(_dereq_,module,exports){
-var toInteger = _dereq_(78)
-  , defined   = _dereq_(19);
+},{"33":33}],96:[function(_dereq_,module,exports){
+var toInteger = _dereq_(105)
+  , defined   = _dereq_(26);
 // true  -> String#at
 // false -> String#codePointAt
 module.exports = function(TO_STRING){
@@ -1280,20 +1672,40 @@ module.exports = function(TO_STRING){
       : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
   };
 };
-},{"19":19,"78":78}],72:[function(_dereq_,module,exports){
+},{"105":105,"26":26}],97:[function(_dereq_,module,exports){
 // helper for String#{startsWith, endsWith, includes}
-var isRegExp = _dereq_(40)
-  , defined  = _dereq_(19);
+var isRegExp = _dereq_(49)
+  , defined  = _dereq_(26);
 
 module.exports = function(that, searchString, NAME){
   if(isRegExp(searchString))throw TypeError('String#' + NAME + " doesn't accept regex!");
   return String(defined(that));
 };
-},{"19":19,"40":40}],73:[function(_dereq_,module,exports){
-// https://github.com/ljharb/proposal-string-pad-left-right
-var toLength = _dereq_(80)
-  , repeat   = _dereq_(74)
-  , defined  = _dereq_(19);
+},{"26":26,"49":49}],98:[function(_dereq_,module,exports){
+var $export = _dereq_(31)
+  , fails   = _dereq_(33)
+  , defined = _dereq_(26)
+  , quot    = /"/g;
+// B.2.3.2.1 CreateHTML(string, tag, attribute, value)
+var createHTML = function(string, tag, attribute, value) {
+  var S  = String(defined(string))
+    , p1 = '<' + tag;
+  if(attribute !== '')p1 += ' ' + attribute + '="' + String(value).replace(quot, '&quot;') + '"';
+  return p1 + '>' + S + '</' + tag + '>';
+};
+module.exports = function(NAME, exec){
+  var O = {};
+  O[NAME] = exec(createHTML);
+  $export($export.P + $export.F * fails(function(){
+    var test = ''[NAME]('"');
+    return test !== test.toLowerCase() || test.split('"').length > 3;
+  }), 'String', O);
+};
+},{"26":26,"31":31,"33":33}],99:[function(_dereq_,module,exports){
+// https://github.com/tc39/proposal-string-pad-start-end
+var toLength = _dereq_(107)
+  , repeat   = _dereq_(100)
+  , defined  = _dereq_(26);
 
 module.exports = function(that, maxLength, fillString, left){
   var S            = String(defined(that))
@@ -1307,10 +1719,11 @@ module.exports = function(that, maxLength, fillString, left){
   if(stringFiller.length > fillLen)stringFiller = stringFiller.slice(0, fillLen);
   return left ? stringFiller + S : S + stringFiller;
 };
-},{"19":19,"74":74,"80":80}],74:[function(_dereq_,module,exports){
+
+},{"100":100,"107":107,"26":26}],100:[function(_dereq_,module,exports){
 'use strict';
-var toInteger = _dereq_(78)
-  , defined   = _dereq_(19);
+var toInteger = _dereq_(105)
+  , defined   = _dereq_(26);
 
 module.exports = function repeat(count){
   var str = String(defined(this))
@@ -1320,23 +1733,24 @@ module.exports = function repeat(count){
   for(;n > 0; (n >>>= 1) && (str += str))if(n & 1)res += str;
   return res;
 };
-},{"19":19,"78":78}],75:[function(_dereq_,module,exports){
-var $export = _dereq_(23)
-  , defined = _dereq_(19)
-  , fails   = _dereq_(25)
-  , spaces  = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
-      '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF'
+},{"105":105,"26":26}],101:[function(_dereq_,module,exports){
+var $export = _dereq_(31)
+  , defined = _dereq_(26)
+  , fails   = _dereq_(33)
+  , spaces  = _dereq_(102)
   , space   = '[' + spaces + ']'
   , non     = '\u200b\u0085'
   , ltrim   = RegExp('^' + space + space + '*')
   , rtrim   = RegExp(space + space + '*$');
 
-var exporter = function(KEY, exec){
-  var exp  = {};
-  exp[KEY] = exec(trim);
-  $export($export.P + $export.F * fails(function(){
+var exporter = function(KEY, exec, ALIAS){
+  var exp   = {};
+  var FORCE = fails(function(){
     return !!spaces[KEY]() || non[KEY]() != non;
-  }), 'String', exp);
+  });
+  var fn = exp[KEY] = FORCE ? exec(trim) : spaces[KEY];
+  if(ALIAS)exp[ALIAS] = fn;
+  $export($export.P + $export.F * FORCE, 'String', exp);
 };
 
 // 1 -> String#trimLeft
@@ -1350,12 +1764,15 @@ var trim = exporter.trim = function(string, TYPE){
 };
 
 module.exports = exporter;
-},{"19":19,"23":23,"25":25}],76:[function(_dereq_,module,exports){
-var ctx                = _dereq_(18)
-  , invoke             = _dereq_(34)
-  , html               = _dereq_(33)
-  , cel                = _dereq_(21)
-  , global             = _dereq_(30)
+},{"102":102,"26":26,"31":31,"33":33}],102:[function(_dereq_,module,exports){
+module.exports = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
+  '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+},{}],103:[function(_dereq_,module,exports){
+var ctx                = _dereq_(24)
+  , invoke             = _dereq_(43)
+  , html               = _dereq_(40)
+  , cel                = _dereq_(28)
+  , global             = _dereq_(37)
   , process            = global.process
   , setTask            = global.setImmediate
   , clearTask          = global.clearImmediate
@@ -1372,7 +1789,7 @@ var run = function(){
     fn();
   }
 };
-var listner = function(event){
+var listener = function(event){
   run.call(event.data);
 };
 // Node.js 0.9+ & IE10+ has setImmediate, otherwise:
@@ -1390,7 +1807,7 @@ if(!setTask || !clearTask){
     delete queue[id];
   };
   // Node.js 0.8-
-  if(_dereq_(12)(process) == 'process'){
+  if(_dereq_(18)(process) == 'process'){
     defer = function(id){
       process.nextTick(ctx(run, id, 1));
     };
@@ -1398,7 +1815,7 @@ if(!setTask || !clearTask){
   } else if(MessageChannel){
     channel = new MessageChannel;
     port    = channel.port2;
-    channel.port1.onmessage = listner;
+    channel.port1.onmessage = listener;
     defer = ctx(port.postMessage, port, 1);
   // Browsers with postMessage, skip WebWorkers
   // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
@@ -1406,7 +1823,7 @@ if(!setTask || !clearTask){
     defer = function(id){
       global.postMessage(id + '', '*');
     };
-    global.addEventListener('message', listner, false);
+    global.addEventListener('message', listener, false);
   // IE8-
   } else if(ONREADYSTATECHANGE in cel('script')){
     defer = function(id){
@@ -1426,44 +1843,44 @@ module.exports = {
   set:   setTask,
   clear: clearTask
 };
-},{"12":12,"18":18,"21":21,"30":30,"33":33,"34":34}],77:[function(_dereq_,module,exports){
-var toInteger = _dereq_(78)
+},{"18":18,"24":24,"28":28,"37":37,"40":40,"43":43}],104:[function(_dereq_,module,exports){
+var toInteger = _dereq_(105)
   , max       = Math.max
   , min       = Math.min;
 module.exports = function(index, length){
   index = toInteger(index);
   return index < 0 ? max(index + length, 0) : min(index, length);
 };
-},{"78":78}],78:[function(_dereq_,module,exports){
+},{"105":105}],105:[function(_dereq_,module,exports){
 // 7.1.4 ToInteger
 var ceil  = Math.ceil
   , floor = Math.floor;
 module.exports = function(it){
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
-},{}],79:[function(_dereq_,module,exports){
+},{}],106:[function(_dereq_,module,exports){
 // to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = _dereq_(35)
-  , defined = _dereq_(19);
+var IObject = _dereq_(44)
+  , defined = _dereq_(26);
 module.exports = function(it){
   return IObject(defined(it));
 };
-},{"19":19,"35":35}],80:[function(_dereq_,module,exports){
+},{"26":26,"44":44}],107:[function(_dereq_,module,exports){
 // 7.1.15 ToLength
-var toInteger = _dereq_(78)
+var toInteger = _dereq_(105)
   , min       = Math.min;
 module.exports = function(it){
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
-},{"78":78}],81:[function(_dereq_,module,exports){
+},{"105":105}],108:[function(_dereq_,module,exports){
 // 7.1.13 ToObject(argument)
-var defined = _dereq_(19);
+var defined = _dereq_(26);
 module.exports = function(it){
   return Object(defined(it));
 };
-},{"19":19}],82:[function(_dereq_,module,exports){
+},{"26":26}],109:[function(_dereq_,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
-var isObject = _dereq_(39);
+var isObject = _dereq_(48);
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
 // and the second argument - flag - preferred type is a string
 module.exports = function(it, S){
@@ -1474,325 +1891,873 @@ module.exports = function(it, S){
   if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
   throw TypeError("Can't convert object to primitive value");
 };
-},{"39":39}],83:[function(_dereq_,module,exports){
+},{"48":48}],110:[function(_dereq_,module,exports){
+'use strict';
+if(_dereq_(27)){
+  var LIBRARY             = _dereq_(57)
+    , global              = _dereq_(37)
+    , fails               = _dereq_(33)
+    , $export             = _dereq_(31)
+    , $typed              = _dereq_(112)
+    , $buffer             = _dereq_(111)
+    , ctx                 = _dereq_(24)
+    , anInstance          = _dereq_(7)
+    , propertyDesc        = _dereq_(84)
+    , hide                = _dereq_(39)
+    , redefineAll         = _dereq_(85)
+    , isInteger           = _dereq_(47)
+    , toInteger           = _dereq_(105)
+    , toLength            = _dereq_(107)
+    , toIndex             = _dereq_(104)
+    , toPrimitive         = _dereq_(109)
+    , has                 = _dereq_(38)
+    , same                = _dereq_(88)
+    , classof             = _dereq_(17)
+    , isObject            = _dereq_(48)
+    , toObject            = _dereq_(108)
+    , isArrayIter         = _dereq_(45)
+    , create              = _dereq_(65)
+    , getPrototypeOf      = _dereq_(73)
+    , gOPN                = _dereq_(71).f
+    , isIterable          = _dereq_(116)
+    , getIterFn           = _dereq_(115)
+    , uid                 = _dereq_(113)
+    , wks                 = _dereq_(114)
+    , createArrayMethod   = _dereq_(13)
+    , createArrayIncludes = _dereq_(12)
+    , speciesConstructor  = _dereq_(94)
+    , ArrayIterators      = _dereq_(128)
+    , Iterators           = _dereq_(55)
+    , $iterDetect         = _dereq_(53)
+    , setSpecies          = _dereq_(90)
+    , arrayFill           = _dereq_(10)
+    , arrayCopyWithin     = _dereq_(9)
+    , $DP                 = _dereq_(66)
+    , $GOPD               = _dereq_(69)
+    , dP                  = $DP.f
+    , gOPD                = $GOPD.f
+    , RangeError          = global.RangeError
+    , TypeError           = global.TypeError
+    , Uint8Array          = global.Uint8Array
+    , ARRAY_BUFFER        = 'ArrayBuffer'
+    , SHARED_BUFFER       = 'Shared' + ARRAY_BUFFER
+    , BYTES_PER_ELEMENT   = 'BYTES_PER_ELEMENT'
+    , PROTOTYPE           = 'prototype'
+    , ArrayProto          = Array[PROTOTYPE]
+    , $ArrayBuffer        = $buffer.ArrayBuffer
+    , $DataView           = $buffer.DataView
+    , arrayForEach        = createArrayMethod(0)
+    , arrayFilter         = createArrayMethod(2)
+    , arraySome           = createArrayMethod(3)
+    , arrayEvery          = createArrayMethod(4)
+    , arrayFind           = createArrayMethod(5)
+    , arrayFindIndex      = createArrayMethod(6)
+    , arrayIncludes       = createArrayIncludes(true)
+    , arrayIndexOf        = createArrayIncludes(false)
+    , arrayValues         = ArrayIterators.values
+    , arrayKeys           = ArrayIterators.keys
+    , arrayEntries        = ArrayIterators.entries
+    , arrayLastIndexOf    = ArrayProto.lastIndexOf
+    , arrayReduce         = ArrayProto.reduce
+    , arrayReduceRight    = ArrayProto.reduceRight
+    , arrayJoin           = ArrayProto.join
+    , arraySort           = ArrayProto.sort
+    , arraySlice          = ArrayProto.slice
+    , arrayToString       = ArrayProto.toString
+    , arrayToLocaleString = ArrayProto.toLocaleString
+    , ITERATOR            = wks('iterator')
+    , TAG                 = wks('toStringTag')
+    , TYPED_CONSTRUCTOR   = uid('typed_constructor')
+    , DEF_CONSTRUCTOR     = uid('def_constructor')
+    , ALL_CONSTRUCTORS    = $typed.CONSTR
+    , TYPED_ARRAY         = $typed.TYPED
+    , VIEW                = $typed.VIEW
+    , WRONG_LENGTH        = 'Wrong length!';
+
+  var $map = createArrayMethod(1, function(O, length){
+    return allocate(speciesConstructor(O, O[DEF_CONSTRUCTOR]), length);
+  });
+
+  var LITTLE_ENDIAN = fails(function(){
+    return new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+  });
+
+  var FORCED_SET = !!Uint8Array && !!Uint8Array[PROTOTYPE].set && fails(function(){
+    new Uint8Array(1).set({});
+  });
+
+  var strictToLength = function(it, SAME){
+    if(it === undefined)throw TypeError(WRONG_LENGTH);
+    var number = +it
+      , length = toLength(it);
+    if(SAME && !same(number, length))throw RangeError(WRONG_LENGTH);
+    return length;
+  };
+
+  var toOffset = function(it, BYTES){
+    var offset = toInteger(it);
+    if(offset < 0 || offset % BYTES)throw RangeError('Wrong offset!');
+    return offset;
+  };
+
+  var validate = function(it){
+    if(isObject(it) && TYPED_ARRAY in it)return it;
+    throw TypeError(it + ' is not a typed array!');
+  };
+
+  var allocate = function(C, length){
+    if(!(isObject(C) && TYPED_CONSTRUCTOR in C)){
+      throw TypeError('It is not a typed array constructor!');
+    } return new C(length);
+  };
+
+  var speciesFromList = function(O, list){
+    return fromList(speciesConstructor(O, O[DEF_CONSTRUCTOR]), list);
+  };
+
+  var fromList = function(C, list){
+    var index  = 0
+      , length = list.length
+      , result = allocate(C, length);
+    while(length > index)result[index] = list[index++];
+    return result;
+  };
+
+  var addGetter = function(it, key, internal){
+    dP(it, key, {get: function(){ return this._d[internal]; }});
+  };
+
+  var $from = function from(source /*, mapfn, thisArg */){
+    var O       = toObject(source)
+      , aLen    = arguments.length
+      , mapfn   = aLen > 1 ? arguments[1] : undefined
+      , mapping = mapfn !== undefined
+      , iterFn  = getIterFn(O)
+      , i, length, values, result, step, iterator;
+    if(iterFn != undefined && !isArrayIter(iterFn)){
+      for(iterator = iterFn.call(O), values = [], i = 0; !(step = iterator.next()).done; i++){
+        values.push(step.value);
+      } O = values;
+    }
+    if(mapping && aLen > 2)mapfn = ctx(mapfn, arguments[2], 2);
+    for(i = 0, length = toLength(O.length), result = allocate(this, length); length > i; i++){
+      result[i] = mapping ? mapfn(O[i], i) : O[i];
+    }
+    return result;
+  };
+
+  var $of = function of(/*...items*/){
+    var index  = 0
+      , length = arguments.length
+      , result = allocate(this, length);
+    while(length > index)result[index] = arguments[index++];
+    return result;
+  };
+
+  // iOS Safari 6.x fails here
+  var TO_LOCALE_BUG = !!Uint8Array && fails(function(){ arrayToLocaleString.call(new Uint8Array(1)); });
+
+  var $toLocaleString = function toLocaleString(){
+    return arrayToLocaleString.apply(TO_LOCALE_BUG ? arraySlice.call(validate(this)) : validate(this), arguments);
+  };
+
+  var proto = {
+    copyWithin: function copyWithin(target, start /*, end */){
+      return arrayCopyWithin.call(validate(this), target, start, arguments.length > 2 ? arguments[2] : undefined);
+    },
+    every: function every(callbackfn /*, thisArg */){
+      return arrayEvery(validate(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    fill: function fill(value /*, start, end */){ // eslint-disable-line no-unused-vars
+      return arrayFill.apply(validate(this), arguments);
+    },
+    filter: function filter(callbackfn /*, thisArg */){
+      return speciesFromList(this, arrayFilter(validate(this), callbackfn,
+        arguments.length > 1 ? arguments[1] : undefined));
+    },
+    find: function find(predicate /*, thisArg */){
+      return arrayFind(validate(this), predicate, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    findIndex: function findIndex(predicate /*, thisArg */){
+      return arrayFindIndex(validate(this), predicate, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    forEach: function forEach(callbackfn /*, thisArg */){
+      arrayForEach(validate(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    indexOf: function indexOf(searchElement /*, fromIndex */){
+      return arrayIndexOf(validate(this), searchElement, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    includes: function includes(searchElement /*, fromIndex */){
+      return arrayIncludes(validate(this), searchElement, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    join: function join(separator){ // eslint-disable-line no-unused-vars
+      return arrayJoin.apply(validate(this), arguments);
+    },
+    lastIndexOf: function lastIndexOf(searchElement /*, fromIndex */){ // eslint-disable-line no-unused-vars
+      return arrayLastIndexOf.apply(validate(this), arguments);
+    },
+    map: function map(mapfn /*, thisArg */){
+      return $map(validate(this), mapfn, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    reduce: function reduce(callbackfn /*, initialValue */){ // eslint-disable-line no-unused-vars
+      return arrayReduce.apply(validate(this), arguments);
+    },
+    reduceRight: function reduceRight(callbackfn /*, initialValue */){ // eslint-disable-line no-unused-vars
+      return arrayReduceRight.apply(validate(this), arguments);
+    },
+    reverse: function reverse(){
+      var that   = this
+        , length = validate(that).length
+        , middle = Math.floor(length / 2)
+        , index  = 0
+        , value;
+      while(index < middle){
+        value         = that[index];
+        that[index++] = that[--length];
+        that[length]  = value;
+      } return that;
+    },
+    some: function some(callbackfn /*, thisArg */){
+      return arraySome(validate(this), callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    },
+    sort: function sort(comparefn){
+      return arraySort.call(validate(this), comparefn);
+    },
+    subarray: function subarray(begin, end){
+      var O      = validate(this)
+        , length = O.length
+        , $begin = toIndex(begin, length);
+      return new (speciesConstructor(O, O[DEF_CONSTRUCTOR]))(
+        O.buffer,
+        O.byteOffset + $begin * O.BYTES_PER_ELEMENT,
+        toLength((end === undefined ? length : toIndex(end, length)) - $begin)
+      );
+    }
+  };
+
+  var $slice = function slice(start, end){
+    return speciesFromList(this, arraySlice.call(validate(this), start, end));
+  };
+
+  var $set = function set(arrayLike /*, offset */){
+    validate(this);
+    var offset = toOffset(arguments[1], 1)
+      , length = this.length
+      , src    = toObject(arrayLike)
+      , len    = toLength(src.length)
+      , index  = 0;
+    if(len + offset > length)throw RangeError(WRONG_LENGTH);
+    while(index < len)this[offset + index] = src[index++];
+  };
+
+  var $iterators = {
+    entries: function entries(){
+      return arrayEntries.call(validate(this));
+    },
+    keys: function keys(){
+      return arrayKeys.call(validate(this));
+    },
+    values: function values(){
+      return arrayValues.call(validate(this));
+    }
+  };
+
+  var isTAIndex = function(target, key){
+    return isObject(target)
+      && target[TYPED_ARRAY]
+      && typeof key != 'symbol'
+      && key in target
+      && String(+key) == String(key);
+  };
+  var $getDesc = function getOwnPropertyDescriptor(target, key){
+    return isTAIndex(target, key = toPrimitive(key, true))
+      ? propertyDesc(2, target[key])
+      : gOPD(target, key);
+  };
+  var $setDesc = function defineProperty(target, key, desc){
+    if(isTAIndex(target, key = toPrimitive(key, true))
+      && isObject(desc)
+      && has(desc, 'value')
+      && !has(desc, 'get')
+      && !has(desc, 'set')
+      // TODO: add validation descriptor w/o calling accessors
+      && !desc.configurable
+      && (!has(desc, 'writable') || desc.writable)
+      && (!has(desc, 'enumerable') || desc.enumerable)
+    ){
+      target[key] = desc.value;
+      return target;
+    } else return dP(target, key, desc);
+  };
+
+  if(!ALL_CONSTRUCTORS){
+    $GOPD.f = $getDesc;
+    $DP.f   = $setDesc;
+  }
+
+  $export($export.S + $export.F * !ALL_CONSTRUCTORS, 'Object', {
+    getOwnPropertyDescriptor: $getDesc,
+    defineProperty:           $setDesc
+  });
+
+  if(fails(function(){ arrayToString.call({}); })){
+    arrayToString = arrayToLocaleString = function toString(){
+      return arrayJoin.call(this);
+    }
+  }
+
+  var $TypedArrayPrototype$ = redefineAll({}, proto);
+  redefineAll($TypedArrayPrototype$, $iterators);
+  hide($TypedArrayPrototype$, ITERATOR, $iterators.values);
+  redefineAll($TypedArrayPrototype$, {
+    slice:          $slice,
+    set:            $set,
+    constructor:    function(){ /* noop */ },
+    toString:       arrayToString,
+    toLocaleString: $toLocaleString
+  });
+  addGetter($TypedArrayPrototype$, 'buffer', 'b');
+  addGetter($TypedArrayPrototype$, 'byteOffset', 'o');
+  addGetter($TypedArrayPrototype$, 'byteLength', 'l');
+  addGetter($TypedArrayPrototype$, 'length', 'e');
+  dP($TypedArrayPrototype$, TAG, {
+    get: function(){ return this[TYPED_ARRAY]; }
+  });
+
+  module.exports = function(KEY, BYTES, wrapper, CLAMPED){
+    CLAMPED = !!CLAMPED;
+    var NAME       = KEY + (CLAMPED ? 'Clamped' : '') + 'Array'
+      , ISNT_UINT8 = NAME != 'Uint8Array'
+      , GETTER     = 'get' + KEY
+      , SETTER     = 'set' + KEY
+      , TypedArray = global[NAME]
+      , Base       = TypedArray || {}
+      , TAC        = TypedArray && getPrototypeOf(TypedArray)
+      , FORCED     = !TypedArray || !$typed.ABV
+      , O          = {}
+      , TypedArrayPrototype = TypedArray && TypedArray[PROTOTYPE];
+    var getter = function(that, index){
+      var data = that._d;
+      return data.v[GETTER](index * BYTES + data.o, LITTLE_ENDIAN);
+    };
+    var setter = function(that, index, value){
+      var data = that._d;
+      if(CLAMPED)value = (value = Math.round(value)) < 0 ? 0 : value > 0xff ? 0xff : value & 0xff;
+      data.v[SETTER](index * BYTES + data.o, value, LITTLE_ENDIAN);
+    };
+    var addElement = function(that, index){
+      dP(that, index, {
+        get: function(){
+          return getter(this, index);
+        },
+        set: function(value){
+          return setter(this, index, value);
+        },
+        enumerable: true
+      });
+    };
+    if(FORCED){
+      TypedArray = wrapper(function(that, data, $offset, $length){
+        anInstance(that, TypedArray, NAME, '_d');
+        var index  = 0
+          , offset = 0
+          , buffer, byteLength, length, klass;
+        if(!isObject(data)){
+          length     = strictToLength(data, true)
+          byteLength = length * BYTES;
+          buffer     = new $ArrayBuffer(byteLength);
+        } else if(data instanceof $ArrayBuffer || (klass = classof(data)) == ARRAY_BUFFER || klass == SHARED_BUFFER){
+          buffer = data;
+          offset = toOffset($offset, BYTES);
+          var $len = data.byteLength;
+          if($length === undefined){
+            if($len % BYTES)throw RangeError(WRONG_LENGTH);
+            byteLength = $len - offset;
+            if(byteLength < 0)throw RangeError(WRONG_LENGTH);
+          } else {
+            byteLength = toLength($length) * BYTES;
+            if(byteLength + offset > $len)throw RangeError(WRONG_LENGTH);
+          }
+          length = byteLength / BYTES;
+        } else if(TYPED_ARRAY in data){
+          return fromList(TypedArray, data);
+        } else {
+          return $from.call(TypedArray, data);
+        }
+        hide(that, '_d', {
+          b: buffer,
+          o: offset,
+          l: byteLength,
+          e: length,
+          v: new $DataView(buffer)
+        });
+        while(index < length)addElement(that, index++);
+      });
+      TypedArrayPrototype = TypedArray[PROTOTYPE] = create($TypedArrayPrototype$);
+      hide(TypedArrayPrototype, 'constructor', TypedArray);
+    } else if(!$iterDetect(function(iter){
+      // V8 works with iterators, but fails in many other cases
+      // https://code.google.com/p/v8/issues/detail?id=4552
+      new TypedArray(null); // eslint-disable-line no-new
+      new TypedArray(iter); // eslint-disable-line no-new
+    }, true)){
+      TypedArray = wrapper(function(that, data, $offset, $length){
+        anInstance(that, TypedArray, NAME);
+        var klass;
+        // `ws` module bug, temporarily remove validation length for Uint8Array
+        // https://github.com/websockets/ws/pull/645
+        if(!isObject(data))return new Base(strictToLength(data, ISNT_UINT8));
+        if(data instanceof $ArrayBuffer || (klass = classof(data)) == ARRAY_BUFFER || klass == SHARED_BUFFER){
+          return $length !== undefined
+            ? new Base(data, toOffset($offset, BYTES), $length)
+            : $offset !== undefined
+              ? new Base(data, toOffset($offset, BYTES))
+              : new Base(data);
+        }
+        if(TYPED_ARRAY in data)return fromList(TypedArray, data);
+        return $from.call(TypedArray, data);
+      });
+      arrayForEach(TAC !== Function.prototype ? gOPN(Base).concat(gOPN(TAC)) : gOPN(Base), function(key){
+        if(!(key in TypedArray))hide(TypedArray, key, Base[key]);
+      });
+      TypedArray[PROTOTYPE] = TypedArrayPrototype;
+      if(!LIBRARY)TypedArrayPrototype.constructor = TypedArray;
+    }
+    var $nativeIterator   = TypedArrayPrototype[ITERATOR]
+      , CORRECT_ITER_NAME = !!$nativeIterator && ($nativeIterator.name == 'values' || $nativeIterator.name == undefined)
+      , $iterator         = $iterators.values;
+    hide(TypedArray, TYPED_CONSTRUCTOR, true);
+    hide(TypedArrayPrototype, TYPED_ARRAY, NAME);
+    hide(TypedArrayPrototype, VIEW, true);
+    hide(TypedArrayPrototype, DEF_CONSTRUCTOR, TypedArray);
+
+    if(CLAMPED ? new TypedArray(1)[TAG] != NAME : !(TAG in TypedArrayPrototype)){
+      dP(TypedArrayPrototype, TAG, {
+        get: function(){ return NAME; }
+      });
+    }
+
+    O[NAME] = TypedArray;
+
+    $export($export.G + $export.W + $export.F * (TypedArray != Base), O);
+
+    $export($export.S, NAME, {
+      BYTES_PER_ELEMENT: BYTES,
+      from: $from,
+      of: $of
+    });
+
+    if(!(BYTES_PER_ELEMENT in TypedArrayPrototype))hide(TypedArrayPrototype, BYTES_PER_ELEMENT, BYTES);
+
+    $export($export.P, NAME, proto);
+
+    setSpecies(NAME);
+
+    $export($export.P + $export.F * FORCED_SET, NAME, {set: $set});
+
+    $export($export.P + $export.F * !CORRECT_ITER_NAME, NAME, $iterators);
+
+    $export($export.P + $export.F * (TypedArrayPrototype.toString != arrayToString), NAME, {toString: arrayToString});
+
+    $export($export.P + $export.F * fails(function(){
+      new TypedArray(1).slice();
+    }), NAME, {slice: $slice});
+
+    $export($export.P + $export.F * (fails(function(){
+      return [1, 2].toLocaleString() != new TypedArray([1, 2]).toLocaleString()
+    }) || !fails(function(){
+      TypedArrayPrototype.toLocaleString.call([1, 2]);
+    })), NAME, {toLocaleString: $toLocaleString});
+
+    Iterators[NAME] = CORRECT_ITER_NAME ? $nativeIterator : $iterator;
+    if(!LIBRARY && !CORRECT_ITER_NAME)hide(TypedArrayPrototype, ITERATOR, $iterator);
+  };
+} else module.exports = function(){ /* empty */ };
+},{"10":10,"104":104,"105":105,"107":107,"108":108,"109":109,"111":111,"112":112,"113":113,"114":114,"115":115,"116":116,"12":12,"128":128,"13":13,"17":17,"24":24,"27":27,"31":31,"33":33,"37":37,"38":38,"39":39,"45":45,"47":47,"48":48,"53":53,"55":55,"57":57,"65":65,"66":66,"69":69,"7":7,"71":71,"73":73,"84":84,"85":85,"88":88,"9":9,"90":90,"94":94}],111:[function(_dereq_,module,exports){
+'use strict';
+var global         = _dereq_(37)
+  , DESCRIPTORS    = _dereq_(27)
+  , LIBRARY        = _dereq_(57)
+  , $typed         = _dereq_(112)
+  , hide           = _dereq_(39)
+  , redefineAll    = _dereq_(85)
+  , fails          = _dereq_(33)
+  , anInstance     = _dereq_(7)
+  , toInteger      = _dereq_(105)
+  , toLength       = _dereq_(107)
+  , gOPN           = _dereq_(71).f
+  , dP             = _dereq_(66).f
+  , arrayFill      = _dereq_(10)
+  , setToStringTag = _dereq_(91)
+  , ARRAY_BUFFER   = 'ArrayBuffer'
+  , DATA_VIEW      = 'DataView'
+  , PROTOTYPE      = 'prototype'
+  , WRONG_LENGTH   = 'Wrong length!'
+  , WRONG_INDEX    = 'Wrong index!'
+  , $ArrayBuffer   = global[ARRAY_BUFFER]
+  , $DataView      = global[DATA_VIEW]
+  , Math           = global.Math
+  , parseInt       = global.parseInt
+  , RangeError     = global.RangeError
+  , Infinity       = global.Infinity
+  , BaseBuffer     = $ArrayBuffer
+  , abs            = Math.abs
+  , pow            = Math.pow
+  , min            = Math.min
+  , floor          = Math.floor
+  , log            = Math.log
+  , LN2            = Math.LN2
+  , BUFFER         = 'buffer'
+  , BYTE_LENGTH    = 'byteLength'
+  , BYTE_OFFSET    = 'byteOffset'
+  , $BUFFER        = DESCRIPTORS ? '_b' : BUFFER
+  , $LENGTH        = DESCRIPTORS ? '_l' : BYTE_LENGTH
+  , $OFFSET        = DESCRIPTORS ? '_o' : BYTE_OFFSET;
+
+// IEEE754 conversions based on https://github.com/feross/ieee754
+var packIEEE754 = function(value, mLen, nBytes){
+  var buffer = Array(nBytes)
+    , eLen   = nBytes * 8 - mLen - 1
+    , eMax   = (1 << eLen) - 1
+    , eBias  = eMax >> 1
+    , rt     = mLen === 23 ? pow(2, -24) - pow(2, -77) : 0
+    , i      = 0
+    , s      = value < 0 || value === 0 && 1 / value < 0 ? 1 : 0
+    , e, m, c;
+  value = abs(value)
+  if(value != value || value === Infinity){
+    m = value != value ? 1 : 0;
+    e = eMax;
+  } else {
+    e = floor(log(value) / LN2);
+    if(value * (c = pow(2, -e)) < 1){
+      e--;
+      c *= 2;
+    }
+    if(e + eBias >= 1){
+      value += rt / c;
+    } else {
+      value += rt * pow(2, 1 - eBias);
+    }
+    if(value * c >= 2){
+      e++;
+      c /= 2;
+    }
+    if(e + eBias >= eMax){
+      m = 0;
+      e = eMax;
+    } else if(e + eBias >= 1){
+      m = (value * c - 1) * pow(2, mLen);
+      e = e + eBias;
+    } else {
+      m = value * pow(2, eBias - 1) * pow(2, mLen);
+      e = 0;
+    }
+  }
+  for(; mLen >= 8; buffer[i++] = m & 255, m /= 256, mLen -= 8);
+  e = e << mLen | m;
+  eLen += mLen;
+  for(; eLen > 0; buffer[i++] = e & 255, e /= 256, eLen -= 8);
+  buffer[--i] |= s * 128;
+  return buffer;
+};
+var unpackIEEE754 = function(buffer, mLen, nBytes){
+  var eLen  = nBytes * 8 - mLen - 1
+    , eMax  = (1 << eLen) - 1
+    , eBias = eMax >> 1
+    , nBits = eLen - 7
+    , i     = nBytes - 1
+    , s     = buffer[i--]
+    , e     = s & 127
+    , m;
+  s >>= 7;
+  for(; nBits > 0; e = e * 256 + buffer[i], i--, nBits -= 8);
+  m = e & (1 << -nBits) - 1;
+  e >>= -nBits;
+  nBits += mLen;
+  for(; nBits > 0; m = m * 256 + buffer[i], i--, nBits -= 8);
+  if(e === 0){
+    e = 1 - eBias;
+  } else if(e === eMax){
+    return m ? NaN : s ? -Infinity : Infinity;
+  } else {
+    m = m + pow(2, mLen);
+    e = e - eBias;
+  } return (s ? -1 : 1) * m * pow(2, e - mLen);
+};
+
+var unpackI32 = function(bytes){
+  return bytes[3] << 24 | bytes[2] << 16 | bytes[1] << 8 | bytes[0];
+};
+var packI8 = function(it){
+  return [it & 0xff];
+};
+var packI16 = function(it){
+  return [it & 0xff, it >> 8 & 0xff];
+};
+var packI32 = function(it){
+  return [it & 0xff, it >> 8 & 0xff, it >> 16 & 0xff, it >> 24 & 0xff];
+};
+var packF64 = function(it){
+  return packIEEE754(it, 52, 8);
+};
+var packF32 = function(it){
+  return packIEEE754(it, 23, 4);
+};
+
+var addGetter = function(C, key, internal){
+  dP(C[PROTOTYPE], key, {get: function(){ return this[internal]; }});
+};
+
+var get = function(view, bytes, index, isLittleEndian){
+  var numIndex = +index
+    , intIndex = toInteger(numIndex);
+  if(numIndex != intIndex || intIndex < 0 || intIndex + bytes > view[$LENGTH])throw RangeError(WRONG_INDEX);
+  var store = view[$BUFFER]._b
+    , start = intIndex + view[$OFFSET]
+    , pack  = store.slice(start, start + bytes);
+  return isLittleEndian ? pack : pack.reverse();
+};
+var set = function(view, bytes, index, conversion, value, isLittleEndian){
+  var numIndex = +index
+    , intIndex = toInteger(numIndex);
+  if(numIndex != intIndex || intIndex < 0 || intIndex + bytes > view[$LENGTH])throw RangeError(WRONG_INDEX);
+  var store = view[$BUFFER]._b
+    , start = intIndex + view[$OFFSET]
+    , pack  = conversion(+value);
+  for(var i = 0; i < bytes; i++)store[start + i] = pack[isLittleEndian ? i : bytes - i - 1];
+};
+
+var validateArrayBufferArguments = function(that, length){
+  anInstance(that, $ArrayBuffer, ARRAY_BUFFER);
+  var numberLength = +length
+    , byteLength   = toLength(numberLength);
+  if(numberLength != byteLength)throw RangeError(WRONG_LENGTH);
+  return byteLength;
+};
+
+if(!$typed.ABV){
+  $ArrayBuffer = function ArrayBuffer(length){
+    var byteLength = validateArrayBufferArguments(this, length);
+    this._b       = arrayFill.call(Array(byteLength), 0);
+    this[$LENGTH] = byteLength;
+  };
+
+  $DataView = function DataView(buffer, byteOffset, byteLength){
+    anInstance(this, $DataView, DATA_VIEW);
+    anInstance(buffer, $ArrayBuffer, DATA_VIEW);
+    var bufferLength = buffer[$LENGTH]
+      , offset       = toInteger(byteOffset);
+    if(offset < 0 || offset > bufferLength)throw RangeError('Wrong offset!');
+    byteLength = byteLength === undefined ? bufferLength - offset : toLength(byteLength);
+    if(offset + byteLength > bufferLength)throw RangeError(WRONG_LENGTH);
+    this[$BUFFER] = buffer;
+    this[$OFFSET] = offset;
+    this[$LENGTH] = byteLength;
+  };
+
+  if(DESCRIPTORS){
+    addGetter($ArrayBuffer, BYTE_LENGTH, '_l');
+    addGetter($DataView, BUFFER, '_b');
+    addGetter($DataView, BYTE_LENGTH, '_l');
+    addGetter($DataView, BYTE_OFFSET, '_o');
+  }
+
+  redefineAll($DataView[PROTOTYPE], {
+    getInt8: function getInt8(byteOffset){
+      return get(this, 1, byteOffset)[0] << 24 >> 24;
+    },
+    getUint8: function getUint8(byteOffset){
+      return get(this, 1, byteOffset)[0];
+    },
+    getInt16: function getInt16(byteOffset /*, littleEndian */){
+      var bytes = get(this, 2, byteOffset, arguments[1]);
+      return (bytes[1] << 8 | bytes[0]) << 16 >> 16;
+    },
+    getUint16: function getUint16(byteOffset /*, littleEndian */){
+      var bytes = get(this, 2, byteOffset, arguments[1]);
+      return bytes[1] << 8 | bytes[0];
+    },
+    getInt32: function getInt32(byteOffset /*, littleEndian */){
+      return unpackI32(get(this, 4, byteOffset, arguments[1]));
+    },
+    getUint32: function getUint32(byteOffset /*, littleEndian */){
+      return unpackI32(get(this, 4, byteOffset, arguments[1])) >>> 0;
+    },
+    getFloat32: function getFloat32(byteOffset /*, littleEndian */){
+      return unpackIEEE754(get(this, 4, byteOffset, arguments[1]), 23, 4);
+    },
+    getFloat64: function getFloat64(byteOffset /*, littleEndian */){
+      return unpackIEEE754(get(this, 8, byteOffset, arguments[1]), 52, 8);
+    },
+    setInt8: function setInt8(byteOffset, value){
+      set(this, 1, byteOffset, packI8, value);
+    },
+    setUint8: function setUint8(byteOffset, value){
+      set(this, 1, byteOffset, packI8, value);
+    },
+    setInt16: function setInt16(byteOffset, value /*, littleEndian */){
+      set(this, 2, byteOffset, packI16, value, arguments[2]);
+    },
+    setUint16: function setUint16(byteOffset, value /*, littleEndian */){
+      set(this, 2, byteOffset, packI16, value, arguments[2]);
+    },
+    setInt32: function setInt32(byteOffset, value /*, littleEndian */){
+      set(this, 4, byteOffset, packI32, value, arguments[2]);
+    },
+    setUint32: function setUint32(byteOffset, value /*, littleEndian */){
+      set(this, 4, byteOffset, packI32, value, arguments[2]);
+    },
+    setFloat32: function setFloat32(byteOffset, value /*, littleEndian */){
+      set(this, 4, byteOffset, packF32, value, arguments[2]);
+    },
+    setFloat64: function setFloat64(byteOffset, value /*, littleEndian */){
+      set(this, 8, byteOffset, packF64, value, arguments[2]);
+    }
+  });
+} else {
+  if(!fails(function(){
+    new $ArrayBuffer;     // eslint-disable-line no-new
+  }) || !fails(function(){
+    new $ArrayBuffer(.5); // eslint-disable-line no-new
+  })){
+    $ArrayBuffer = function ArrayBuffer(length){
+      return new BaseBuffer(validateArrayBufferArguments(this, length));
+    };
+    var ArrayBufferProto = $ArrayBuffer[PROTOTYPE] = BaseBuffer[PROTOTYPE];
+    for(var keys = gOPN(BaseBuffer), j = 0, key; keys.length > j; ){
+      if(!((key = keys[j++]) in $ArrayBuffer))hide($ArrayBuffer, key, BaseBuffer[key]);
+    };
+    if(!LIBRARY)ArrayBufferProto.constructor = $ArrayBuffer;
+  }
+  // iOS Safari 7.x bug
+  var view = new $DataView(new $ArrayBuffer(2))
+    , $setInt8 = $DataView[PROTOTYPE].setInt8;
+  view.setInt8(0, 2147483648);
+  view.setInt8(1, 2147483649);
+  if(view.getInt8(0) || !view.getInt8(1))redefineAll($DataView[PROTOTYPE], {
+    setInt8: function setInt8(byteOffset, value){
+      $setInt8.call(this, byteOffset, value << 24 >> 24);
+    },
+    setUint8: function setUint8(byteOffset, value){
+      $setInt8.call(this, byteOffset, value << 24 >> 24);
+    }
+  }, true);
+}
+setToStringTag($ArrayBuffer, ARRAY_BUFFER);
+setToStringTag($DataView, DATA_VIEW);
+hide($DataView[PROTOTYPE], $typed.VIEW, true);
+exports[ARRAY_BUFFER] = $ArrayBuffer;
+exports[DATA_VIEW] = $DataView;
+},{"10":10,"105":105,"107":107,"112":112,"27":27,"33":33,"37":37,"39":39,"57":57,"66":66,"7":7,"71":71,"85":85,"91":91}],112:[function(_dereq_,module,exports){
+var global = _dereq_(37)
+  , hide   = _dereq_(39)
+  , uid    = _dereq_(113)
+  , TYPED  = uid('typed_array')
+  , VIEW   = uid('view')
+  , ABV    = !!(global.ArrayBuffer && global.DataView)
+  , CONSTR = ABV
+  , i = 0, l = 9, Typed;
+
+var TypedArrayConstructors = (
+  'Int8Array,Uint8Array,Uint8ClampedArray,Int16Array,Uint16Array,Int32Array,Uint32Array,Float32Array,Float64Array'
+).split(',');
+
+while(i < l){
+  if(Typed = global[TypedArrayConstructors[i++]]){
+    hide(Typed.prototype, TYPED, true);
+    hide(Typed.prototype, VIEW, true);
+  } else CONSTR = false;
+}
+
+module.exports = {
+  ABV:    ABV,
+  CONSTR: CONSTR,
+  TYPED:  TYPED,
+  VIEW:   VIEW
+};
+},{"113":113,"37":37,"39":39}],113:[function(_dereq_,module,exports){
 var id = 0
   , px = Math.random();
 module.exports = function(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
 };
-},{}],84:[function(_dereq_,module,exports){
-var store  = _dereq_(68)('wks')
-  , uid    = _dereq_(83)
-  , Symbol = _dereq_(30).Symbol;
+},{}],114:[function(_dereq_,module,exports){
+var store      = _dereq_(93)('wks')
+  , uid        = _dereq_(113)
+  , Symbol     = _dereq_(37).Symbol
+  , USE_SYMBOL = typeof Symbol == 'function';
 module.exports = function(name){
   return store[name] || (store[name] =
-    Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
 };
-},{"30":30,"68":68,"83":83}],85:[function(_dereq_,module,exports){
-var classof   = _dereq_(11)
-  , ITERATOR  = _dereq_(84)('iterator')
-  , Iterators = _dereq_(46);
-module.exports = _dereq_(17).getIteratorMethod = function(it){
+},{"113":113,"37":37,"93":93}],115:[function(_dereq_,module,exports){
+var classof   = _dereq_(17)
+  , ITERATOR  = _dereq_(114)('iterator')
+  , Iterators = _dereq_(55);
+module.exports = _dereq_(23).getIteratorMethod = function(it){
   if(it != undefined)return it[ITERATOR]
     || it['@@iterator']
     || Iterators[classof(it)];
 };
-},{"11":11,"17":17,"46":46,"84":84}],86:[function(_dereq_,module,exports){
-'use strict';
-var $                 = _dereq_(47)
-  , $export           = _dereq_(23)
-  , DESCRIPTORS       = _dereq_(20)
-  , createDesc        = _dereq_(60)
-  , html              = _dereq_(33)
-  , cel               = _dereq_(21)
-  , has               = _dereq_(31)
-  , cof               = _dereq_(12)
-  , invoke            = _dereq_(34)
-  , fails             = _dereq_(25)
-  , anObject          = _dereq_(5)
-  , aFunction         = _dereq_(3)
-  , isObject          = _dereq_(39)
-  , toObject          = _dereq_(81)
-  , toIObject         = _dereq_(79)
-  , toInteger         = _dereq_(78)
-  , toIndex           = _dereq_(77)
-  , toLength          = _dereq_(80)
-  , IObject           = _dereq_(35)
-  , IE_PROTO          = _dereq_(83)('__proto__')
-  , createArrayMethod = _dereq_(9)
-  , arrayIndexOf      = _dereq_(8)(false)
-  , ObjectProto       = Object.prototype
-  , ArrayProto        = Array.prototype
-  , arraySlice        = ArrayProto.slice
-  , arrayJoin         = ArrayProto.join
-  , defineProperty    = $.setDesc
-  , getOwnDescriptor  = $.getDesc
-  , defineProperties  = $.setDescs
-  , factories         = {}
-  , IE8_DOM_DEFINE;
-
-if(!DESCRIPTORS){
-  IE8_DOM_DEFINE = !fails(function(){
-    return defineProperty(cel('div'), 'a', {get: function(){ return 7; }}).a != 7;
-  });
-  $.setDesc = function(O, P, Attributes){
-    if(IE8_DOM_DEFINE)try {
-      return defineProperty(O, P, Attributes);
-    } catch(e){ /* empty */ }
-    if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
-    if('value' in Attributes)anObject(O)[P] = Attributes.value;
-    return O;
-  };
-  $.getDesc = function(O, P){
-    if(IE8_DOM_DEFINE)try {
-      return getOwnDescriptor(O, P);
-    } catch(e){ /* empty */ }
-    if(has(O, P))return createDesc(!ObjectProto.propertyIsEnumerable.call(O, P), O[P]);
-  };
-  $.setDescs = defineProperties = function(O, Properties){
-    anObject(O);
-    var keys   = $.getKeys(Properties)
-      , length = keys.length
-      , i = 0
-      , P;
-    while(length > i)$.setDesc(O, P = keys[i++], Properties[P]);
-    return O;
-  };
-}
-$export($export.S + $export.F * !DESCRIPTORS, 'Object', {
-  // 19.1.2.6 / 15.2.3.3 Object.getOwnPropertyDescriptor(O, P)
-  getOwnPropertyDescriptor: $.getDesc,
-  // 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
-  defineProperty: $.setDesc,
-  // 19.1.2.3 / 15.2.3.7 Object.defineProperties(O, Properties)
-  defineProperties: defineProperties
-});
-
-  // IE 8- don't enum bug keys
-var keys1 = ('constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,' +
-            'toLocaleString,toString,valueOf').split(',')
-  // Additional keys for getOwnPropertyNames
-  , keys2 = keys1.concat('length', 'prototype')
-  , keysLen1 = keys1.length;
-
-// Create object with `null` prototype: use iframe Object with cleared prototype
-var createDict = function(){
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = cel('iframe')
-    , i      = keysLen1
-    , gt     = '>'
-    , iframeDocument;
-  iframe.style.display = 'none';
-  html.appendChild(iframe);
-  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
-  // createDict = iframe.contentWindow.Object;
-  // html.removeChild(iframe);
-  iframeDocument = iframe.contentWindow.document;
-  iframeDocument.open();
-  iframeDocument.write('<script>document.F=Object</script' + gt);
-  iframeDocument.close();
-  createDict = iframeDocument.F;
-  while(i--)delete createDict.prototype[keys1[i]];
-  return createDict();
+},{"114":114,"17":17,"23":23,"55":55}],116:[function(_dereq_,module,exports){
+var classof   = _dereq_(17)
+  , ITERATOR  = _dereq_(114)('iterator')
+  , Iterators = _dereq_(55);
+module.exports = _dereq_(23).isIterable = function(it){
+  var O = Object(it);
+  return O[ITERATOR] !== undefined
+    || '@@iterator' in O
+    || Iterators.hasOwnProperty(classof(O));
 };
-var createGetKeys = function(names, length){
-  return function(object){
-    var O      = toIObject(object)
-      , i      = 0
-      , result = []
-      , key;
-    for(key in O)if(key != IE_PROTO)has(O, key) && result.push(key);
-    // Don't enum bug & hidden keys
-    while(length > i)if(has(O, key = names[i++])){
-      ~arrayIndexOf(result, key) || result.push(key);
-    }
-    return result;
-  };
-};
-var Empty = function(){};
-$export($export.S, 'Object', {
-  // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-  getPrototypeOf: $.getProto = $.getProto || function(O){
-    O = toObject(O);
-    if(has(O, IE_PROTO))return O[IE_PROTO];
-    if(typeof O.constructor == 'function' && O instanceof O.constructor){
-      return O.constructor.prototype;
-    } return O instanceof Object ? ObjectProto : null;
-  },
-  // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-  getOwnPropertyNames: $.getNames = $.getNames || createGetKeys(keys2, keys2.length, true),
-  // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-  create: $.create = $.create || function(O, /*?*/Properties){
-    var result;
-    if(O !== null){
-      Empty.prototype = anObject(O);
-      result = new Empty();
-      Empty.prototype = null;
-      // add "__proto__" for Object.getPrototypeOf shim
-      result[IE_PROTO] = O;
-    } else result = createDict();
-    return Properties === undefined ? result : defineProperties(result, Properties);
-  },
-  // 19.1.2.14 / 15.2.3.14 Object.keys(O)
-  keys: $.getKeys = $.getKeys || createGetKeys(keys1, keysLen1, false)
-});
+},{"114":114,"17":17,"23":23,"55":55}],117:[function(_dereq_,module,exports){
+// https://github.com/benjamingr/RexExp.escape
+var $export = _dereq_(31)
+  , $re     = _dereq_(87)(/[\\^$*+?.()|[\]{}]/g, '\\$&');
 
-var construct = function(F, len, args){
-  if(!(len in factories)){
-    for(var n = [], i = 0; i < len; i++)n[i] = 'a[' + i + ']';
-    factories[len] = Function('F,a', 'return new F(' + n.join(',') + ')');
-  }
-  return factories[len](F, args);
-};
+$export($export.S, 'RegExp', {escape: function escape(it){ return $re(it); }});
 
-// 19.2.3.2 / 15.3.4.5 Function.prototype.bind(thisArg, args...)
-$export($export.P, 'Function', {
-  bind: function bind(that /*, args... */){
-    var fn       = aFunction(this)
-      , partArgs = arraySlice.call(arguments, 1);
-    var bound = function(/* args... */){
-      var args = partArgs.concat(arraySlice.call(arguments));
-      return this instanceof bound ? construct(fn, args.length, args) : invoke(fn, args, that);
-    };
-    if(isObject(fn.prototype))bound.prototype = fn.prototype;
-    return bound;
-  }
-});
-
-// fallback for not array-like ES3 strings and DOM objects
-$export($export.P + $export.F * fails(function(){
-  if(html)arraySlice.call(html);
-}), 'Array', {
-  slice: function(begin, end){
-    var len   = toLength(this.length)
-      , klass = cof(this);
-    end = end === undefined ? len : end;
-    if(klass == 'Array')return arraySlice.call(this, begin, end);
-    var start  = toIndex(begin, len)
-      , upTo   = toIndex(end, len)
-      , size   = toLength(upTo - start)
-      , cloned = Array(size)
-      , i      = 0;
-    for(; i < size; i++)cloned[i] = klass == 'String'
-      ? this.charAt(start + i)
-      : this[start + i];
-    return cloned;
-  }
-});
-$export($export.P + $export.F * (IObject != Object), 'Array', {
-  join: function join(separator){
-    return arrayJoin.call(IObject(this), separator === undefined ? ',' : separator);
-  }
-});
-
-// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-$export($export.S, 'Array', {isArray: _dereq_(37)});
-
-var createArrayReduce = function(isRight){
-  return function(callbackfn, memo){
-    aFunction(callbackfn);
-    var O      = IObject(this)
-      , length = toLength(O.length)
-      , index  = isRight ? length - 1 : 0
-      , i      = isRight ? -1 : 1;
-    if(arguments.length < 2)for(;;){
-      if(index in O){
-        memo = O[index];
-        index += i;
-        break;
-      }
-      index += i;
-      if(isRight ? index < 0 : length <= index){
-        throw TypeError('Reduce of empty array with no initial value');
-      }
-    }
-    for(;isRight ? index >= 0 : length > index; index += i)if(index in O){
-      memo = callbackfn(memo, O[index], index, this);
-    }
-    return memo;
-  };
-};
-
-var methodize = function($fn){
-  return function(arg1/*, arg2 = undefined */){
-    return $fn(this, arg1, arguments[1]);
-  };
-};
-
-$export($export.P, 'Array', {
-  // 22.1.3.10 / 15.4.4.18 Array.prototype.forEach(callbackfn [, thisArg])
-  forEach: $.each = $.each || methodize(createArrayMethod(0)),
-  // 22.1.3.15 / 15.4.4.19 Array.prototype.map(callbackfn [, thisArg])
-  map: methodize(createArrayMethod(1)),
-  // 22.1.3.7 / 15.4.4.20 Array.prototype.filter(callbackfn [, thisArg])
-  filter: methodize(createArrayMethod(2)),
-  // 22.1.3.23 / 15.4.4.17 Array.prototype.some(callbackfn [, thisArg])
-  some: methodize(createArrayMethod(3)),
-  // 22.1.3.5 / 15.4.4.16 Array.prototype.every(callbackfn [, thisArg])
-  every: methodize(createArrayMethod(4)),
-  // 22.1.3.18 / 15.4.4.21 Array.prototype.reduce(callbackfn [, initialValue])
-  reduce: createArrayReduce(false),
-  // 22.1.3.19 / 15.4.4.22 Array.prototype.reduceRight(callbackfn [, initialValue])
-  reduceRight: createArrayReduce(true),
-  // 22.1.3.11 / 15.4.4.14 Array.prototype.indexOf(searchElement [, fromIndex])
-  indexOf: methodize(arrayIndexOf),
-  // 22.1.3.14 / 15.4.4.15 Array.prototype.lastIndexOf(searchElement [, fromIndex])
-  lastIndexOf: function(el, fromIndex /* = @[*-1] */){
-    var O      = toIObject(this)
-      , length = toLength(O.length)
-      , index  = length - 1;
-    if(arguments.length > 1)index = Math.min(index, toInteger(fromIndex));
-    if(index < 0)index = toLength(length + index);
-    for(;index >= 0; index--)if(index in O)if(O[index] === el)return index;
-    return -1;
-  }
-});
-
-// 20.3.3.1 / 15.9.4.4 Date.now()
-$export($export.S, 'Date', {now: function(){ return +new Date; }});
-
-var lz = function(num){
-  return num > 9 ? num : '0' + num;
-};
-
-// 20.3.4.36 / 15.9.5.43 Date.prototype.toISOString()
-// PhantomJS / old WebKit has a broken implementations
-$export($export.P + $export.F * (fails(function(){
-  return new Date(-5e13 - 1).toISOString() != '0385-07-25T07:06:39.999Z';
-}) || !fails(function(){
-  new Date(NaN).toISOString();
-})), 'Date', {
-  toISOString: function toISOString(){
-    if(!isFinite(this))throw RangeError('Invalid time value');
-    var d = this
-      , y = d.getUTCFullYear()
-      , m = d.getUTCMilliseconds()
-      , s = y < 0 ? '-' : y > 9999 ? '+' : '';
-    return s + ('00000' + Math.abs(y)).slice(s ? -6 : -4) +
-      '-' + lz(d.getUTCMonth() + 1) + '-' + lz(d.getUTCDate()) +
-      'T' + lz(d.getUTCHours()) + ':' + lz(d.getUTCMinutes()) +
-      ':' + lz(d.getUTCSeconds()) + '.' + (m > 99 ? m : '0' + lz(m)) + 'Z';
-  }
-});
-},{"12":12,"20":20,"21":21,"23":23,"25":25,"3":3,"31":31,"33":33,"34":34,"35":35,"37":37,"39":39,"47":47,"5":5,"60":60,"77":77,"78":78,"79":79,"8":8,"80":80,"81":81,"83":83,"9":9}],87:[function(_dereq_,module,exports){
+},{"31":31,"87":87}],118:[function(_dereq_,module,exports){
 // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.P, 'Array', {copyWithin: _dereq_(6)});
+$export($export.P, 'Array', {copyWithin: _dereq_(9)});
 
-_dereq_(4)('copyWithin');
-},{"23":23,"4":4,"6":6}],88:[function(_dereq_,module,exports){
+_dereq_(6)('copyWithin');
+},{"31":31,"6":6,"9":9}],119:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31)
+  , $every  = _dereq_(13)(4);
+
+$export($export.P + $export.F * !_dereq_(95)([].every, true), 'Array', {
+  // 22.1.3.5 / 15.4.4.16 Array.prototype.every(callbackfn [, thisArg])
+  every: function every(callbackfn /* , thisArg */){
+    return $every(this, callbackfn, arguments[1]);
+  }
+});
+},{"13":13,"31":31,"95":95}],120:[function(_dereq_,module,exports){
 // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.P, 'Array', {fill: _dereq_(7)});
+$export($export.P, 'Array', {fill: _dereq_(10)});
 
-_dereq_(4)('fill');
-},{"23":23,"4":4,"7":7}],89:[function(_dereq_,module,exports){
+_dereq_(6)('fill');
+},{"10":10,"31":31,"6":6}],121:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31)
+  , $filter = _dereq_(13)(2);
+
+$export($export.P + $export.F * !_dereq_(95)([].filter, true), 'Array', {
+  // 22.1.3.7 / 15.4.4.20 Array.prototype.filter(callbackfn [, thisArg])
+  filter: function filter(callbackfn /* , thisArg */){
+    return $filter(this, callbackfn, arguments[1]);
+  }
+});
+},{"13":13,"31":31,"95":95}],122:[function(_dereq_,module,exports){
 'use strict';
 // 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
-var $export = _dereq_(23)
-  , $find   = _dereq_(9)(6)
+var $export = _dereq_(31)
+  , $find   = _dereq_(13)(6)
   , KEY     = 'findIndex'
   , forced  = true;
 // Shouldn't skip holes
@@ -1802,12 +2767,12 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-_dereq_(4)(KEY);
-},{"23":23,"4":4,"9":9}],90:[function(_dereq_,module,exports){
+_dereq_(6)(KEY);
+},{"13":13,"31":31,"6":6}],123:[function(_dereq_,module,exports){
 'use strict';
 // 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
-var $export = _dereq_(23)
-  , $find   = _dereq_(9)(5)
+var $export = _dereq_(31)
+  , $find   = _dereq_(13)(5)
   , KEY     = 'find'
   , forced  = true;
 // Shouldn't skip holes
@@ -1817,29 +2782,40 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-_dereq_(4)(KEY);
-},{"23":23,"4":4,"9":9}],91:[function(_dereq_,module,exports){
+_dereq_(6)(KEY);
+},{"13":13,"31":31,"6":6}],124:[function(_dereq_,module,exports){
 'use strict';
-var ctx         = _dereq_(18)
-  , $export     = _dereq_(23)
-  , toObject    = _dereq_(81)
-  , call        = _dereq_(41)
-  , isArrayIter = _dereq_(36)
-  , toLength    = _dereq_(80)
-  , getIterFn   = _dereq_(85);
-$export($export.S + $export.F * !_dereq_(44)(function(iter){ Array.from(iter); }), 'Array', {
+var $export  = _dereq_(31)
+  , $forEach = _dereq_(13)(0)
+  , STRICT   = _dereq_(95)([].forEach, true);
+
+$export($export.P + $export.F * !STRICT, 'Array', {
+  // 22.1.3.10 / 15.4.4.18 Array.prototype.forEach(callbackfn [, thisArg])
+  forEach: function forEach(callbackfn /* , thisArg */){
+    return $forEach(this, callbackfn, arguments[1]);
+  }
+});
+},{"13":13,"31":31,"95":95}],125:[function(_dereq_,module,exports){
+'use strict';
+var ctx         = _dereq_(24)
+  , $export     = _dereq_(31)
+  , toObject    = _dereq_(108)
+  , call        = _dereq_(50)
+  , isArrayIter = _dereq_(45)
+  , toLength    = _dereq_(107)
+  , getIterFn   = _dereq_(115);
+$export($export.S + $export.F * !_dereq_(53)(function(iter){ Array.from(iter); }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
     var O       = toObject(arrayLike)
       , C       = typeof this == 'function' ? this : Array
-      , $$      = arguments
-      , $$len   = $$.length
-      , mapfn   = $$len > 1 ? $$[1] : undefined
+      , aLen    = arguments.length
+      , mapfn   = aLen > 1 ? arguments[1] : undefined
       , mapping = mapfn !== undefined
       , index   = 0
       , iterFn  = getIterFn(O)
       , length, result, step, iterator;
-    if(mapping)mapfn = ctx(mapfn, $$len > 2 ? $$[2] : undefined, 2);
+    if(mapping)mapfn = ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
     // if object isn't iterable or it's array with default iterator - use simple case
     if(iterFn != undefined && !(C == Array && isArrayIter(iterFn))){
       for(iterator = iterFn.call(O), result = new C; !(step = iterator.next()).done; index++){
@@ -1856,18 +2832,34 @@ $export($export.S + $export.F * !_dereq_(44)(function(iter){ Array.from(iter); }
   }
 });
 
-},{"18":18,"23":23,"36":36,"41":41,"44":44,"80":80,"81":81,"85":85}],92:[function(_dereq_,module,exports){
+},{"107":107,"108":108,"115":115,"24":24,"31":31,"45":45,"50":50,"53":53}],126:[function(_dereq_,module,exports){
 'use strict';
-var addToUnscopables = _dereq_(4)
-  , step             = _dereq_(45)
-  , Iterators        = _dereq_(46)
-  , toIObject        = _dereq_(79);
+var $export  = _dereq_(31)
+  , $indexOf = _dereq_(12)(false);
+
+$export($export.P + $export.F * !_dereq_(95)([].indexOf), 'Array', {
+  // 22.1.3.11 / 15.4.4.14 Array.prototype.indexOf(searchElement [, fromIndex])
+  indexOf: function indexOf(searchElement /*, fromIndex = 0 */){
+    return $indexOf(this, searchElement, arguments[1]);
+  }
+});
+},{"12":12,"31":31,"95":95}],127:[function(_dereq_,module,exports){
+// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+var $export = _dereq_(31);
+
+$export($export.S, 'Array', {isArray: _dereq_(46)});
+},{"31":31,"46":46}],128:[function(_dereq_,module,exports){
+'use strict';
+var addToUnscopables = _dereq_(6)
+  , step             = _dereq_(54)
+  , Iterators        = _dereq_(55)
+  , toIObject        = _dereq_(106);
 
 // 22.1.3.4 Array.prototype.entries()
 // 22.1.3.13 Array.prototype.keys()
 // 22.1.3.29 Array.prototype.values()
 // 22.1.3.30 Array.prototype[@@iterator]()
-module.exports = _dereq_(43)(Array, 'Array', function(iterated, kind){
+module.exports = _dereq_(52)(Array, 'Array', function(iterated, kind){
   this._t = toIObject(iterated); // target
   this._i = 0;                   // next index
   this._k = kind;                // kind
@@ -1891,65 +2883,264 @@ Iterators.Arguments = Iterators.Array;
 addToUnscopables('keys');
 addToUnscopables('values');
 addToUnscopables('entries');
-},{"4":4,"43":43,"45":45,"46":46,"79":79}],93:[function(_dereq_,module,exports){
+},{"106":106,"52":52,"54":54,"55":55,"6":6}],129:[function(_dereq_,module,exports){
 'use strict';
-var $export = _dereq_(23);
+// 22.1.3.13 Array.prototype.join(separator)
+var $export   = _dereq_(31)
+  , toIObject = _dereq_(106)
+  , arrayJoin = [].join;
+
+// fallback for not array-like strings
+$export($export.P + $export.F * (_dereq_(44) != Object || !_dereq_(95)(arrayJoin)), 'Array', {
+  join: function join(separator){
+    return arrayJoin.call(toIObject(this), separator === undefined ? ',' : separator);
+  }
+});
+},{"106":106,"31":31,"44":44,"95":95}],130:[function(_dereq_,module,exports){
+'use strict';
+var $export   = _dereq_(31)
+  , toIObject = _dereq_(106)
+  , toInteger = _dereq_(105)
+  , toLength  = _dereq_(107);
+
+$export($export.P + $export.F * !_dereq_(95)([].lastIndexOf), 'Array', {
+  // 22.1.3.14 / 15.4.4.15 Array.prototype.lastIndexOf(searchElement [, fromIndex])
+  lastIndexOf: function lastIndexOf(searchElement /*, fromIndex = @[*-1] */){
+    var O      = toIObject(this)
+      , length = toLength(O.length)
+      , index  = length - 1;
+    if(arguments.length > 1)index = Math.min(index, toInteger(arguments[1]));
+    if(index < 0)index = length + index;
+    for(;index >= 0; index--)if(index in O)if(O[index] === searchElement)return index;
+    return -1;
+  }
+});
+},{"105":105,"106":106,"107":107,"31":31,"95":95}],131:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31)
+  , $map    = _dereq_(13)(1);
+
+$export($export.P + $export.F * !_dereq_(95)([].map, true), 'Array', {
+  // 22.1.3.15 / 15.4.4.19 Array.prototype.map(callbackfn [, thisArg])
+  map: function map(callbackfn /* , thisArg */){
+    return $map(this, callbackfn, arguments[1]);
+  }
+});
+},{"13":13,"31":31,"95":95}],132:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31);
 
 // WebKit Array.of isn't generic
-$export($export.S + $export.F * _dereq_(25)(function(){
+$export($export.S + $export.F * _dereq_(33)(function(){
   function F(){}
   return !(Array.of.call(F) instanceof F);
 }), 'Array', {
   // 22.1.2.3 Array.of( ...items)
   of: function of(/* ...args */){
     var index  = 0
-      , $$     = arguments
-      , $$len  = $$.length
-      , result = new (typeof this == 'function' ? this : Array)($$len);
-    while($$len > index)result[index] = $$[index++];
-    result.length = $$len;
+      , aLen   = arguments.length
+      , result = new (typeof this == 'function' ? this : Array)(aLen);
+    while(aLen > index)result[index] = arguments[index++];
+    result.length = aLen;
     return result;
   }
 });
-},{"23":23,"25":25}],94:[function(_dereq_,module,exports){
-_dereq_(66)('Array');
-},{"66":66}],95:[function(_dereq_,module,exports){
+},{"31":31,"33":33}],133:[function(_dereq_,module,exports){
 'use strict';
-var $             = _dereq_(47)
-  , isObject      = _dereq_(39)
-  , HAS_INSTANCE  = _dereq_(84)('hasInstance')
-  , FunctionProto = Function.prototype;
+var $export = _dereq_(31)
+  , $reduce = _dereq_(14);
+
+$export($export.P + $export.F * !_dereq_(95)([].reduceRight, true), 'Array', {
+  // 22.1.3.19 / 15.4.4.22 Array.prototype.reduceRight(callbackfn [, initialValue])
+  reduceRight: function reduceRight(callbackfn /* , initialValue */){
+    return $reduce(this, callbackfn, arguments.length, arguments[1], true);
+  }
+});
+},{"14":14,"31":31,"95":95}],134:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31)
+  , $reduce = _dereq_(14);
+
+$export($export.P + $export.F * !_dereq_(95)([].reduce, true), 'Array', {
+  // 22.1.3.18 / 15.4.4.21 Array.prototype.reduce(callbackfn [, initialValue])
+  reduce: function reduce(callbackfn /* , initialValue */){
+    return $reduce(this, callbackfn, arguments.length, arguments[1], false);
+  }
+});
+},{"14":14,"31":31,"95":95}],135:[function(_dereq_,module,exports){
+'use strict';
+var $export    = _dereq_(31)
+  , html       = _dereq_(40)
+  , cof        = _dereq_(18)
+  , toIndex    = _dereq_(104)
+  , toLength   = _dereq_(107)
+  , arraySlice = [].slice;
+
+// fallback for not array-like ES3 strings and DOM objects
+$export($export.P + $export.F * _dereq_(33)(function(){
+  if(html)arraySlice.call(html);
+}), 'Array', {
+  slice: function slice(begin, end){
+    var len   = toLength(this.length)
+      , klass = cof(this);
+    end = end === undefined ? len : end;
+    if(klass == 'Array')return arraySlice.call(this, begin, end);
+    var start  = toIndex(begin, len)
+      , upTo   = toIndex(end, len)
+      , size   = toLength(upTo - start)
+      , cloned = Array(size)
+      , i      = 0;
+    for(; i < size; i++)cloned[i] = klass == 'String'
+      ? this.charAt(start + i)
+      : this[start + i];
+    return cloned;
+  }
+});
+},{"104":104,"107":107,"18":18,"31":31,"33":33,"40":40}],136:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31)
+  , $some   = _dereq_(13)(3);
+
+$export($export.P + $export.F * !_dereq_(95)([].some, true), 'Array', {
+  // 22.1.3.23 / 15.4.4.17 Array.prototype.some(callbackfn [, thisArg])
+  some: function some(callbackfn /* , thisArg */){
+    return $some(this, callbackfn, arguments[1]);
+  }
+});
+},{"13":13,"31":31,"95":95}],137:[function(_dereq_,module,exports){
+'use strict';
+var $export   = _dereq_(31)
+  , aFunction = _dereq_(4)
+  , toObject  = _dereq_(108)
+  , fails     = _dereq_(33)
+  , $sort     = [].sort
+  , test      = [1, 2, 3];
+
+$export($export.P + $export.F * (fails(function(){
+  // IE8-
+  test.sort(undefined);
+}) || !fails(function(){
+  // V8 bug
+  test.sort(null);
+  // Old WebKit
+}) || !_dereq_(95)($sort)), 'Array', {
+  // 22.1.3.25 Array.prototype.sort(comparefn)
+  sort: function sort(comparefn){
+    return comparefn === undefined
+      ? $sort.call(toObject(this))
+      : $sort.call(toObject(this), aFunction(comparefn));
+  }
+});
+},{"108":108,"31":31,"33":33,"4":4,"95":95}],138:[function(_dereq_,module,exports){
+_dereq_(90)('Array');
+},{"90":90}],139:[function(_dereq_,module,exports){
+// 20.3.3.1 / 15.9.4.4 Date.now()
+var $export = _dereq_(31);
+
+$export($export.S, 'Date', {now: function(){ return new Date().getTime(); }});
+},{"31":31}],140:[function(_dereq_,module,exports){
+'use strict';
+// 20.3.4.36 / 15.9.5.43 Date.prototype.toISOString()
+var $export = _dereq_(31)
+  , fails   = _dereq_(33)
+  , getTime = Date.prototype.getTime;
+
+var lz = function(num){
+  return num > 9 ? num : '0' + num;
+};
+
+// PhantomJS / old WebKit has a broken implementations
+$export($export.P + $export.F * (fails(function(){
+  return new Date(-5e13 - 1).toISOString() != '0385-07-25T07:06:39.999Z';
+}) || !fails(function(){
+  new Date(NaN).toISOString();
+})), 'Date', {
+  toISOString: function toISOString(){
+    if(!isFinite(getTime.call(this)))throw RangeError('Invalid time value');
+    var d = this
+      , y = d.getUTCFullYear()
+      , m = d.getUTCMilliseconds()
+      , s = y < 0 ? '-' : y > 9999 ? '+' : '';
+    return s + ('00000' + Math.abs(y)).slice(s ? -6 : -4) +
+      '-' + lz(d.getUTCMonth() + 1) + '-' + lz(d.getUTCDate()) +
+      'T' + lz(d.getUTCHours()) + ':' + lz(d.getUTCMinutes()) +
+      ':' + lz(d.getUTCSeconds()) + '.' + (m > 99 ? m : '0' + lz(m)) + 'Z';
+  }
+});
+},{"31":31,"33":33}],141:[function(_dereq_,module,exports){
+'use strict';
+var $export     = _dereq_(31)
+  , toObject    = _dereq_(108)
+  , toPrimitive = _dereq_(109);
+
+$export($export.P + $export.F * _dereq_(33)(function(){
+  return new Date(NaN).toJSON() !== null || Date.prototype.toJSON.call({toISOString: function(){ return 1; }}) !== 1;
+}), 'Date', {
+  toJSON: function toJSON(key){
+    var O  = toObject(this)
+      , pv = toPrimitive(O);
+    return typeof pv == 'number' && !isFinite(pv) ? null : O.toISOString();
+  }
+});
+},{"108":108,"109":109,"31":31,"33":33}],142:[function(_dereq_,module,exports){
+var TO_PRIMITIVE = _dereq_(114)('toPrimitive')
+  , proto        = Date.prototype;
+
+if(!(TO_PRIMITIVE in proto))_dereq_(39)(proto, TO_PRIMITIVE, _dereq_(25));
+},{"114":114,"25":25,"39":39}],143:[function(_dereq_,module,exports){
+var DateProto    = Date.prototype
+  , INVALID_DATE = 'Invalid Date'
+  , TO_STRING    = 'toString'
+  , $toString    = DateProto[TO_STRING]
+  , getTime      = DateProto.getTime;
+if(new Date(NaN) + '' != INVALID_DATE){
+  _dereq_(86)(DateProto, TO_STRING, function toString(){
+    var value = getTime.call(this);
+    return value === value ? $toString.call(this) : INVALID_DATE;
+  });
+}
+},{"86":86}],144:[function(_dereq_,module,exports){
+// 19.2.3.2 / 15.3.4.5 Function.prototype.bind(thisArg, args...)
+var $export = _dereq_(31);
+
+$export($export.P, 'Function', {bind: _dereq_(16)});
+},{"16":16,"31":31}],145:[function(_dereq_,module,exports){
+'use strict';
+var isObject       = _dereq_(48)
+  , getPrototypeOf = _dereq_(73)
+  , HAS_INSTANCE   = _dereq_(114)('hasInstance')
+  , FunctionProto  = Function.prototype;
 // 19.2.3.6 Function.prototype[@@hasInstance](V)
-if(!(HAS_INSTANCE in FunctionProto))$.setDesc(FunctionProto, HAS_INSTANCE, {value: function(O){
+if(!(HAS_INSTANCE in FunctionProto))_dereq_(66).f(FunctionProto, HAS_INSTANCE, {value: function(O){
   if(typeof this != 'function' || !isObject(O))return false;
   if(!isObject(this.prototype))return O instanceof this;
   // for environment w/o native `@@hasInstance` logic enough `instanceof`, but add this:
-  while(O = $.getProto(O))if(this.prototype === O)return true;
+  while(O = getPrototypeOf(O))if(this.prototype === O)return true;
   return false;
 }});
-},{"39":39,"47":47,"84":84}],96:[function(_dereq_,module,exports){
-var setDesc    = _dereq_(47).setDesc
-  , createDesc = _dereq_(60)
-  , has        = _dereq_(31)
+},{"114":114,"48":48,"66":66,"73":73}],146:[function(_dereq_,module,exports){
+var dP         = _dereq_(66).f
+  , createDesc = _dereq_(84)
+  , has        = _dereq_(38)
   , FProto     = Function.prototype
   , nameRE     = /^\s*function ([^ (]*)/
   , NAME       = 'name';
 // 19.2.4.2 name
-NAME in FProto || _dereq_(20) && setDesc(FProto, NAME, {
+NAME in FProto || _dereq_(27) && dP(FProto, NAME, {
   configurable: true,
   get: function(){
     var match = ('' + this).match(nameRE)
       , name  = match ? match[1] : '';
-    has(this, NAME) || setDesc(this, NAME, createDesc(5, name));
+    has(this, NAME) || dP(this, NAME, createDesc(5, name));
     return name;
   }
 });
-},{"20":20,"31":31,"47":47,"60":60}],97:[function(_dereq_,module,exports){
+},{"27":27,"38":38,"66":66,"84":84}],147:[function(_dereq_,module,exports){
 'use strict';
-var strong = _dereq_(13);
+var strong = _dereq_(19);
 
 // 23.1 Map Objects
-_dereq_(16)('Map', function(get){
+module.exports = _dereq_(22)('Map', function(get){
   return function Map(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 }, {
   // 23.1.3.6 Map.prototype.get(key)
@@ -1962,10 +3153,10 @@ _dereq_(16)('Map', function(get){
     return strong.def(this, key === 0 ? 0 : key, value);
   }
 }, strong, true);
-},{"13":13,"16":16}],98:[function(_dereq_,module,exports){
+},{"19":19,"22":22}],148:[function(_dereq_,module,exports){
 // 20.2.2.3 Math.acosh(x)
-var $export = _dereq_(23)
-  , log1p   = _dereq_(51)
+var $export = _dereq_(31)
+  , log1p   = _dereq_(59)
   , sqrt    = Math.sqrt
   , $acosh  = Math.acosh;
 
@@ -1977,46 +3168,46 @@ $export($export.S + $export.F * !($acosh && Math.floor($acosh(Number.MAX_VALUE))
       : log1p(x - 1 + sqrt(x - 1) * sqrt(x + 1));
   }
 });
-},{"23":23,"51":51}],99:[function(_dereq_,module,exports){
+},{"31":31,"59":59}],149:[function(_dereq_,module,exports){
 // 20.2.2.5 Math.asinh(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 function asinh(x){
   return !isFinite(x = +x) || x == 0 ? x : x < 0 ? -asinh(-x) : Math.log(x + Math.sqrt(x * x + 1));
 }
 
 $export($export.S, 'Math', {asinh: asinh});
-},{"23":23}],100:[function(_dereq_,module,exports){
+},{"31":31}],150:[function(_dereq_,module,exports){
 // 20.2.2.7 Math.atanh(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Math', {
   atanh: function atanh(x){
     return (x = +x) == 0 ? x : Math.log((1 + x) / (1 - x)) / 2;
   }
 });
-},{"23":23}],101:[function(_dereq_,module,exports){
+},{"31":31}],151:[function(_dereq_,module,exports){
 // 20.2.2.9 Math.cbrt(x)
-var $export = _dereq_(23)
-  , sign    = _dereq_(52);
+var $export = _dereq_(31)
+  , sign    = _dereq_(60);
 
 $export($export.S, 'Math', {
   cbrt: function cbrt(x){
     return sign(x = +x) * Math.pow(Math.abs(x), 1 / 3);
   }
 });
-},{"23":23,"52":52}],102:[function(_dereq_,module,exports){
+},{"31":31,"60":60}],152:[function(_dereq_,module,exports){
 // 20.2.2.11 Math.clz32(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Math', {
   clz32: function clz32(x){
     return (x >>>= 0) ? 31 - Math.floor(Math.log(x + 0.5) * Math.LOG2E) : 32;
   }
 });
-},{"23":23}],103:[function(_dereq_,module,exports){
+},{"31":31}],153:[function(_dereq_,module,exports){
 // 20.2.2.12 Math.cosh(x)
-var $export = _dereq_(23)
+var $export = _dereq_(31)
   , exp     = Math.exp;
 
 $export($export.S, 'Math', {
@@ -2024,15 +3215,15 @@ $export($export.S, 'Math', {
     return (exp(x = +x) + exp(-x)) / 2;
   }
 });
-},{"23":23}],104:[function(_dereq_,module,exports){
+},{"31":31}],154:[function(_dereq_,module,exports){
 // 20.2.2.14 Math.expm1(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.S, 'Math', {expm1: _dereq_(50)});
-},{"23":23,"50":50}],105:[function(_dereq_,module,exports){
+$export($export.S, 'Math', {expm1: _dereq_(58)});
+},{"31":31,"58":58}],155:[function(_dereq_,module,exports){
 // 20.2.2.16 Math.fround(x)
-var $export   = _dereq_(23)
-  , sign      = _dereq_(52)
+var $export   = _dereq_(31)
+  , sign      = _dereq_(60)
   , pow       = Math.pow
   , EPSILON   = pow(2, -52)
   , EPSILON32 = pow(2, -23)
@@ -2056,21 +3247,20 @@ $export($export.S, 'Math', {
     return $sign * result;
   }
 });
-},{"23":23,"52":52}],106:[function(_dereq_,module,exports){
+},{"31":31,"60":60}],156:[function(_dereq_,module,exports){
 // 20.2.2.17 Math.hypot([value1[, value2[, … ]]])
-var $export = _dereq_(23)
+var $export = _dereq_(31)
   , abs     = Math.abs;
 
 $export($export.S, 'Math', {
   hypot: function hypot(value1, value2){ // eslint-disable-line no-unused-vars
-    var sum   = 0
-      , i     = 0
-      , $$    = arguments
-      , $$len = $$.length
-      , larg  = 0
+    var sum  = 0
+      , i    = 0
+      , aLen = arguments.length
+      , larg = 0
       , arg, div;
-    while(i < $$len){
-      arg = abs($$[i++]);
+    while(i < aLen){
+      arg = abs(arguments[i++]);
       if(larg < arg){
         div  = larg / arg;
         sum  = sum * div * div + 1;
@@ -2083,13 +3273,13 @@ $export($export.S, 'Math', {
     return larg === Infinity ? Infinity : larg * Math.sqrt(sum);
   }
 });
-},{"23":23}],107:[function(_dereq_,module,exports){
+},{"31":31}],157:[function(_dereq_,module,exports){
 // 20.2.2.18 Math.imul(x, y)
-var $export = _dereq_(23)
+var $export = _dereq_(31)
   , $imul   = Math.imul;
 
 // some WebKit versions fails with big numbers, some has wrong arity
-$export($export.S + $export.F * _dereq_(25)(function(){
+$export($export.S + $export.F * _dereq_(33)(function(){
   return $imul(0xffffffff, 5) != -5 || $imul.length != 2;
 }), 'Math', {
   imul: function imul(x, y){
@@ -2101,42 +3291,42 @@ $export($export.S + $export.F * _dereq_(25)(function(){
     return 0 | xl * yl + ((UINT16 & xn >>> 16) * yl + xl * (UINT16 & yn >>> 16) << 16 >>> 0);
   }
 });
-},{"23":23,"25":25}],108:[function(_dereq_,module,exports){
+},{"31":31,"33":33}],158:[function(_dereq_,module,exports){
 // 20.2.2.21 Math.log10(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Math', {
   log10: function log10(x){
     return Math.log(x) / Math.LN10;
   }
 });
-},{"23":23}],109:[function(_dereq_,module,exports){
+},{"31":31}],159:[function(_dereq_,module,exports){
 // 20.2.2.20 Math.log1p(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.S, 'Math', {log1p: _dereq_(51)});
-},{"23":23,"51":51}],110:[function(_dereq_,module,exports){
+$export($export.S, 'Math', {log1p: _dereq_(59)});
+},{"31":31,"59":59}],160:[function(_dereq_,module,exports){
 // 20.2.2.22 Math.log2(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Math', {
   log2: function log2(x){
     return Math.log(x) / Math.LN2;
   }
 });
-},{"23":23}],111:[function(_dereq_,module,exports){
+},{"31":31}],161:[function(_dereq_,module,exports){
 // 20.2.2.28 Math.sign(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.S, 'Math', {sign: _dereq_(52)});
-},{"23":23,"52":52}],112:[function(_dereq_,module,exports){
+$export($export.S, 'Math', {sign: _dereq_(60)});
+},{"31":31,"60":60}],162:[function(_dereq_,module,exports){
 // 20.2.2.30 Math.sinh(x)
-var $export = _dereq_(23)
-  , expm1   = _dereq_(50)
+var $export = _dereq_(31)
+  , expm1   = _dereq_(58)
   , exp     = Math.exp;
 
 // V8 near Chromium 38 has a problem with very small numbers
-$export($export.S + $export.F * _dereq_(25)(function(){
+$export($export.S + $export.F * _dereq_(33)(function(){
   return !Math.sinh(-2e-17) != -2e-17;
 }), 'Math', {
   sinh: function sinh(x){
@@ -2145,10 +3335,10 @@ $export($export.S + $export.F * _dereq_(25)(function(){
       : (exp(x - 1) - exp(-x - 1)) * (Math.E / 2);
   }
 });
-},{"23":23,"25":25,"50":50}],113:[function(_dereq_,module,exports){
+},{"31":31,"33":33,"58":58}],163:[function(_dereq_,module,exports){
 // 20.2.2.33 Math.tanh(x)
-var $export = _dereq_(23)
-  , expm1   = _dereq_(50)
+var $export = _dereq_(31)
+  , expm1   = _dereq_(58)
   , exp     = Math.exp;
 
 $export($export.S, 'Math', {
@@ -2158,31 +3348,34 @@ $export($export.S, 'Math', {
     return a == Infinity ? 1 : b == Infinity ? -1 : (a - b) / (exp(x) + exp(-x));
   }
 });
-},{"23":23,"50":50}],114:[function(_dereq_,module,exports){
+},{"31":31,"58":58}],164:[function(_dereq_,module,exports){
 // 20.2.2.34 Math.trunc(x)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Math', {
   trunc: function trunc(it){
     return (it > 0 ? Math.floor : Math.ceil)(it);
   }
 });
-},{"23":23}],115:[function(_dereq_,module,exports){
+},{"31":31}],165:[function(_dereq_,module,exports){
 'use strict';
-var $           = _dereq_(47)
-  , global      = _dereq_(30)
-  , has         = _dereq_(31)
-  , cof         = _dereq_(12)
-  , toPrimitive = _dereq_(82)
-  , fails       = _dereq_(25)
-  , $trim       = _dereq_(75).trim
-  , NUMBER      = 'Number'
-  , $Number     = global[NUMBER]
-  , Base        = $Number
-  , proto       = $Number.prototype
+var global            = _dereq_(37)
+  , has               = _dereq_(38)
+  , cof               = _dereq_(18)
+  , inheritIfRequired = _dereq_(42)
+  , toPrimitive       = _dereq_(109)
+  , fails             = _dereq_(33)
+  , gOPN              = _dereq_(71).f
+  , gOPD              = _dereq_(69).f
+  , dP                = _dereq_(66).f
+  , $trim             = _dereq_(101).trim
+  , NUMBER            = 'Number'
+  , $Number           = global[NUMBER]
+  , Base              = $Number
+  , proto             = $Number.prototype
   // Opera ~12 has broken Object#toString
-  , BROKEN_COF  = cof($.create(proto)) == NUMBER
-  , TRIM        = 'trim' in String.prototype;
+  , BROKEN_COF        = cof(_dereq_(65)(proto)) == NUMBER
+  , TRIM              = 'trim' in String.prototype;
 
 // 7.1.3 ToNumber(argument)
 var toNumber = function(argument){
@@ -2217,56 +3410,56 @@ if(!$Number(' 0o1') || !$Number('0b1') || $Number('+0x1')){
     return that instanceof $Number
       // check on 1..constructor(foo) case
       && (BROKEN_COF ? fails(function(){ proto.valueOf.call(that); }) : cof(that) != NUMBER)
-        ? new Base(toNumber(it)) : toNumber(it);
+        ? inheritIfRequired(new Base(toNumber(it)), that, $Number) : toNumber(it);
   };
-  $.each.call(_dereq_(20) ? $.getNames(Base) : (
+  for(var keys = _dereq_(27) ? gOPN(Base) : (
     // ES3:
     'MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,' +
     // ES6 (in case, if modules with ES6 Number statics required before):
     'EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,' +
     'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
-  ).split(','), function(key){
-    if(has(Base, key) && !has($Number, key)){
-      $.setDesc($Number, key, $.getDesc(Base, key));
+  ).split(','), j = 0, key; keys.length > j; j++){
+    if(has(Base, key = keys[j]) && !has($Number, key)){
+      dP($Number, key, gOPD(Base, key));
     }
-  });
+  }
   $Number.prototype = proto;
   proto.constructor = $Number;
-  _dereq_(62)(global, NUMBER, $Number);
+  _dereq_(86)(global, NUMBER, $Number);
 }
-},{"12":12,"20":20,"25":25,"30":30,"31":31,"47":47,"62":62,"75":75,"82":82}],116:[function(_dereq_,module,exports){
+},{"101":101,"109":109,"18":18,"27":27,"33":33,"37":37,"38":38,"42":42,"65":65,"66":66,"69":69,"71":71,"86":86}],166:[function(_dereq_,module,exports){
 // 20.1.2.1 Number.EPSILON
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Number', {EPSILON: Math.pow(2, -52)});
-},{"23":23}],117:[function(_dereq_,module,exports){
+},{"31":31}],167:[function(_dereq_,module,exports){
 // 20.1.2.2 Number.isFinite(number)
-var $export   = _dereq_(23)
-  , _isFinite = _dereq_(30).isFinite;
+var $export   = _dereq_(31)
+  , _isFinite = _dereq_(37).isFinite;
 
 $export($export.S, 'Number', {
   isFinite: function isFinite(it){
     return typeof it == 'number' && _isFinite(it);
   }
 });
-},{"23":23,"30":30}],118:[function(_dereq_,module,exports){
+},{"31":31,"37":37}],168:[function(_dereq_,module,exports){
 // 20.1.2.3 Number.isInteger(number)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.S, 'Number', {isInteger: _dereq_(38)});
-},{"23":23,"38":38}],119:[function(_dereq_,module,exports){
+$export($export.S, 'Number', {isInteger: _dereq_(47)});
+},{"31":31,"47":47}],169:[function(_dereq_,module,exports){
 // 20.1.2.4 Number.isNaN(number)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Number', {
   isNaN: function isNaN(number){
     return number != number;
   }
 });
-},{"23":23}],120:[function(_dereq_,module,exports){
+},{"31":31}],170:[function(_dereq_,module,exports){
 // 20.1.2.5 Number.isSafeInteger(number)
-var $export   = _dereq_(23)
-  , isInteger = _dereq_(38)
+var $export   = _dereq_(31)
+  , isInteger = _dereq_(47)
   , abs       = Math.abs;
 
 $export($export.S, 'Number', {
@@ -2274,216 +3467,356 @@ $export($export.S, 'Number', {
     return isInteger(number) && abs(number) <= 0x1fffffffffffff;
   }
 });
-},{"23":23,"38":38}],121:[function(_dereq_,module,exports){
+},{"31":31,"47":47}],171:[function(_dereq_,module,exports){
 // 20.1.2.6 Number.MAX_SAFE_INTEGER
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Number', {MAX_SAFE_INTEGER: 0x1fffffffffffff});
-},{"23":23}],122:[function(_dereq_,module,exports){
+},{"31":31}],172:[function(_dereq_,module,exports){
 // 20.1.2.10 Number.MIN_SAFE_INTEGER
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Number', {MIN_SAFE_INTEGER: -0x1fffffffffffff});
-},{"23":23}],123:[function(_dereq_,module,exports){
+},{"31":31}],173:[function(_dereq_,module,exports){
+var $export     = _dereq_(31)
+  , $parseFloat = _dereq_(80);
 // 20.1.2.12 Number.parseFloat(string)
-var $export = _dereq_(23);
-
-$export($export.S, 'Number', {parseFloat: parseFloat});
-},{"23":23}],124:[function(_dereq_,module,exports){
+$export($export.S + $export.F * (Number.parseFloat != $parseFloat), 'Number', {parseFloat: $parseFloat});
+},{"31":31,"80":80}],174:[function(_dereq_,module,exports){
+var $export   = _dereq_(31)
+  , $parseInt = _dereq_(81);
 // 20.1.2.13 Number.parseInt(string, radix)
-var $export = _dereq_(23);
+$export($export.S + $export.F * (Number.parseInt != $parseInt), 'Number', {parseInt: $parseInt});
+},{"31":31,"81":81}],175:[function(_dereq_,module,exports){
+'use strict';
+var $export      = _dereq_(31)
+  , anInstance   = _dereq_(7)
+  , toInteger    = _dereq_(105)
+  , aNumberValue = _dereq_(5)
+  , repeat       = _dereq_(100)
+  , $toFixed     = 1..toFixed
+  , floor        = Math.floor
+  , data         = [0, 0, 0, 0, 0, 0]
+  , ERROR        = 'Number.toFixed: incorrect invocation!'
+  , ZERO         = '0';
 
-$export($export.S, 'Number', {parseInt: parseInt});
-},{"23":23}],125:[function(_dereq_,module,exports){
+var multiply = function(n, c){
+  var i  = -1
+    , c2 = c;
+  while(++i < 6){
+    c2 += n * data[i];
+    data[i] = c2 % 1e7;
+    c2 = floor(c2 / 1e7);
+  }
+};
+var divide = function(n){
+  var i = 6
+    , c = 0;
+  while(--i >= 0){
+    c += data[i];
+    data[i] = floor(c / n);
+    c = (c % n) * 1e7;
+  }
+};
+var numToString = function(){
+  var i = 6
+    , s = '';
+  while(--i >= 0){
+    if(s !== '' || i === 0 || data[i] !== 0){
+      var t = String(data[i]);
+      s = s === '' ? t : s + repeat.call(ZERO, 7 - t.length) + t;
+    }
+  } return s;
+};
+var pow = function(x, n, acc){
+  return n === 0 ? acc : n % 2 === 1 ? pow(x, n - 1, acc * x) : pow(x * x, n / 2, acc);
+};
+var log = function(x){
+  var n  = 0
+    , x2 = x;
+  while(x2 >= 4096){
+    n += 12;
+    x2 /= 4096;
+  }
+  while(x2 >= 2){
+    n  += 1;
+    x2 /= 2;
+  } return n;
+};
+
+$export($export.P + $export.F * (!!$toFixed && (
+  0.00008.toFixed(3) !== '0.000' ||
+  0.9.toFixed(0) !== '1' ||
+  1.255.toFixed(2) !== '1.25' ||
+  1000000000000000128..toFixed(0) !== '1000000000000000128'
+) || !_dereq_(33)(function(){
+  // V8 ~ Android 4.3-
+  $toFixed.call({});
+})), 'Number', {
+  toFixed: function toFixed(fractionDigits){
+    var x = aNumberValue(this, ERROR)
+      , f = toInteger(fractionDigits)
+      , s = ''
+      , m = ZERO
+      , e, z, j, k;
+    if(f < 0 || f > 20)throw RangeError(ERROR);
+    if(x != x)return 'NaN';
+    if(x <= -1e21 || x >= 1e21)return String(x);
+    if(x < 0){
+      s = '-';
+      x = -x;
+    }
+    if(x > 1e-21){
+      e = log(x * pow(2, 69, 1)) - 69;
+      z = e < 0 ? x * pow(2, -e, 1) : x / pow(2, e, 1);
+      z *= 0x10000000000000;
+      e = 52 - e;
+      if(e > 0){
+        multiply(0, z);
+        j = f;
+        while(j >= 7){
+          multiply(1e7, 0);
+          j -= 7;
+        }
+        multiply(pow(10, j, 1), 0);
+        j = e - 1;
+        while(j >= 23){
+          divide(1 << 23);
+          j -= 23;
+        }
+        divide(1 << j);
+        multiply(1, 1);
+        divide(2);
+        m = numToString();
+      } else {
+        multiply(0, z);
+        multiply(1 << -e, 0);
+        m = numToString() + repeat.call(ZERO, f);
+      }
+    }
+    if(f > 0){
+      k = m.length;
+      m = s + (k <= f ? '0.' + repeat.call(ZERO, f - k) + m : m.slice(0, k - f) + '.' + m.slice(k - f));
+    } else {
+      m = s + m;
+    } return m;
+  }
+});
+},{"100":100,"105":105,"31":31,"33":33,"5":5,"7":7}],176:[function(_dereq_,module,exports){
+'use strict';
+var $export      = _dereq_(31)
+  , $fails       = _dereq_(33)
+  , aNumberValue = _dereq_(5)
+  , $toPrecision = 1..toPrecision;
+
+$export($export.P + $export.F * ($fails(function(){
+  // IE7-
+  return $toPrecision.call(1, undefined) !== '1';
+}) || !$fails(function(){
+  // V8 ~ Android 4.3-
+  $toPrecision.call({});
+})), 'Number', {
+  toPrecision: function toPrecision(precision){
+    var that = aNumberValue(this, 'Number#toPrecision: incorrect invocation!');
+    return precision === undefined ? $toPrecision.call(that) : $toPrecision.call(that, precision); 
+  }
+});
+},{"31":31,"33":33,"5":5}],177:[function(_dereq_,module,exports){
 // 19.1.3.1 Object.assign(target, source)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.S + $export.F, 'Object', {assign: _dereq_(54)});
-},{"23":23,"54":54}],126:[function(_dereq_,module,exports){
+$export($export.S + $export.F, 'Object', {assign: _dereq_(64)});
+},{"31":31,"64":64}],178:[function(_dereq_,module,exports){
+var $export = _dereq_(31)
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+$export($export.S, 'Object', {create: _dereq_(65)});
+},{"31":31,"65":65}],179:[function(_dereq_,module,exports){
+var $export = _dereq_(31);
+// 19.1.2.3 / 15.2.3.7 Object.defineProperties(O, Properties)
+$export($export.S + $export.F * !_dereq_(27), 'Object', {defineProperties: _dereq_(67)});
+},{"27":27,"31":31,"67":67}],180:[function(_dereq_,module,exports){
+var $export = _dereq_(31);
+// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
+$export($export.S + $export.F * !_dereq_(27), 'Object', {defineProperty: _dereq_(66).f});
+},{"27":27,"31":31,"66":66}],181:[function(_dereq_,module,exports){
 // 19.1.2.5 Object.freeze(O)
-var isObject = _dereq_(39);
+var isObject = _dereq_(48)
+  , meta     = _dereq_(61).onFreeze;
 
-_dereq_(55)('freeze', function($freeze){
+_dereq_(77)('freeze', function($freeze){
   return function freeze(it){
-    return $freeze && isObject(it) ? $freeze(it) : it;
+    return $freeze && isObject(it) ? $freeze(meta(it)) : it;
   };
 });
-},{"39":39,"55":55}],127:[function(_dereq_,module,exports){
+},{"48":48,"61":61,"77":77}],182:[function(_dereq_,module,exports){
 // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-var toIObject = _dereq_(79);
+var toIObject                 = _dereq_(106)
+  , $getOwnPropertyDescriptor = _dereq_(69).f;
 
-_dereq_(55)('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor){
+_dereq_(77)('getOwnPropertyDescriptor', function(){
   return function getOwnPropertyDescriptor(it, key){
     return $getOwnPropertyDescriptor(toIObject(it), key);
   };
 });
-},{"55":55,"79":79}],128:[function(_dereq_,module,exports){
+},{"106":106,"69":69,"77":77}],183:[function(_dereq_,module,exports){
 // 19.1.2.7 Object.getOwnPropertyNames(O)
-_dereq_(55)('getOwnPropertyNames', function(){
-  return _dereq_(29).get;
+_dereq_(77)('getOwnPropertyNames', function(){
+  return _dereq_(70).f;
 });
-},{"29":29,"55":55}],129:[function(_dereq_,module,exports){
+},{"70":70,"77":77}],184:[function(_dereq_,module,exports){
 // 19.1.2.9 Object.getPrototypeOf(O)
-var toObject = _dereq_(81);
+var toObject        = _dereq_(108)
+  , $getPrototypeOf = _dereq_(73);
 
-_dereq_(55)('getPrototypeOf', function($getPrototypeOf){
+_dereq_(77)('getPrototypeOf', function(){
   return function getPrototypeOf(it){
     return $getPrototypeOf(toObject(it));
   };
 });
-},{"55":55,"81":81}],130:[function(_dereq_,module,exports){
+},{"108":108,"73":73,"77":77}],185:[function(_dereq_,module,exports){
 // 19.1.2.11 Object.isExtensible(O)
-var isObject = _dereq_(39);
+var isObject = _dereq_(48);
 
-_dereq_(55)('isExtensible', function($isExtensible){
+_dereq_(77)('isExtensible', function($isExtensible){
   return function isExtensible(it){
     return isObject(it) ? $isExtensible ? $isExtensible(it) : true : false;
   };
 });
-},{"39":39,"55":55}],131:[function(_dereq_,module,exports){
+},{"48":48,"77":77}],186:[function(_dereq_,module,exports){
 // 19.1.2.12 Object.isFrozen(O)
-var isObject = _dereq_(39);
+var isObject = _dereq_(48);
 
-_dereq_(55)('isFrozen', function($isFrozen){
+_dereq_(77)('isFrozen', function($isFrozen){
   return function isFrozen(it){
     return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
   };
 });
-},{"39":39,"55":55}],132:[function(_dereq_,module,exports){
+},{"48":48,"77":77}],187:[function(_dereq_,module,exports){
 // 19.1.2.13 Object.isSealed(O)
-var isObject = _dereq_(39);
+var isObject = _dereq_(48);
 
-_dereq_(55)('isSealed', function($isSealed){
+_dereq_(77)('isSealed', function($isSealed){
   return function isSealed(it){
     return isObject(it) ? $isSealed ? $isSealed(it) : false : true;
   };
 });
-},{"39":39,"55":55}],133:[function(_dereq_,module,exports){
+},{"48":48,"77":77}],188:[function(_dereq_,module,exports){
 // 19.1.3.10 Object.is(value1, value2)
-var $export = _dereq_(23);
-$export($export.S, 'Object', {is: _dereq_(64)});
-},{"23":23,"64":64}],134:[function(_dereq_,module,exports){
+var $export = _dereq_(31);
+$export($export.S, 'Object', {is: _dereq_(88)});
+},{"31":31,"88":88}],189:[function(_dereq_,module,exports){
 // 19.1.2.14 Object.keys(O)
-var toObject = _dereq_(81);
+var toObject = _dereq_(108)
+  , $keys    = _dereq_(75);
 
-_dereq_(55)('keys', function($keys){
+_dereq_(77)('keys', function(){
   return function keys(it){
     return $keys(toObject(it));
   };
 });
-},{"55":55,"81":81}],135:[function(_dereq_,module,exports){
+},{"108":108,"75":75,"77":77}],190:[function(_dereq_,module,exports){
 // 19.1.2.15 Object.preventExtensions(O)
-var isObject = _dereq_(39);
+var isObject = _dereq_(48)
+  , meta     = _dereq_(61).onFreeze;
 
-_dereq_(55)('preventExtensions', function($preventExtensions){
+_dereq_(77)('preventExtensions', function($preventExtensions){
   return function preventExtensions(it){
-    return $preventExtensions && isObject(it) ? $preventExtensions(it) : it;
+    return $preventExtensions && isObject(it) ? $preventExtensions(meta(it)) : it;
   };
 });
-},{"39":39,"55":55}],136:[function(_dereq_,module,exports){
+},{"48":48,"61":61,"77":77}],191:[function(_dereq_,module,exports){
 // 19.1.2.17 Object.seal(O)
-var isObject = _dereq_(39);
+var isObject = _dereq_(48)
+  , meta     = _dereq_(61).onFreeze;
 
-_dereq_(55)('seal', function($seal){
+_dereq_(77)('seal', function($seal){
   return function seal(it){
-    return $seal && isObject(it) ? $seal(it) : it;
+    return $seal && isObject(it) ? $seal(meta(it)) : it;
   };
 });
-},{"39":39,"55":55}],137:[function(_dereq_,module,exports){
+},{"48":48,"61":61,"77":77}],192:[function(_dereq_,module,exports){
 // 19.1.3.19 Object.setPrototypeOf(O, proto)
-var $export = _dereq_(23);
-$export($export.S, 'Object', {setPrototypeOf: _dereq_(65).set});
-},{"23":23,"65":65}],138:[function(_dereq_,module,exports){
+var $export = _dereq_(31);
+$export($export.S, 'Object', {setPrototypeOf: _dereq_(89).set});
+},{"31":31,"89":89}],193:[function(_dereq_,module,exports){
 'use strict';
 // 19.1.3.6 Object.prototype.toString()
-var classof = _dereq_(11)
+var classof = _dereq_(17)
   , test    = {};
-test[_dereq_(84)('toStringTag')] = 'z';
+test[_dereq_(114)('toStringTag')] = 'z';
 if(test + '' != '[object z]'){
-  _dereq_(62)(Object.prototype, 'toString', function toString(){
+  _dereq_(86)(Object.prototype, 'toString', function toString(){
     return '[object ' + classof(this) + ']';
   }, true);
 }
-},{"11":11,"62":62,"84":84}],139:[function(_dereq_,module,exports){
+},{"114":114,"17":17,"86":86}],194:[function(_dereq_,module,exports){
+var $export     = _dereq_(31)
+  , $parseFloat = _dereq_(80);
+// 18.2.4 parseFloat(string)
+$export($export.G + $export.F * (parseFloat != $parseFloat), {parseFloat: $parseFloat});
+},{"31":31,"80":80}],195:[function(_dereq_,module,exports){
+var $export   = _dereq_(31)
+  , $parseInt = _dereq_(81);
+// 18.2.5 parseInt(string, radix)
+$export($export.G + $export.F * (parseInt != $parseInt), {parseInt: $parseInt});
+},{"31":31,"81":81}],196:[function(_dereq_,module,exports){
 'use strict';
-var $          = _dereq_(47)
-  , LIBRARY    = _dereq_(49)
-  , global     = _dereq_(30)
-  , ctx        = _dereq_(18)
-  , classof    = _dereq_(11)
-  , $export    = _dereq_(23)
-  , isObject   = _dereq_(39)
-  , anObject   = _dereq_(5)
-  , aFunction  = _dereq_(3)
-  , strictNew  = _dereq_(70)
-  , forOf      = _dereq_(28)
-  , setProto   = _dereq_(65).set
-  , same       = _dereq_(64)
-  , SPECIES    = _dereq_(84)('species')
-  , speciesConstructor = _dereq_(69)
-  , asap       = _dereq_(53)
-  , PROMISE    = 'Promise'
-  , process    = global.process
-  , isNode     = classof(process) == 'process'
-  , P          = global[PROMISE]
-  , Wrapper;
+var LIBRARY            = _dereq_(57)
+  , global             = _dereq_(37)
+  , ctx                = _dereq_(24)
+  , classof            = _dereq_(17)
+  , $export            = _dereq_(31)
+  , isObject           = _dereq_(48)
+  , anObject           = _dereq_(8)
+  , aFunction          = _dereq_(4)
+  , anInstance         = _dereq_(7)
+  , forOf              = _dereq_(36)
+  , setProto           = _dereq_(89).set
+  , speciesConstructor = _dereq_(94)
+  , task               = _dereq_(103).set
+  , microtask          = _dereq_(63)
+  , PROMISE            = 'Promise'
+  , TypeError          = global.TypeError
+  , process            = global.process
+  , $Promise           = global[PROMISE]
+  , process            = global.process
+  , isNode             = classof(process) == 'process'
+  , empty              = function(){ /* empty */ }
+  , Internal, GenericPromiseCapability, Wrapper;
 
-var testResolve = function(sub){
-  var test = new P(function(){});
-  if(sub)test.constructor = Object;
-  return P.resolve(test) === test;
-};
-
-var USE_NATIVE = function(){
-  var works = false;
-  function P2(x){
-    var self = new P(x);
-    setProto(self, P2.prototype);
-    return self;
-  }
+var USE_NATIVE = !!function(){
   try {
-    works = P && P.resolve && testResolve();
-    setProto(P2, P);
-    P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
-    // actual Firefox has broken subclass support, test that
-    if(!(P2.resolve(5).then(function(){}) instanceof P2)){
-      works = false;
-    }
-    // actual V8 bug, https://code.google.com/p/v8/issues/detail?id=4162
-    if(works && _dereq_(20)){
-      var thenableThenGotten = false;
-      P.resolve($.setDesc({}, 'then', {
-        get: function(){ thenableThenGotten = true; }
-      }));
-      works = thenableThenGotten;
-    }
-  } catch(e){ works = false; }
-  return works;
+    // correct subclassing with @@species support
+    var promise     = $Promise.resolve(1)
+      , FakePromise = (promise.constructor = {})[_dereq_(114)('species')] = function(exec){ exec(empty, empty); };
+    // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+    return (isNode || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
+  } catch(e){ /* empty */ }
 }();
 
 // helpers
 var sameConstructor = function(a, b){
-  // library wrapper special case
-  if(LIBRARY && a === P && b === Wrapper)return true;
-  return same(a, b);
-};
-var getConstructor = function(C){
-  var S = anObject(C)[SPECIES];
-  return S != undefined ? S : C;
+  // with library wrapper special case
+  return a === b || a === $Promise && b === Wrapper;
 };
 var isThenable = function(it){
   var then;
   return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
 };
-var PromiseCapability = function(C){
+var newPromiseCapability = function(C){
+  return sameConstructor($Promise, C)
+    ? new PromiseCapability(C)
+    : new GenericPromiseCapability(C);
+};
+var PromiseCapability = GenericPromiseCapability = function(C){
   var resolve, reject;
   this.promise = new C(function($$resolve, $$reject){
     if(resolve !== undefined || reject !== undefined)throw TypeError('Bad Promise constructor');
     resolve = $$resolve;
     reject  = $$reject;
   });
-  this.resolve = aFunction(resolve),
-  this.reject  = aFunction(reject)
+  this.resolve = aFunction(resolve);
+  this.reject  = aFunction(reject);
 };
 var perform = function(exec){
   try {
@@ -2492,23 +3825,32 @@ var perform = function(exec){
     return {error: e};
   }
 };
-var notify = function(record, isReject){
-  if(record.n)return;
-  record.n = true;
-  var chain = record.c;
-  asap(function(){
-    var value = record.v
-      , ok    = record.s == 1
+var notify = function(promise, isReject){
+  if(promise._n)return;
+  promise._n = true;
+  var chain = promise._c;
+  microtask(function(){
+    var value = promise._v
+      , ok    = promise._s == 1
       , i     = 0;
     var run = function(reaction){
       var handler = ok ? reaction.ok : reaction.fail
         , resolve = reaction.resolve
         , reject  = reaction.reject
+        , domain  = reaction.domain
         , result, then;
       try {
         if(handler){
-          if(!ok)record.h = true;
-          result = handler === true ? value : handler(value);
+          if(!ok){
+            if(promise._h == 2)onHandleUnhandled(promise);
+            promise._h = 1;
+          }
+          if(handler === true)result = value;
+          else {
+            if(domain)domain.enter();
+            result = handler(value);
+            if(domain)domain.exit();
+          }
           if(result === reaction.promise){
             reject(TypeError('Promise-chain cycle'));
           } else if(then = isThenable(result)){
@@ -2520,12 +3862,17 @@ var notify = function(record, isReject){
       }
     };
     while(chain.length > i)run(chain[i++]); // variable length - can't use forEach
-    chain.length = 0;
-    record.n = false;
-    if(isReject)setTimeout(function(){
-      var promise = record.p
-        , handler, console;
-      if(isUnhandled(promise)){
+    promise._c = [];
+    promise._n = false;
+    if(isReject && !promise._h)onUnhandled(promise);
+  });
+};
+var onUnhandled = function(promise){
+  task.call(global, function(){
+    var value = promise._v
+      , abrupt, handler, console;
+    if(isUnhandled(promise)){
+      abrupt = perform(function(){
         if(isNode){
           process.emit('unhandledRejection', value, promise);
         } else if(handler = global.onunhandledrejection){
@@ -2533,42 +3880,54 @@ var notify = function(record, isReject){
         } else if((console = global.console) && console.error){
           console.error('Unhandled promise rejection', value);
         }
-      } record.a = undefined;
-    }, 1);
+      });
+      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
+      promise._h = isNode || isUnhandled(promise) ? 2 : 1;
+    } promise._a = undefined;
+    if(abrupt)throw abrupt.error;
   });
 };
 var isUnhandled = function(promise){
-  var record = promise._d
-    , chain  = record.a || record.c
-    , i      = 0
+  if(promise._h == 1)return false;
+  var chain = promise._a || promise._c
+    , i     = 0
     , reaction;
-  if(record.h)return false;
   while(chain.length > i){
     reaction = chain[i++];
     if(reaction.fail || !isUnhandled(reaction.promise))return false;
   } return true;
 };
+var onHandleUnhandled = function(promise){
+  task.call(global, function(){
+    var handler;
+    if(isNode){
+      process.emit('rejectionHandled', promise);
+    } else if(handler = global.onrejectionhandled){
+      handler({promise: promise, reason: promise._v});
+    }
+  });
+};
 var $reject = function(value){
-  var record = this;
-  if(record.d)return;
-  record.d = true;
-  record = record.r || record; // unwrap
-  record.v = value;
-  record.s = 2;
-  record.a = record.c.slice();
-  notify(record, true);
+  var promise = this;
+  if(promise._d)return;
+  promise._d = true;
+  promise = promise._w || promise; // unwrap
+  promise._v = value;
+  promise._s = 2;
+  if(!promise._a)promise._a = promise._c.slice();
+  notify(promise, true);
 };
 var $resolve = function(value){
-  var record = this
+  var promise = this
     , then;
-  if(record.d)return;
-  record.d = true;
-  record = record.r || record; // unwrap
+  if(promise._d)return;
+  promise._d = true;
+  promise = promise._w || promise; // unwrap
   try {
-    if(record.p === value)throw TypeError("Promise can't be resolved itself");
+    if(promise === value)throw TypeError("Promise can't be resolved itself");
     if(then = isThenable(value)){
-      asap(function(){
-        var wrapper = {r: record, d: false}; // wrap
+      microtask(function(){
+        var wrapper = {_w: promise, _d: false}; // wrap
         try {
           then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
         } catch(e){
@@ -2576,114 +3935,122 @@ var $resolve = function(value){
         }
       });
     } else {
-      record.v = value;
-      record.s = 1;
-      notify(record, false);
+      promise._v = value;
+      promise._s = 1;
+      notify(promise, false);
     }
   } catch(e){
-    $reject.call({r: record, d: false}, e); // wrap
+    $reject.call({_w: promise, _d: false}, e); // wrap
   }
 };
 
 // constructor polyfill
 if(!USE_NATIVE){
   // 25.4.3.1 Promise(executor)
-  P = function Promise(executor){
+  $Promise = function Promise(executor){
+    anInstance(this, $Promise, PROMISE, '_h');
     aFunction(executor);
-    var record = this._d = {
-      p: strictNew(this, P, PROMISE),         // <- promise
-      c: [],                                  // <- awaiting reactions
-      a: undefined,                           // <- checked in isUnhandled reactions
-      s: 0,                                   // <- state
-      d: false,                               // <- done
-      v: undefined,                           // <- value
-      h: false,                               // <- handled rejection
-      n: false                                // <- notify
-    };
+    Internal.call(this);
     try {
-      executor(ctx($resolve, record, 1), ctx($reject, record, 1));
+      executor(ctx($resolve, this, 1), ctx($reject, this, 1));
     } catch(err){
-      $reject.call(record, err);
+      $reject.call(this, err);
     }
   };
-  _dereq_(61)(P.prototype, {
+  Internal = function Promise(executor){
+    this._c = [];             // <- awaiting reactions
+    this._a = undefined;      // <- checked in isUnhandled reactions
+    this._s = 0;              // <- state
+    this._d = false;          // <- done
+    this._v = undefined;      // <- value
+    this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
+    this._n = false;          // <- notify
+  };
+  Internal.prototype = _dereq_(85)($Promise.prototype, {
     // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
     then: function then(onFulfilled, onRejected){
-      var reaction = new PromiseCapability(speciesConstructor(this, P))
-        , promise  = reaction.promise
-        , record   = this._d;
-      reaction.ok   = typeof onFulfilled == 'function' ? onFulfilled : true;
-      reaction.fail = typeof onRejected == 'function' && onRejected;
-      record.c.push(reaction);
-      if(record.a)record.a.push(reaction);
-      if(record.s)notify(record, false);
-      return promise;
+      var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
+      reaction.ok     = typeof onFulfilled == 'function' ? onFulfilled : true;
+      reaction.fail   = typeof onRejected == 'function' && onRejected;
+      reaction.domain = isNode ? process.domain : undefined;
+      this._c.push(reaction);
+      if(this._a)this._a.push(reaction);
+      if(this._s)notify(this, false);
+      return reaction.promise;
     },
     // 25.4.5.1 Promise.prototype.catch(onRejected)
     'catch': function(onRejected){
       return this.then(undefined, onRejected);
     }
   });
+  PromiseCapability = function(){
+    var promise  = new Internal;
+    this.promise = promise;
+    this.resolve = ctx($resolve, promise, 1);
+    this.reject  = ctx($reject, promise, 1);
+  };
 }
 
-$export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: P});
-_dereq_(67)(P, PROMISE);
-_dereq_(66)(PROMISE);
-Wrapper = _dereq_(17)[PROMISE];
+$export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
+_dereq_(91)($Promise, PROMISE);
+_dereq_(90)(PROMISE);
+Wrapper = _dereq_(23)[PROMISE];
 
 // statics
 $export($export.S + $export.F * !USE_NATIVE, PROMISE, {
   // 25.4.4.5 Promise.reject(r)
   reject: function reject(r){
-    var capability = new PromiseCapability(this)
+    var capability = newPromiseCapability(this)
       , $$reject   = capability.reject;
     $$reject(r);
     return capability.promise;
   }
 });
-$export($export.S + $export.F * (!USE_NATIVE || testResolve(true)), PROMISE, {
+$export($export.S + $export.F * (LIBRARY || !USE_NATIVE), PROMISE, {
   // 25.4.4.6 Promise.resolve(x)
   resolve: function resolve(x){
     // instanceof instead of internal slot check because we should fix it without replacement native Promise core
-    if(x instanceof P && sameConstructor(x.constructor, this))return x;
-    var capability = new PromiseCapability(this)
+    if(x instanceof $Promise && sameConstructor(x.constructor, this))return x;
+    var capability = newPromiseCapability(this)
       , $$resolve  = capability.resolve;
     $$resolve(x);
     return capability.promise;
   }
 });
-$export($export.S + $export.F * !(USE_NATIVE && _dereq_(44)(function(iter){
-  P.all(iter)['catch'](function(){});
+$export($export.S + $export.F * !(USE_NATIVE && _dereq_(53)(function(iter){
+  $Promise.all(iter)['catch'](empty);
 })), PROMISE, {
   // 25.4.4.1 Promise.all(iterable)
   all: function all(iterable){
-    var C          = getConstructor(this)
-      , capability = new PromiseCapability(C)
+    var C          = this
+      , capability = newPromiseCapability(C)
       , resolve    = capability.resolve
-      , reject     = capability.reject
-      , values     = [];
+      , reject     = capability.reject;
     var abrupt = perform(function(){
-      forOf(iterable, false, values.push, values);
-      var remaining = values.length
-        , results   = Array(remaining);
-      if(remaining)$.each.call(values, function(promise, index){
-        var alreadyCalled = false;
+      var values    = []
+        , index     = 0
+        , remaining = 1;
+      forOf(iterable, false, function(promise){
+        var $index        = index++
+          , alreadyCalled = false;
+        values.push(undefined);
+        remaining++;
         C.resolve(promise).then(function(value){
           if(alreadyCalled)return;
-          alreadyCalled = true;
-          results[index] = value;
-          --remaining || resolve(results);
+          alreadyCalled  = true;
+          values[$index] = value;
+          --remaining || resolve(values);
         }, reject);
       });
-      else resolve(results);
+      --remaining || resolve(values);
     });
     if(abrupt)reject(abrupt.error);
     return capability.promise;
   },
   // 25.4.4.4 Promise.race(iterable)
   race: function race(iterable){
-    var C          = getConstructor(this)
-      , capability = new PromiseCapability(C)
+    var C          = this
+      , capability = newPromiseCapability(C)
       , reject     = capability.reject;
     var abrupt = perform(function(){
       forOf(iterable, false, function(promise){
@@ -2694,9 +4061,9 @@ $export($export.S + $export.F * !(USE_NATIVE && _dereq_(44)(function(iter){
     return capability.promise;
   }
 });
-},{"11":11,"17":17,"18":18,"20":20,"23":23,"28":28,"3":3,"30":30,"39":39,"44":44,"47":47,"49":49,"5":5,"53":53,"61":61,"64":64,"65":65,"66":66,"67":67,"69":69,"70":70,"84":84}],140:[function(_dereq_,module,exports){
+},{"103":103,"114":114,"17":17,"23":23,"24":24,"31":31,"36":36,"37":37,"4":4,"48":48,"53":53,"57":57,"63":63,"7":7,"8":8,"85":85,"89":89,"90":90,"91":91,"94":94}],197:[function(_dereq_,module,exports){
 // 26.1.1 Reflect.apply(target, thisArgument, argumentsList)
-var $export = _dereq_(23)
+var $export = _dereq_(31)
   , _apply  = Function.apply;
 
 $export($export.S, 'Reflect', {
@@ -2704,18 +4071,18 @@ $export($export.S, 'Reflect', {
     return _apply.call(target, thisArgument, argumentsList);
   }
 });
-},{"23":23}],141:[function(_dereq_,module,exports){
+},{"31":31}],198:[function(_dereq_,module,exports){
 // 26.1.2 Reflect.construct(target, argumentsList [, newTarget])
-var $         = _dereq_(47)
-  , $export   = _dereq_(23)
-  , aFunction = _dereq_(3)
-  , anObject  = _dereq_(5)
-  , isObject  = _dereq_(39)
-  , bind      = Function.bind || _dereq_(17).Function.prototype.bind;
+var $export   = _dereq_(31)
+  , create    = _dereq_(65)
+  , aFunction = _dereq_(4)
+  , anObject  = _dereq_(8)
+  , isObject  = _dereq_(48)
+  , bind      = _dereq_(16);
 
 // MS Edge supports only 2 arguments
 // FF Nightly sets third argument as `new.target`, but does not create `this` from it
-$export($export.S + $export.F * _dereq_(25)(function(){
+$export($export.S + $export.F * _dereq_(33)(function(){
   function F(){}
   return !(Reflect.construct(function(){}, [], F) instanceof F);
 }), 'Reflect', {
@@ -2738,48 +4105,51 @@ $export($export.S + $export.F * _dereq_(25)(function(){
     }
     // with altered newTarget, not support built-in constructors
     var proto    = newTarget.prototype
-      , instance = $.create(isObject(proto) ? proto : Object.prototype)
+      , instance = create(isObject(proto) ? proto : Object.prototype)
       , result   = Function.apply.call(Target, instance, args);
     return isObject(result) ? result : instance;
   }
 });
-},{"17":17,"23":23,"25":25,"3":3,"39":39,"47":47,"5":5}],142:[function(_dereq_,module,exports){
+},{"16":16,"31":31,"33":33,"4":4,"48":48,"65":65,"8":8}],199:[function(_dereq_,module,exports){
 // 26.1.3 Reflect.defineProperty(target, propertyKey, attributes)
-var $        = _dereq_(47)
-  , $export  = _dereq_(23)
-  , anObject = _dereq_(5);
+var dP          = _dereq_(66)
+  , $export     = _dereq_(31)
+  , anObject    = _dereq_(8)
+  , toPrimitive = _dereq_(109);
 
 // MS Edge has broken Reflect.defineProperty - throwing instead of returning false
-$export($export.S + $export.F * _dereq_(25)(function(){
-  Reflect.defineProperty($.setDesc({}, 1, {value: 1}), 1, {value: 2});
+$export($export.S + $export.F * _dereq_(33)(function(){
+  Reflect.defineProperty(dP.f({}, 1, {value: 1}), 1, {value: 2});
 }), 'Reflect', {
   defineProperty: function defineProperty(target, propertyKey, attributes){
     anObject(target);
+    propertyKey = toPrimitive(propertyKey, true);
+    anObject(attributes);
     try {
-      $.setDesc(target, propertyKey, attributes);
+      dP.f(target, propertyKey, attributes);
       return true;
     } catch(e){
       return false;
     }
   }
 });
-},{"23":23,"25":25,"47":47,"5":5}],143:[function(_dereq_,module,exports){
+},{"109":109,"31":31,"33":33,"66":66,"8":8}],200:[function(_dereq_,module,exports){
 // 26.1.4 Reflect.deleteProperty(target, propertyKey)
-var $export  = _dereq_(23)
-  , getDesc  = _dereq_(47).getDesc
-  , anObject = _dereq_(5);
+var $export  = _dereq_(31)
+  , gOPD     = _dereq_(69).f
+  , anObject = _dereq_(8);
 
 $export($export.S, 'Reflect', {
   deleteProperty: function deleteProperty(target, propertyKey){
-    var desc = getDesc(anObject(target), propertyKey);
+    var desc = gOPD(anObject(target), propertyKey);
     return desc && !desc.configurable ? false : delete target[propertyKey];
   }
 });
-},{"23":23,"47":47,"5":5}],144:[function(_dereq_,module,exports){
+},{"31":31,"69":69,"8":8}],201:[function(_dereq_,module,exports){
 'use strict';
 // 26.1.5 Reflect.enumerate(target)
-var $export  = _dereq_(23)
-  , anObject = _dereq_(5);
+var $export  = _dereq_(31)
+  , anObject = _dereq_(8);
 var Enumerate = function(iterated){
   this._t = anObject(iterated); // target
   this._i = 0;                  // next index
@@ -2787,7 +4157,7 @@ var Enumerate = function(iterated){
     , key;
   for(key in iterated)keys.push(key);
 };
-_dereq_(42)(Enumerate, 'Object', function(){
+_dereq_(51)(Enumerate, 'Object', function(){
   var that = this
     , keys = that._k
     , key;
@@ -2802,62 +4172,63 @@ $export($export.S, 'Reflect', {
     return new Enumerate(target);
   }
 });
-},{"23":23,"42":42,"5":5}],145:[function(_dereq_,module,exports){
+},{"31":31,"51":51,"8":8}],202:[function(_dereq_,module,exports){
 // 26.1.7 Reflect.getOwnPropertyDescriptor(target, propertyKey)
-var $        = _dereq_(47)
-  , $export  = _dereq_(23)
-  , anObject = _dereq_(5);
+var gOPD     = _dereq_(69)
+  , $export  = _dereq_(31)
+  , anObject = _dereq_(8);
 
 $export($export.S, 'Reflect', {
   getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, propertyKey){
-    return $.getDesc(anObject(target), propertyKey);
+    return gOPD.f(anObject(target), propertyKey);
   }
 });
-},{"23":23,"47":47,"5":5}],146:[function(_dereq_,module,exports){
+},{"31":31,"69":69,"8":8}],203:[function(_dereq_,module,exports){
 // 26.1.8 Reflect.getPrototypeOf(target)
-var $export  = _dereq_(23)
-  , getProto = _dereq_(47).getProto
-  , anObject = _dereq_(5);
+var $export  = _dereq_(31)
+  , getProto = _dereq_(73)
+  , anObject = _dereq_(8);
 
 $export($export.S, 'Reflect', {
   getPrototypeOf: function getPrototypeOf(target){
     return getProto(anObject(target));
   }
 });
-},{"23":23,"47":47,"5":5}],147:[function(_dereq_,module,exports){
+},{"31":31,"73":73,"8":8}],204:[function(_dereq_,module,exports){
 // 26.1.6 Reflect.get(target, propertyKey [, receiver])
-var $        = _dereq_(47)
-  , has      = _dereq_(31)
-  , $export  = _dereq_(23)
-  , isObject = _dereq_(39)
-  , anObject = _dereq_(5);
+var gOPD           = _dereq_(69)
+  , getPrototypeOf = _dereq_(73)
+  , has            = _dereq_(38)
+  , $export        = _dereq_(31)
+  , isObject       = _dereq_(48)
+  , anObject       = _dereq_(8);
 
 function get(target, propertyKey/*, receiver*/){
   var receiver = arguments.length < 3 ? target : arguments[2]
     , desc, proto;
   if(anObject(target) === receiver)return target[propertyKey];
-  if(desc = $.getDesc(target, propertyKey))return has(desc, 'value')
+  if(desc = gOPD.f(target, propertyKey))return has(desc, 'value')
     ? desc.value
     : desc.get !== undefined
       ? desc.get.call(receiver)
       : undefined;
-  if(isObject(proto = $.getProto(target)))return get(proto, propertyKey, receiver);
+  if(isObject(proto = getPrototypeOf(target)))return get(proto, propertyKey, receiver);
 }
 
 $export($export.S, 'Reflect', {get: get});
-},{"23":23,"31":31,"39":39,"47":47,"5":5}],148:[function(_dereq_,module,exports){
+},{"31":31,"38":38,"48":48,"69":69,"73":73,"8":8}],205:[function(_dereq_,module,exports){
 // 26.1.9 Reflect.has(target, propertyKey)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
 $export($export.S, 'Reflect', {
   has: function has(target, propertyKey){
     return propertyKey in target;
   }
 });
-},{"23":23}],149:[function(_dereq_,module,exports){
+},{"31":31}],206:[function(_dereq_,module,exports){
 // 26.1.10 Reflect.isExtensible(target)
-var $export       = _dereq_(23)
-  , anObject      = _dereq_(5)
+var $export       = _dereq_(31)
+  , anObject      = _dereq_(8)
   , $isExtensible = Object.isExtensible;
 
 $export($export.S, 'Reflect', {
@@ -2866,15 +4237,15 @@ $export($export.S, 'Reflect', {
     return $isExtensible ? $isExtensible(target) : true;
   }
 });
-},{"23":23,"5":5}],150:[function(_dereq_,module,exports){
+},{"31":31,"8":8}],207:[function(_dereq_,module,exports){
 // 26.1.11 Reflect.ownKeys(target)
-var $export = _dereq_(23);
+var $export = _dereq_(31);
 
-$export($export.S, 'Reflect', {ownKeys: _dereq_(57)});
-},{"23":23,"57":57}],151:[function(_dereq_,module,exports){
+$export($export.S, 'Reflect', {ownKeys: _dereq_(79)});
+},{"31":31,"79":79}],208:[function(_dereq_,module,exports){
 // 26.1.12 Reflect.preventExtensions(target)
-var $export            = _dereq_(23)
-  , anObject           = _dereq_(5)
+var $export            = _dereq_(31)
+  , anObject           = _dereq_(8)
   , $preventExtensions = Object.preventExtensions;
 
 $export($export.S, 'Reflect', {
@@ -2888,10 +4259,10 @@ $export($export.S, 'Reflect', {
     }
   }
 });
-},{"23":23,"5":5}],152:[function(_dereq_,module,exports){
+},{"31":31,"8":8}],209:[function(_dereq_,module,exports){
 // 26.1.14 Reflect.setPrototypeOf(target, proto)
-var $export  = _dereq_(23)
-  , setProto = _dereq_(65);
+var $export  = _dereq_(31)
+  , setProto = _dereq_(89);
 
 if(setProto)$export($export.S, 'Reflect', {
   setPrototypeOf: function setPrototypeOf(target, proto){
@@ -2904,136 +4275,226 @@ if(setProto)$export($export.S, 'Reflect', {
     }
   }
 });
-},{"23":23,"65":65}],153:[function(_dereq_,module,exports){
+},{"31":31,"89":89}],210:[function(_dereq_,module,exports){
 // 26.1.13 Reflect.set(target, propertyKey, V [, receiver])
-var $          = _dereq_(47)
-  , has        = _dereq_(31)
-  , $export    = _dereq_(23)
-  , createDesc = _dereq_(60)
-  , anObject   = _dereq_(5)
-  , isObject   = _dereq_(39);
+var dP             = _dereq_(66)
+  , gOPD           = _dereq_(69)
+  , getPrototypeOf = _dereq_(73)
+  , has            = _dereq_(38)
+  , $export        = _dereq_(31)
+  , createDesc     = _dereq_(84)
+  , anObject       = _dereq_(8)
+  , isObject       = _dereq_(48);
 
 function set(target, propertyKey, V/*, receiver*/){
   var receiver = arguments.length < 4 ? target : arguments[3]
-    , ownDesc  = $.getDesc(anObject(target), propertyKey)
+    , ownDesc  = gOPD.f(anObject(target), propertyKey)
     , existingDescriptor, proto;
   if(!ownDesc){
-    if(isObject(proto = $.getProto(target))){
+    if(isObject(proto = getPrototypeOf(target))){
       return set(proto, propertyKey, V, receiver);
     }
     ownDesc = createDesc(0);
   }
   if(has(ownDesc, 'value')){
     if(ownDesc.writable === false || !isObject(receiver))return false;
-    existingDescriptor = $.getDesc(receiver, propertyKey) || createDesc(0);
+    existingDescriptor = gOPD.f(receiver, propertyKey) || createDesc(0);
     existingDescriptor.value = V;
-    $.setDesc(receiver, propertyKey, existingDescriptor);
+    dP.f(receiver, propertyKey, existingDescriptor);
     return true;
   }
   return ownDesc.set === undefined ? false : (ownDesc.set.call(receiver, V), true);
 }
 
 $export($export.S, 'Reflect', {set: set});
-},{"23":23,"31":31,"39":39,"47":47,"5":5,"60":60}],154:[function(_dereq_,module,exports){
-var $        = _dereq_(47)
-  , global   = _dereq_(30)
-  , isRegExp = _dereq_(40)
-  , $flags   = _dereq_(27)
-  , $RegExp  = global.RegExp
-  , Base     = $RegExp
-  , proto    = $RegExp.prototype
-  , re1      = /a/g
-  , re2      = /a/g
+},{"31":31,"38":38,"48":48,"66":66,"69":69,"73":73,"8":8,"84":84}],211:[function(_dereq_,module,exports){
+var global            = _dereq_(37)
+  , inheritIfRequired = _dereq_(42)
+  , dP                = _dereq_(66).f
+  , gOPN              = _dereq_(71).f
+  , isRegExp          = _dereq_(49)
+  , $flags            = _dereq_(35)
+  , $RegExp           = global.RegExp
+  , Base              = $RegExp
+  , proto             = $RegExp.prototype
+  , re1               = /a/g
+  , re2               = /a/g
   // "new" creates a new object, old webkit buggy here
-  , CORRECT_NEW = new $RegExp(re1) !== re1;
+  , CORRECT_NEW       = new $RegExp(re1) !== re1;
 
-if(_dereq_(20) && (!CORRECT_NEW || _dereq_(25)(function(){
-  re2[_dereq_(84)('match')] = false;
+if(_dereq_(27) && (!CORRECT_NEW || _dereq_(33)(function(){
+  re2[_dereq_(114)('match')] = false;
   // RegExp constructor can alter flags and IsRegExp works correct with @@match
   return $RegExp(re1) != re1 || $RegExp(re2) == re2 || $RegExp(re1, 'i') != '/a/i';
 }))){
   $RegExp = function RegExp(p, f){
-    var piRE = isRegExp(p)
+    var tiRE = this instanceof $RegExp
+      , piRE = isRegExp(p)
       , fiU  = f === undefined;
-    return !(this instanceof $RegExp) && piRE && p.constructor === $RegExp && fiU ? p
-      : CORRECT_NEW
+    return !tiRE && piRE && p.constructor === $RegExp && fiU ? p
+      : inheritIfRequired(CORRECT_NEW
         ? new Base(piRE && !fiU ? p.source : p, f)
-        : Base((piRE = p instanceof $RegExp) ? p.source : p, piRE && fiU ? $flags.call(p) : f);
+        : Base((piRE = p instanceof $RegExp) ? p.source : p, piRE && fiU ? $flags.call(p) : f)
+      , tiRE ? this : proto, $RegExp);
   };
-  $.each.call($.getNames(Base), function(key){
-    key in $RegExp || $.setDesc($RegExp, key, {
+  var proxy = function(key){
+    key in $RegExp || dP($RegExp, key, {
       configurable: true,
       get: function(){ return Base[key]; },
       set: function(it){ Base[key] = it; }
     });
-  });
+  };
+  for(var keys = gOPN(Base), i = 0; keys.length > i; )proxy(keys[i++]);
   proto.constructor = $RegExp;
   $RegExp.prototype = proto;
-  _dereq_(62)(global, 'RegExp', $RegExp);
+  _dereq_(86)(global, 'RegExp', $RegExp);
 }
 
-_dereq_(66)('RegExp');
-},{"20":20,"25":25,"27":27,"30":30,"40":40,"47":47,"62":62,"66":66,"84":84}],155:[function(_dereq_,module,exports){
+_dereq_(90)('RegExp');
+},{"114":114,"27":27,"33":33,"35":35,"37":37,"42":42,"49":49,"66":66,"71":71,"86":86,"90":90}],212:[function(_dereq_,module,exports){
 // 21.2.5.3 get RegExp.prototype.flags()
-var $ = _dereq_(47);
-if(_dereq_(20) && /./g.flags != 'g')$.setDesc(RegExp.prototype, 'flags', {
+if(_dereq_(27) && /./g.flags != 'g')_dereq_(66).f(RegExp.prototype, 'flags', {
   configurable: true,
-  get: _dereq_(27)
+  get: _dereq_(35)
 });
-},{"20":20,"27":27,"47":47}],156:[function(_dereq_,module,exports){
+},{"27":27,"35":35,"66":66}],213:[function(_dereq_,module,exports){
 // @@match logic
-_dereq_(26)('match', 1, function(defined, MATCH){
+_dereq_(34)('match', 1, function(defined, MATCH, $match){
   // 21.1.3.11 String.prototype.match(regexp)
-  return function match(regexp){
+  return [function match(regexp){
     'use strict';
     var O  = defined(this)
       , fn = regexp == undefined ? undefined : regexp[MATCH];
     return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
-  };
+  }, $match];
 });
-},{"26":26}],157:[function(_dereq_,module,exports){
+},{"34":34}],214:[function(_dereq_,module,exports){
 // @@replace logic
-_dereq_(26)('replace', 2, function(defined, REPLACE, $replace){
+_dereq_(34)('replace', 2, function(defined, REPLACE, $replace){
   // 21.1.3.14 String.prototype.replace(searchValue, replaceValue)
-  return function replace(searchValue, replaceValue){
+  return [function replace(searchValue, replaceValue){
     'use strict';
     var O  = defined(this)
       , fn = searchValue == undefined ? undefined : searchValue[REPLACE];
     return fn !== undefined
       ? fn.call(searchValue, O, replaceValue)
       : $replace.call(String(O), searchValue, replaceValue);
-  };
+  }, $replace];
 });
-},{"26":26}],158:[function(_dereq_,module,exports){
+},{"34":34}],215:[function(_dereq_,module,exports){
 // @@search logic
-_dereq_(26)('search', 1, function(defined, SEARCH){
+_dereq_(34)('search', 1, function(defined, SEARCH, $search){
   // 21.1.3.15 String.prototype.search(regexp)
-  return function search(regexp){
+  return [function search(regexp){
     'use strict';
     var O  = defined(this)
       , fn = regexp == undefined ? undefined : regexp[SEARCH];
     return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
-  };
+  }, $search];
 });
-},{"26":26}],159:[function(_dereq_,module,exports){
+},{"34":34}],216:[function(_dereq_,module,exports){
 // @@split logic
-_dereq_(26)('split', 2, function(defined, SPLIT, $split){
+_dereq_(34)('split', 2, function(defined, SPLIT, $split){
+  'use strict';
+  var isRegExp   = _dereq_(49)
+    , _split     = $split
+    , $push      = [].push
+    , $SPLIT     = 'split'
+    , LENGTH     = 'length'
+    , LAST_INDEX = 'lastIndex';
+  if(
+    'abbc'[$SPLIT](/(b)*/)[1] == 'c' ||
+    'test'[$SPLIT](/(?:)/, -1)[LENGTH] != 4 ||
+    'ab'[$SPLIT](/(?:ab)*/)[LENGTH] != 2 ||
+    '.'[$SPLIT](/(.?)(.?)/)[LENGTH] != 4 ||
+    '.'[$SPLIT](/()()/)[LENGTH] > 1 ||
+    ''[$SPLIT](/.?/)[LENGTH]
+  ){
+    var NPCG = /()??/.exec('')[1] === undefined; // nonparticipating capturing group
+    // based on es5-shim implementation, need to rework it
+    $split = function(separator, limit){
+      var string = String(this);
+      if(separator === undefined && limit === 0)return [];
+      // If `separator` is not a regex, use native split
+      if(!isRegExp(separator))return _split.call(string, separator, limit);
+      var output = [];
+      var flags = (separator.ignoreCase ? 'i' : '') +
+                  (separator.multiline ? 'm' : '') +
+                  (separator.unicode ? 'u' : '') +
+                  (separator.sticky ? 'y' : '');
+      var lastLastIndex = 0;
+      var splitLimit = limit === undefined ? 4294967295 : limit >>> 0;
+      // Make `global` and avoid `lastIndex` issues by working with a copy
+      var separatorCopy = new RegExp(separator.source, flags + 'g');
+      var separator2, match, lastIndex, lastLength, i;
+      // Doesn't need flags gy, but they don't hurt
+      if(!NPCG)separator2 = new RegExp('^' + separatorCopy.source + '$(?!\\s)', flags);
+      while(match = separatorCopy.exec(string)){
+        // `separatorCopy.lastIndex` is not reliable cross-browser
+        lastIndex = match.index + match[0][LENGTH];
+        if(lastIndex > lastLastIndex){
+          output.push(string.slice(lastLastIndex, match.index));
+          // Fix browsers whose `exec` methods don't consistently return `undefined` for NPCG
+          if(!NPCG && match[LENGTH] > 1)match[0].replace(separator2, function(){
+            for(i = 1; i < arguments[LENGTH] - 2; i++)if(arguments[i] === undefined)match[i] = undefined;
+          });
+          if(match[LENGTH] > 1 && match.index < string[LENGTH])$push.apply(output, match.slice(1));
+          lastLength = match[0][LENGTH];
+          lastLastIndex = lastIndex;
+          if(output[LENGTH] >= splitLimit)break;
+        }
+        if(separatorCopy[LAST_INDEX] === match.index)separatorCopy[LAST_INDEX]++; // Avoid an infinite loop
+      }
+      if(lastLastIndex === string[LENGTH]){
+        if(lastLength || !separatorCopy.test(''))output.push('');
+      } else output.push(string.slice(lastLastIndex));
+      return output[LENGTH] > splitLimit ? output.slice(0, splitLimit) : output;
+    };
+  // Chakra, V8
+  } else if('0'[$SPLIT](undefined, 0)[LENGTH]){
+    $split = function(separator, limit){
+      return separator === undefined && limit === 0 ? [] : _split.call(this, separator, limit);
+    };
+  }
   // 21.1.3.17 String.prototype.split(separator, limit)
-  return function split(separator, limit){
-    'use strict';
+  return [function split(separator, limit){
     var O  = defined(this)
       , fn = separator == undefined ? undefined : separator[SPLIT];
-    return fn !== undefined
-      ? fn.call(separator, O, limit)
-      : $split.call(String(O), separator, limit);
-  };
+    return fn !== undefined ? fn.call(separator, O, limit) : $split.call(String(O), separator, limit);
+  }, $split];
 });
-},{"26":26}],160:[function(_dereq_,module,exports){
+},{"34":34,"49":49}],217:[function(_dereq_,module,exports){
 'use strict';
-var strong = _dereq_(13);
+_dereq_(212);
+var anObject    = _dereq_(8)
+  , $flags      = _dereq_(35)
+  , DESCRIPTORS = _dereq_(27)
+  , TO_STRING   = 'toString'
+  , $toString   = /./[TO_STRING];
+
+var define = function(fn){
+  _dereq_(86)(RegExp.prototype, TO_STRING, fn, true);
+};
+
+// 21.2.5.14 RegExp.prototype.toString()
+if(_dereq_(33)(function(){ return $toString.call({source: 'a', flags: 'b'}) != '/a/b'; })){
+  define(function toString(){
+    var R = anObject(this);
+    return '/'.concat(R.source, '/',
+      'flags' in R ? R.flags : !DESCRIPTORS && R instanceof RegExp ? $flags.call(R) : undefined);
+  });
+// FF44- RegExp#toString has a wrong name
+} else if($toString.name != TO_STRING){
+  define(function toString(){
+    return $toString.call(this);
+  });
+}
+},{"212":212,"27":27,"33":33,"35":35,"8":8,"86":86}],218:[function(_dereq_,module,exports){
+'use strict';
+var strong = _dereq_(19);
 
 // 23.2 Set Objects
-_dereq_(16)('Set', function(get){
+module.exports = _dereq_(22)('Set', function(get){
   return function Set(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 }, {
   // 23.2.3.1 Set.prototype.add(value)
@@ -3041,30 +4502,61 @@ _dereq_(16)('Set', function(get){
     return strong.def(this, value = value === 0 ? 0 : value, value);
   }
 }, strong);
-},{"13":13,"16":16}],161:[function(_dereq_,module,exports){
+},{"19":19,"22":22}],219:[function(_dereq_,module,exports){
 'use strict';
-var $export = _dereq_(23)
-  , $at     = _dereq_(71)(false);
+// B.2.3.2 String.prototype.anchor(name)
+_dereq_(98)('anchor', function(createHTML){
+  return function anchor(name){
+    return createHTML(this, 'a', 'name', name);
+  }
+});
+},{"98":98}],220:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.3 String.prototype.big()
+_dereq_(98)('big', function(createHTML){
+  return function big(){
+    return createHTML(this, 'big', '', '');
+  }
+});
+},{"98":98}],221:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.4 String.prototype.blink()
+_dereq_(98)('blink', function(createHTML){
+  return function blink(){
+    return createHTML(this, 'blink', '', '');
+  }
+});
+},{"98":98}],222:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.5 String.prototype.bold()
+_dereq_(98)('bold', function(createHTML){
+  return function bold(){
+    return createHTML(this, 'b', '', '');
+  }
+});
+},{"98":98}],223:[function(_dereq_,module,exports){
+'use strict';
+var $export = _dereq_(31)
+  , $at     = _dereq_(96)(false);
 $export($export.P, 'String', {
   // 21.1.3.3 String.prototype.codePointAt(pos)
   codePointAt: function codePointAt(pos){
     return $at(this, pos);
   }
 });
-},{"23":23,"71":71}],162:[function(_dereq_,module,exports){
+},{"31":31,"96":96}],224:[function(_dereq_,module,exports){
 // 21.1.3.6 String.prototype.endsWith(searchString [, endPosition])
 'use strict';
-var $export   = _dereq_(23)
-  , toLength  = _dereq_(80)
-  , context   = _dereq_(72)
+var $export   = _dereq_(31)
+  , toLength  = _dereq_(107)
+  , context   = _dereq_(97)
   , ENDS_WITH = 'endsWith'
   , $endsWith = ''[ENDS_WITH];
 
-$export($export.P + $export.F * _dereq_(24)(ENDS_WITH), 'String', {
+$export($export.P + $export.F * _dereq_(32)(ENDS_WITH), 'String', {
   endsWith: function endsWith(searchString /*, endPosition = @length */){
     var that = context(this, searchString, ENDS_WITH)
-      , $$   = arguments
-      , endPosition = $$.length > 1 ? $$[1] : undefined
+      , endPosition = arguments.length > 1 ? arguments[1] : undefined
       , len    = toLength(that.length)
       , end    = endPosition === undefined ? len : Math.min(toLength(endPosition), len)
       , search = String(searchString);
@@ -3073,9 +4565,33 @@ $export($export.P + $export.F * _dereq_(24)(ENDS_WITH), 'String', {
       : that.slice(end - search.length, end) === search;
   }
 });
-},{"23":23,"24":24,"72":72,"80":80}],163:[function(_dereq_,module,exports){
-var $export        = _dereq_(23)
-  , toIndex        = _dereq_(77)
+},{"107":107,"31":31,"32":32,"97":97}],225:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.6 String.prototype.fixed()
+_dereq_(98)('fixed', function(createHTML){
+  return function fixed(){
+    return createHTML(this, 'tt', '', '');
+  }
+});
+},{"98":98}],226:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.7 String.prototype.fontcolor(color)
+_dereq_(98)('fontcolor', function(createHTML){
+  return function fontcolor(color){
+    return createHTML(this, 'font', 'color', color);
+  }
+});
+},{"98":98}],227:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.8 String.prototype.fontsize(size)
+_dereq_(98)('fontsize', function(createHTML){
+  return function fontsize(size){
+    return createHTML(this, 'font', 'size', size);
+  }
+});
+},{"98":98}],228:[function(_dereq_,module,exports){
+var $export        = _dereq_(31)
+  , toIndex        = _dereq_(104)
   , fromCharCode   = String.fromCharCode
   , $fromCodePoint = String.fromCodePoint;
 
@@ -3083,13 +4599,12 @@ var $export        = _dereq_(23)
 $export($export.S + $export.F * (!!$fromCodePoint && $fromCodePoint.length != 1), 'String', {
   // 21.1.2.2 String.fromCodePoint(...codePoints)
   fromCodePoint: function fromCodePoint(x){ // eslint-disable-line no-unused-vars
-    var res   = []
-      , $$    = arguments
-      , $$len = $$.length
-      , i     = 0
+    var res  = []
+      , aLen = arguments.length
+      , i    = 0
       , code;
-    while($$len > i){
-      code = +$$[i++];
+    while(aLen > i){
+      code = +arguments[i++];
       if(toIndex(code, 0x10ffff) !== code)throw RangeError(code + ' is not a valid code point');
       res.push(code < 0x10000
         ? fromCharCode(code)
@@ -3098,25 +4613,33 @@ $export($export.S + $export.F * (!!$fromCodePoint && $fromCodePoint.length != 1)
     } return res.join('');
   }
 });
-},{"23":23,"77":77}],164:[function(_dereq_,module,exports){
+},{"104":104,"31":31}],229:[function(_dereq_,module,exports){
 // 21.1.3.7 String.prototype.includes(searchString, position = 0)
 'use strict';
-var $export  = _dereq_(23)
-  , context  = _dereq_(72)
+var $export  = _dereq_(31)
+  , context  = _dereq_(97)
   , INCLUDES = 'includes';
 
-$export($export.P + $export.F * _dereq_(24)(INCLUDES), 'String', {
+$export($export.P + $export.F * _dereq_(32)(INCLUDES), 'String', {
   includes: function includes(searchString /*, position = 0 */){
     return !!~context(this, searchString, INCLUDES)
       .indexOf(searchString, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-},{"23":23,"24":24,"72":72}],165:[function(_dereq_,module,exports){
+},{"31":31,"32":32,"97":97}],230:[function(_dereq_,module,exports){
 'use strict';
-var $at  = _dereq_(71)(true);
+// B.2.3.9 String.prototype.italics()
+_dereq_(98)('italics', function(createHTML){
+  return function italics(){
+    return createHTML(this, 'i', '', '');
+  }
+});
+},{"98":98}],231:[function(_dereq_,module,exports){
+'use strict';
+var $at  = _dereq_(96)(true);
 
 // 21.1.3.27 String.prototype[@@iterator]()
-_dereq_(43)(String, 'String', function(iterated){
+_dereq_(52)(String, 'String', function(iterated){
   this._t = String(iterated); // target
   this._i = 0;                // next index
 // 21.1.5.2.1 %StringIteratorPrototype%.next()
@@ -3129,111 +4652,156 @@ _dereq_(43)(String, 'String', function(iterated){
   this._i += point.length;
   return {value: point, done: false};
 });
-},{"43":43,"71":71}],166:[function(_dereq_,module,exports){
-var $export   = _dereq_(23)
-  , toIObject = _dereq_(79)
-  , toLength  = _dereq_(80);
+},{"52":52,"96":96}],232:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.10 String.prototype.link(url)
+_dereq_(98)('link', function(createHTML){
+  return function link(url){
+    return createHTML(this, 'a', 'href', url);
+  }
+});
+},{"98":98}],233:[function(_dereq_,module,exports){
+var $export   = _dereq_(31)
+  , toIObject = _dereq_(106)
+  , toLength  = _dereq_(107);
 
 $export($export.S, 'String', {
   // 21.1.2.4 String.raw(callSite, ...substitutions)
   raw: function raw(callSite){
-    var tpl   = toIObject(callSite.raw)
-      , len   = toLength(tpl.length)
-      , $$    = arguments
-      , $$len = $$.length
-      , res   = []
-      , i     = 0;
+    var tpl  = toIObject(callSite.raw)
+      , len  = toLength(tpl.length)
+      , aLen = arguments.length
+      , res  = []
+      , i    = 0;
     while(len > i){
       res.push(String(tpl[i++]));
-      if(i < $$len)res.push(String($$[i]));
+      if(i < aLen)res.push(String(arguments[i]));
     } return res.join('');
   }
 });
-},{"23":23,"79":79,"80":80}],167:[function(_dereq_,module,exports){
-var $export = _dereq_(23);
+},{"106":106,"107":107,"31":31}],234:[function(_dereq_,module,exports){
+var $export = _dereq_(31);
 
 $export($export.P, 'String', {
   // 21.1.3.13 String.prototype.repeat(count)
-  repeat: _dereq_(74)
+  repeat: _dereq_(100)
 });
-},{"23":23,"74":74}],168:[function(_dereq_,module,exports){
+},{"100":100,"31":31}],235:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.11 String.prototype.small()
+_dereq_(98)('small', function(createHTML){
+  return function small(){
+    return createHTML(this, 'small', '', '');
+  }
+});
+},{"98":98}],236:[function(_dereq_,module,exports){
 // 21.1.3.18 String.prototype.startsWith(searchString [, position ])
 'use strict';
-var $export     = _dereq_(23)
-  , toLength    = _dereq_(80)
-  , context     = _dereq_(72)
+var $export     = _dereq_(31)
+  , toLength    = _dereq_(107)
+  , context     = _dereq_(97)
   , STARTS_WITH = 'startsWith'
   , $startsWith = ''[STARTS_WITH];
 
-$export($export.P + $export.F * _dereq_(24)(STARTS_WITH), 'String', {
+$export($export.P + $export.F * _dereq_(32)(STARTS_WITH), 'String', {
   startsWith: function startsWith(searchString /*, position = 0 */){
     var that   = context(this, searchString, STARTS_WITH)
-      , $$     = arguments
-      , index  = toLength(Math.min($$.length > 1 ? $$[1] : undefined, that.length))
+      , index  = toLength(Math.min(arguments.length > 1 ? arguments[1] : undefined, that.length))
       , search = String(searchString);
     return $startsWith
       ? $startsWith.call(that, search, index)
       : that.slice(index, index + search.length) === search;
   }
 });
-},{"23":23,"24":24,"72":72,"80":80}],169:[function(_dereq_,module,exports){
+},{"107":107,"31":31,"32":32,"97":97}],237:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.12 String.prototype.strike()
+_dereq_(98)('strike', function(createHTML){
+  return function strike(){
+    return createHTML(this, 'strike', '', '');
+  }
+});
+},{"98":98}],238:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.13 String.prototype.sub()
+_dereq_(98)('sub', function(createHTML){
+  return function sub(){
+    return createHTML(this, 'sub', '', '');
+  }
+});
+},{"98":98}],239:[function(_dereq_,module,exports){
+'use strict';
+// B.2.3.14 String.prototype.sup()
+_dereq_(98)('sup', function(createHTML){
+  return function sup(){
+    return createHTML(this, 'sup', '', '');
+  }
+});
+},{"98":98}],240:[function(_dereq_,module,exports){
 'use strict';
 // 21.1.3.25 String.prototype.trim()
-_dereq_(75)('trim', function($trim){
+_dereq_(101)('trim', function($trim){
   return function trim(){
     return $trim(this, 3);
   };
 });
-},{"75":75}],170:[function(_dereq_,module,exports){
+},{"101":101}],241:[function(_dereq_,module,exports){
 'use strict';
 // ECMAScript 6 symbols shim
-var $              = _dereq_(47)
-  , global         = _dereq_(30)
-  , has            = _dereq_(31)
-  , DESCRIPTORS    = _dereq_(20)
-  , $export        = _dereq_(23)
-  , redefine       = _dereq_(62)
-  , $fails         = _dereq_(25)
-  , shared         = _dereq_(68)
-  , setToStringTag = _dereq_(67)
-  , uid            = _dereq_(83)
-  , wks            = _dereq_(84)
-  , keyOf          = _dereq_(48)
-  , $names         = _dereq_(29)
-  , enumKeys       = _dereq_(22)
-  , isArray        = _dereq_(37)
-  , anObject       = _dereq_(5)
-  , toIObject      = _dereq_(79)
-  , createDesc     = _dereq_(60)
-  , getDesc        = $.getDesc
-  , setDesc        = $.setDesc
-  , _create        = $.create
-  , getNames       = $names.get
+var global         = _dereq_(37)
+  , core           = _dereq_(23)
+  , has            = _dereq_(38)
+  , DESCRIPTORS    = _dereq_(27)
+  , $export        = _dereq_(31)
+  , redefine       = _dereq_(86)
+  , META           = _dereq_(61).KEY
+  , $fails         = _dereq_(33)
+  , shared         = _dereq_(93)
+  , setToStringTag = _dereq_(91)
+  , uid            = _dereq_(113)
+  , wks            = _dereq_(114)
+  , keyOf          = _dereq_(56)
+  , enumKeys       = _dereq_(30)
+  , isArray        = _dereq_(46)
+  , anObject       = _dereq_(8)
+  , toIObject      = _dereq_(106)
+  , toPrimitive    = _dereq_(109)
+  , createDesc     = _dereq_(84)
+  , _create        = _dereq_(65)
+  , gOPNExt        = _dereq_(70)
+  , $GOPD          = _dereq_(69)
+  , $DP            = _dereq_(66)
+  , gOPD           = $GOPD.f
+  , dP             = $DP.f
+  , gOPN           = gOPNExt.f
   , $Symbol        = global.Symbol
   , $JSON          = global.JSON
   , _stringify     = $JSON && $JSON.stringify
   , setter         = false
+  , PROTOTYPE      = 'prototype'
   , HIDDEN         = wks('_hidden')
-  , isEnum         = $.isEnum
+  , TO_PRIMITIVE   = wks('toPrimitive')
+  , isEnum         = {}.propertyIsEnumerable
   , SymbolRegistry = shared('symbol-registry')
   , AllSymbols     = shared('symbols')
-  , useNative      = typeof $Symbol == 'function'
-  , ObjectProto    = Object.prototype;
+  , ObjectProto    = Object[PROTOTYPE]
+  , USE_NATIVE     = typeof $Symbol == 'function'
+  , QObject        = global.QObject;
 
 // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
 var setSymbolDesc = DESCRIPTORS && $fails(function(){
-  return _create(setDesc({}, 'a', {
-    get: function(){ return setDesc(this, 'a', {value: 7}).a; }
+  return _create(dP({}, 'a', {
+    get: function(){ return dP(this, 'a', {value: 7}).a; }
   })).a != 7;
 }) ? function(it, key, D){
-  var protoDesc = getDesc(ObjectProto, key);
+  var protoDesc = gOPD(ObjectProto, key);
   if(protoDesc)delete ObjectProto[key];
-  setDesc(it, key, D);
-  if(protoDesc && it !== ObjectProto)setDesc(ObjectProto, key, protoDesc);
-} : setDesc;
+  dP(it, key, D);
+  if(protoDesc && it !== ObjectProto)dP(ObjectProto, key, protoDesc);
+} : dP;
 
 var wrap = function(tag){
-  var sym = AllSymbols[tag] = _create($Symbol.prototype);
+  var sym = AllSymbols[tag] = _create($Symbol[PROTOTYPE]);
   sym._k = tag;
   DESCRIPTORS && setter && setSymbolDesc(ObjectProto, tag, {
     configurable: true,
@@ -3245,20 +4813,25 @@ var wrap = function(tag){
   return sym;
 };
 
-var isSymbol = function(it){
+var isSymbol = USE_NATIVE && typeof $Symbol.iterator == 'symbol' ? function(it){
   return typeof it == 'symbol';
+} : function(it){
+  return it instanceof $Symbol;
 };
 
 var $defineProperty = function defineProperty(it, key, D){
-  if(D && has(AllSymbols, key)){
+  anObject(it);
+  key = toPrimitive(key, true);
+  anObject(D);
+  if(has(AllSymbols, key)){
     if(!D.enumerable){
-      if(!has(it, HIDDEN))setDesc(it, HIDDEN, createDesc(1, {}));
+      if(!has(it, HIDDEN))dP(it, HIDDEN, createDesc(1, {}));
       it[HIDDEN][key] = true;
     } else {
       if(has(it, HIDDEN) && it[HIDDEN][key])it[HIDDEN][key] = false;
       D = _create(D, {enumerable: createDesc(0, false)});
     } return setSymbolDesc(it, key, D);
-  } return setDesc(it, key, D);
+  } return dP(it, key, D);
 };
 var $defineProperties = function defineProperties(it, P){
   anObject(it);
@@ -3273,25 +4846,24 @@ var $create = function create(it, P){
   return P === undefined ? _create(it) : $defineProperties(_create(it), P);
 };
 var $propertyIsEnumerable = function propertyIsEnumerable(key){
-  var E = isEnum.call(this, key);
-  return E || !has(this, key) || !has(AllSymbols, key) || has(this, HIDDEN) && this[HIDDEN][key]
-    ? E : true;
+  var E = isEnum.call(this, key = toPrimitive(key, true));
+  return E || !has(this, key) || !has(AllSymbols, key) || has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
 };
 var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key){
-  var D = getDesc(it = toIObject(it), key);
+  var D = gOPD(it = toIObject(it), key = toPrimitive(key, true));
   if(D && has(AllSymbols, key) && !(has(it, HIDDEN) && it[HIDDEN][key]))D.enumerable = true;
   return D;
 };
 var $getOwnPropertyNames = function getOwnPropertyNames(it){
-  var names  = getNames(toIObject(it))
+  var names  = gOPN(toIObject(it))
     , result = []
     , i      = 0
     , key;
-  while(names.length > i)if(!has(AllSymbols, key = names[i++]) && key != HIDDEN)result.push(key);
+  while(names.length > i)if(!has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META)result.push(key);
   return result;
 };
 var $getOwnPropertySymbols = function getOwnPropertySymbols(it){
-  var names  = getNames(toIObject(it))
+  var names  = gOPN(toIObject(it))
     , result = []
     , i      = 0
     , key;
@@ -3302,9 +4874,8 @@ var $stringify = function stringify(it){
   if(it === undefined || isSymbol(it))return; // IE8 returns string on undefined
   var args = [it]
     , i    = 1
-    , $$   = arguments
     , replacer, $replacer;
-  while($$.length > i)args.push($$[i++]);
+  while(arguments.length > i)args.push(arguments[i++]);
   replacer = args[1];
   if(typeof replacer == 'function')$replacer = replacer;
   if($replacer || !isArray(replacer))replacer = function(key, value){
@@ -3314,7 +4885,7 @@ var $stringify = function stringify(it){
   args[1] = replacer;
   return _stringify.apply($JSON, args);
 };
-var buggyJSON = $fails(function(){
+var BUGGY_JSON = $fails(function(){
   var S = $Symbol();
   // MS Edge converts symbol values to JSON as {}
   // WebKit converts symbol values to JSON as null
@@ -3323,46 +4894,28 @@ var buggyJSON = $fails(function(){
 });
 
 // 19.4.1.1 Symbol([description])
-if(!useNative){
+if(!USE_NATIVE){
   $Symbol = function Symbol(){
-    if(isSymbol(this))throw TypeError('Symbol is not a constructor');
+    if(this instanceof $Symbol)throw TypeError('Symbol is not a constructor!');
     return wrap(uid(arguments.length > 0 ? arguments[0] : undefined));
   };
-  redefine($Symbol.prototype, 'toString', function toString(){
+  redefine($Symbol[PROTOTYPE], 'toString', function toString(){
     return this._k;
   });
 
-  isSymbol = function(it){
-    return it instanceof $Symbol;
-  };
+  $GOPD.f = $getOwnPropertyDescriptor;
+  $DP.f   = $defineProperty;
+  _dereq_(71).f = gOPNExt.f = $getOwnPropertyNames;
+  _dereq_(76).f  = $propertyIsEnumerable
+  _dereq_(72).f = $getOwnPropertySymbols;
 
-  $.create     = $create;
-  $.isEnum     = $propertyIsEnumerable;
-  $.getDesc    = $getOwnPropertyDescriptor;
-  $.setDesc    = $defineProperty;
-  $.setDescs   = $defineProperties;
-  $.getNames   = $names.get = $getOwnPropertyNames;
-  $.getSymbols = $getOwnPropertySymbols;
-
-  if(DESCRIPTORS && !_dereq_(49)){
+  if(DESCRIPTORS && !_dereq_(57)){
     redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
   }
 }
 
-var symbolStatics = {
-  // 19.4.2.1 Symbol.for(key)
-  'for': function(key){
-    return has(SymbolRegistry, key += '')
-      ? SymbolRegistry[key]
-      : SymbolRegistry[key] = $Symbol(key);
-  },
-  // 19.4.2.5 Symbol.keyFor(sym)
-  keyFor: function keyFor(key){
-    return keyOf(SymbolRegistry, key);
-  },
-  useSetter: function(){ setter = true; },
-  useSimple: function(){ setter = false; }
-};
+$export($export.G + $export.W + $export.F * !USE_NATIVE, {Symbol: $Symbol});
+
 // 19.4.2.2 Symbol.hasInstance
 // 19.4.2.3 Symbol.isConcatSpreadable
 // 19.4.2.4 Symbol.iterator
@@ -3374,21 +4927,35 @@ var symbolStatics = {
 // 19.4.2.12 Symbol.toPrimitive
 // 19.4.2.13 Symbol.toStringTag
 // 19.4.2.14 Symbol.unscopables
-$.each.call((
-  'hasInstance,isConcatSpreadable,iterator,match,replace,search,' +
-  'species,split,toPrimitive,toStringTag,unscopables'
-).split(','), function(it){
-  var sym = wks(it);
-  symbolStatics[it] = useNative ? sym : wrap(sym);
+for(var symbols = (
+  'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
+).split(','), i = 0; symbols.length > i; ){
+  var key     = symbols[i++]
+    , Wrapper = core.Symbol
+    , sym     = wks(key);
+  if(!(key in Wrapper))dP(Wrapper, key, {value: USE_NATIVE ? sym : wrap(sym)});
+};
+
+// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+if(!QObject || !QObject[PROTOTYPE] || !QObject[PROTOTYPE].findChild)setter = true;
+
+$export($export.S + $export.F * !USE_NATIVE, 'Symbol', {
+  // 19.4.2.1 Symbol.for(key)
+  'for': function(key){
+    return has(SymbolRegistry, key += '')
+      ? SymbolRegistry[key]
+      : SymbolRegistry[key] = $Symbol(key);
+  },
+  // 19.4.2.5 Symbol.keyFor(sym)
+  keyFor: function keyFor(key){
+    if(isSymbol(key))return keyOf(SymbolRegistry, key);
+    throw TypeError(key + ' is not a symbol!');
+  },
+  useSetter: function(){ setter = true; },
+  useSimple: function(){ setter = false; }
 });
 
-setter = true;
-
-$export($export.G + $export.W, {Symbol: $Symbol});
-
-$export($export.S, 'Symbol', symbolStatics);
-
-$export($export.S + $export.F * !useNative, 'Object', {
+$export($export.S + $export.F * !USE_NATIVE, 'Object', {
   // 19.1.2.2 Object.create(O [, Properties])
   create: $create,
   // 19.1.2.4 Object.defineProperty(O, P, Attributes)
@@ -3404,64 +4971,187 @@ $export($export.S + $export.F * !useNative, 'Object', {
 });
 
 // 24.3.2 JSON.stringify(value [, replacer [, space]])
-$JSON && $export($export.S + $export.F * (!useNative || buggyJSON), 'JSON', {stringify: $stringify});
+$JSON && $export($export.S + $export.F * (!USE_NATIVE || BUGGY_JSON), 'JSON', {stringify: $stringify});
 
+// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+$Symbol[PROTOTYPE][TO_PRIMITIVE] || _dereq_(39)($Symbol[PROTOTYPE], TO_PRIMITIVE, $Symbol[PROTOTYPE].valueOf);
 // 19.4.3.5 Symbol.prototype[@@toStringTag]
 setToStringTag($Symbol, 'Symbol');
 // 20.2.1.9 Math[@@toStringTag]
 setToStringTag(Math, 'Math', true);
 // 24.3.3 JSON[@@toStringTag]
 setToStringTag(global.JSON, 'JSON', true);
-},{"20":20,"22":22,"23":23,"25":25,"29":29,"30":30,"31":31,"37":37,"47":47,"48":48,"49":49,"5":5,"60":60,"62":62,"67":67,"68":68,"79":79,"83":83,"84":84}],171:[function(_dereq_,module,exports){
+},{"106":106,"109":109,"113":113,"114":114,"23":23,"27":27,"30":30,"31":31,"33":33,"37":37,"38":38,"39":39,"46":46,"56":56,"57":57,"61":61,"65":65,"66":66,"69":69,"70":70,"71":71,"72":72,"76":76,"8":8,"84":84,"86":86,"91":91,"93":93}],242:[function(_dereq_,module,exports){
 'use strict';
-var $            = _dereq_(47)
-  , redefine     = _dereq_(62)
-  , weak         = _dereq_(15)
-  , isObject     = _dereq_(39)
-  , has          = _dereq_(31)
-  , frozenStore  = weak.frozenStore
-  , WEAK         = weak.WEAK
-  , isExtensible = Object.isExtensible || isObject
-  , tmp          = {};
+var $export      = _dereq_(31)
+  , $typed       = _dereq_(112)
+  , buffer       = _dereq_(111)
+  , anObject     = _dereq_(8)
+  , toIndex      = _dereq_(104)
+  , toLength     = _dereq_(107)
+  , isObject     = _dereq_(48)
+  , TYPED_ARRAY  = _dereq_(114)('typed_array')
+  , ArrayBuffer  = _dereq_(37).ArrayBuffer
+  , speciesConstructor = _dereq_(94)
+  , $ArrayBuffer = buffer.ArrayBuffer
+  , $DataView    = buffer.DataView
+  , $isView      = $typed.ABV && ArrayBuffer.isView
+  , $slice       = $ArrayBuffer.prototype.slice
+  , VIEW         = $typed.VIEW
+  , ARRAY_BUFFER = 'ArrayBuffer';
 
-// 23.3 WeakMap Objects
-var $WeakMap = _dereq_(16)('WeakMap', function(get){
-  return function WeakMap(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
-}, {
+$export($export.G + $export.W + $export.F * (ArrayBuffer !== $ArrayBuffer), {ArrayBuffer: $ArrayBuffer});
+
+$export($export.S + $export.F * !$typed.CONSTR, ARRAY_BUFFER, {
+  // 24.1.3.1 ArrayBuffer.isView(arg)
+  isView: function isView(it){
+    return $isView && $isView(it) || isObject(it) && VIEW in it;
+  }
+});
+
+$export($export.P + $export.U + $export.F * _dereq_(33)(function(){
+  return !new $ArrayBuffer(2).slice(1, undefined).byteLength;
+}), ARRAY_BUFFER, {
+  // 24.1.4.3 ArrayBuffer.prototype.slice(start, end)
+  slice: function slice(start, end){
+    if($slice !== undefined && end === undefined)return $slice.call(anObject(this), start); // FF fix
+    var len    = anObject(this).byteLength
+      , first  = toIndex(start, len)
+      , final  = toIndex(end === undefined ? len : end, len)
+      , result = new (speciesConstructor(this, $ArrayBuffer))(toLength(final - first))
+      , viewS  = new $DataView(this)
+      , viewT  = new $DataView(result)
+      , index  = 0;
+    while(first < final){
+      viewT.setUint8(index++, viewS.getUint8(first++));
+    } return result;
+  }
+});
+
+_dereq_(90)(ARRAY_BUFFER);
+},{"104":104,"107":107,"111":111,"112":112,"114":114,"31":31,"33":33,"37":37,"48":48,"8":8,"90":90,"94":94}],243:[function(_dereq_,module,exports){
+var $export = _dereq_(31);
+$export($export.G + $export.W + $export.F * !_dereq_(112).ABV, {
+  DataView: _dereq_(111).DataView
+});
+},{"111":111,"112":112,"31":31}],244:[function(_dereq_,module,exports){
+_dereq_(110)('Float32', 4, function(init){
+  return function Float32Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],245:[function(_dereq_,module,exports){
+_dereq_(110)('Float64', 8, function(init){
+  return function Float64Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],246:[function(_dereq_,module,exports){
+_dereq_(110)('Int16', 2, function(init){
+  return function Int16Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],247:[function(_dereq_,module,exports){
+_dereq_(110)('Int32', 4, function(init){
+  return function Int32Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],248:[function(_dereq_,module,exports){
+_dereq_(110)('Int8', 1, function(init){
+  return function Int8Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],249:[function(_dereq_,module,exports){
+_dereq_(110)('Uint16', 2, function(init){
+  return function Uint16Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],250:[function(_dereq_,module,exports){
+_dereq_(110)('Uint32', 4, function(init){
+  return function Uint32Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],251:[function(_dereq_,module,exports){
+_dereq_(110)('Uint8', 1, function(init){
+  return function Uint8Array(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+});
+},{"110":110}],252:[function(_dereq_,module,exports){
+_dereq_(110)('Uint8', 1, function(init){
+  return function Uint8ClampedArray(data, byteOffset, length){
+    return init(this, data, byteOffset, length);
+  };
+}, true);
+},{"110":110}],253:[function(_dereq_,module,exports){
+'use strict';
+var each         = _dereq_(13)(0)
+  , redefine     = _dereq_(86)
+  , meta         = _dereq_(61)
+  , assign       = _dereq_(64)
+  , weak         = _dereq_(21)
+  , isObject     = _dereq_(48)
+  , has          = _dereq_(38)
+  , getWeak      = meta.getWeak
+  , isExtensible = Object.isExtensible
+  , uncaughtFrozenStore = weak.ufstore
+  , tmp          = {}
+  , InternalMap;
+
+var wrapper = function(get){
+  return function WeakMap(){
+    return get(this, arguments.length > 0 ? arguments[0] : undefined);
+  };
+};
+
+var methods = {
   // 23.3.3.3 WeakMap.prototype.get(key)
   get: function get(key){
     if(isObject(key)){
-      if(!isExtensible(key))return frozenStore(this).get(key);
-      if(has(key, WEAK))return key[WEAK][this._i];
+      var data = getWeak(key);
+      if(data === true)return uncaughtFrozenStore(this).get(key);
+      return data ? data[this._i] : undefined;
     }
   },
   // 23.3.3.5 WeakMap.prototype.set(key, value)
   set: function set(key, value){
     return weak.def(this, key, value);
   }
-}, weak, true, true);
+};
+
+// 23.3 WeakMap Objects
+var $WeakMap = module.exports = _dereq_(22)('WeakMap', wrapper, methods, weak, true, true);
 
 // IE11 WeakMap frozen keys fix
 if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
-  $.each.call(['delete', 'has', 'get', 'set'], function(key){
+  InternalMap = weak.getConstructor(wrapper);
+  assign(InternalMap.prototype, methods);
+  meta.NEED = true;
+  each(['delete', 'has', 'get', 'set'], function(key){
     var proto  = $WeakMap.prototype
       , method = proto[key];
     redefine(proto, key, function(a, b){
-      // store frozen objects on leaky map
+      // store frozen objects on internal weakmap shim
       if(isObject(a) && !isExtensible(a)){
-        var result = frozenStore(this)[key](a, b);
+        if(!this._f)this._f = new InternalMap;
+        var result = this._f[key](a, b);
         return key == 'set' ? this : result;
       // store all the rest on native weakmap
       } return method.call(this, a, b);
     });
   });
 }
-},{"15":15,"16":16,"31":31,"39":39,"47":47,"62":62}],172:[function(_dereq_,module,exports){
+},{"13":13,"21":21,"22":22,"38":38,"48":48,"61":61,"64":64,"86":86}],254:[function(_dereq_,module,exports){
 'use strict';
-var weak = _dereq_(15);
+var weak = _dereq_(21);
 
 // 23.4 WeakSet Objects
-_dereq_(16)('WeakSet', function(get){
+_dereq_(22)('WeakSet', function(get){
   return function WeakSet(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 }, {
   // 23.4.3.1 WeakSet.prototype.add(value)
@@ -3469,171 +5159,451 @@ _dereq_(16)('WeakSet', function(get){
     return weak.def(this, value, true);
   }
 }, weak, false, true);
-},{"15":15,"16":16}],173:[function(_dereq_,module,exports){
+},{"21":21,"22":22}],255:[function(_dereq_,module,exports){
 'use strict';
-var $export   = _dereq_(23)
-  , $includes = _dereq_(8)(true);
+// https://github.com/tc39/Array.prototype.includes
+var $export   = _dereq_(31)
+  , $includes = _dereq_(12)(true);
 
 $export($export.P, 'Array', {
-  // https://github.com/domenic/Array.prototype.includes
   includes: function includes(el /*, fromIndex = 0 */){
     return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
 
-_dereq_(4)('includes');
-},{"23":23,"4":4,"8":8}],174:[function(_dereq_,module,exports){
-// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-var $export  = _dereq_(23);
+_dereq_(6)('includes');
+},{"12":12,"31":31,"6":6}],256:[function(_dereq_,module,exports){
+// https://github.com/ljharb/proposal-is-error
+var $export = _dereq_(31)
+  , cof     = _dereq_(18);
 
-$export($export.P, 'Map', {toJSON: _dereq_(14)('Map')});
-},{"14":14,"23":23}],175:[function(_dereq_,module,exports){
-// http://goo.gl/XkBrjD
-var $export  = _dereq_(23)
-  , $entries = _dereq_(56)(true);
+$export($export.S, 'Error', {
+  isError: function isError(it){
+    return cof(it) === 'Error';
+  }
+});
+},{"18":18,"31":31}],257:[function(_dereq_,module,exports){
+// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+var $export  = _dereq_(31);
+
+$export($export.P + $export.R, 'Map', {toJSON: _dereq_(20)('Map')});
+},{"20":20,"31":31}],258:[function(_dereq_,module,exports){
+// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
+var $export = _dereq_(31);
+
+$export($export.S, 'Math', {
+  iaddh: function iaddh(x0, x1, y0, y1){
+    var $x0 = x0 >>> 0
+      , $x1 = x1 >>> 0
+      , $y0 = y0 >>> 0;
+    return $x1 + (y1 >>> 0) + (($x0 & $y0 | ($x0 | $y0) & ~($x0 + $y0 >>> 0)) >>> 31) | 0;
+  }
+});
+},{"31":31}],259:[function(_dereq_,module,exports){
+// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
+var $export = _dereq_(31);
+
+$export($export.S, 'Math', {
+  imulh: function imulh(u, v){
+    var UINT16 = 0xffff
+      , $u = +u
+      , $v = +v
+      , u0 = $u & UINT16
+      , v0 = $v & UINT16
+      , u1 = $u >> 16
+      , v1 = $v >> 16
+      , t  = (u1 * v0 >>> 0) + (u0 * v0 >>> 16);
+    return u1 * v1 + (t >> 16) + ((u0 * v1 >>> 0) + (t & UINT16) >> 16);
+  }
+});
+},{"31":31}],260:[function(_dereq_,module,exports){
+// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
+var $export = _dereq_(31);
+
+$export($export.S, 'Math', {
+  isubh: function isubh(x0, x1, y0, y1){
+    var $x0 = x0 >>> 0
+      , $x1 = x1 >>> 0
+      , $y0 = y0 >>> 0;
+    return $x1 - (y1 >>> 0) - ((~$x0 & $y0 | ~($x0 ^ $y0) & $x0 - $y0 >>> 0) >>> 31) | 0;
+  }
+});
+},{"31":31}],261:[function(_dereq_,module,exports){
+// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
+var $export = _dereq_(31);
+
+$export($export.S, 'Math', {
+  umulh: function umulh(u, v){
+    var UINT16 = 0xffff
+      , $u = +u
+      , $v = +v
+      , u0 = $u & UINT16
+      , v0 = $v & UINT16
+      , u1 = $u >>> 16
+      , v1 = $v >>> 16
+      , t  = (u1 * v0 >>> 0) + (u0 * v0 >>> 16);
+    return u1 * v1 + (t >>> 16) + ((u0 * v1 >>> 0) + (t & UINT16) >>> 16);
+  }
+});
+},{"31":31}],262:[function(_dereq_,module,exports){
+'use strict';
+var $export         = _dereq_(31)
+  , toObject        = _dereq_(108)
+  , aFunction       = _dereq_(4)
+  , $defineProperty = _dereq_(66);
+
+// B.2.2.2 Object.prototype.__defineGetter__(P, getter)
+_dereq_(27) && $export($export.P + _dereq_(68), 'Object', {
+  __defineGetter__: function __defineGetter__(P, getter){
+    $defineProperty.f(toObject(this), P, {get: aFunction(getter), enumerable: true, configurable: true});
+  }
+});
+},{"108":108,"27":27,"31":31,"4":4,"66":66,"68":68}],263:[function(_dereq_,module,exports){
+'use strict';
+var $export         = _dereq_(31)
+  , toObject        = _dereq_(108)
+  , aFunction       = _dereq_(4)
+  , $defineProperty = _dereq_(66);
+
+// B.2.2.3 Object.prototype.__defineSetter__(P, setter)
+_dereq_(27) && $export($export.P + _dereq_(68), 'Object', {
+  __defineSetter__: function __defineSetter__(P, setter){
+    $defineProperty.f(toObject(this), P, {set: aFunction(setter), enumerable: true, configurable: true});
+  }
+});
+},{"108":108,"27":27,"31":31,"4":4,"66":66,"68":68}],264:[function(_dereq_,module,exports){
+// https://github.com/tc39/proposal-object-values-entries
+var $export  = _dereq_(31)
+  , $entries = _dereq_(78)(true);
 
 $export($export.S, 'Object', {
   entries: function entries(it){
     return $entries(it);
   }
 });
-},{"23":23,"56":56}],176:[function(_dereq_,module,exports){
-// https://gist.github.com/WebReflection/9353781
-var $          = _dereq_(47)
-  , $export    = _dereq_(23)
-  , ownKeys    = _dereq_(57)
-  , toIObject  = _dereq_(79)
-  , createDesc = _dereq_(60);
+},{"31":31,"78":78}],265:[function(_dereq_,module,exports){
+// https://github.com/tc39/proposal-object-getownpropertydescriptors
+var $export    = _dereq_(31)
+  , ownKeys    = _dereq_(79)
+  , toIObject  = _dereq_(106)
+  , createDesc = _dereq_(84)
+  , gOPD       = _dereq_(69)
+  , dP         = _dereq_(66);
 
 $export($export.S, 'Object', {
   getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object){
     var O       = toIObject(object)
-      , setDesc = $.setDesc
-      , getDesc = $.getDesc
+      , getDesc = gOPD.f
       , keys    = ownKeys(O)
       , result  = {}
       , i       = 0
       , key, D;
     while(keys.length > i){
       D = getDesc(O, key = keys[i++]);
-      if(key in result)setDesc(result, key, createDesc(0, D));
+      if(key in result)dP.f(result, key, createDesc(0, D));
       else result[key] = D;
     } return result;
   }
 });
-},{"23":23,"47":47,"57":57,"60":60,"79":79}],177:[function(_dereq_,module,exports){
-// http://goo.gl/XkBrjD
-var $export = _dereq_(23)
-  , $values = _dereq_(56)(false);
+},{"106":106,"31":31,"66":66,"69":69,"79":79,"84":84}],266:[function(_dereq_,module,exports){
+'use strict';
+var $export                  = _dereq_(31)
+  , toObject                 = _dereq_(108)
+  , toPrimitive              = _dereq_(109)
+  , getPrototypeOf           = _dereq_(73)
+  , getOwnPropertyDescriptor = _dereq_(69).f;
+
+// B.2.2.4 Object.prototype.__lookupGetter__(P)
+_dereq_(27) && $export($export.P + _dereq_(68), 'Object', {
+  __lookupGetter__: function __lookupGetter__(P){
+    var O = toObject(this)
+      , K = toPrimitive(P, true)
+      , D;
+    do {
+      if(D = getOwnPropertyDescriptor(O, K))return D.get;
+    } while(O = getPrototypeOf(O));
+  }
+});
+},{"108":108,"109":109,"27":27,"31":31,"68":68,"69":69,"73":73}],267:[function(_dereq_,module,exports){
+'use strict';
+var $export                  = _dereq_(31)
+  , toObject                 = _dereq_(108)
+  , toPrimitive              = _dereq_(109)
+  , getPrototypeOf           = _dereq_(73)
+  , getOwnPropertyDescriptor = _dereq_(69).f;
+
+// B.2.2.5 Object.prototype.__lookupSetter__(P)
+_dereq_(27) && $export($export.P + _dereq_(68), 'Object', {
+  __lookupSetter__: function __lookupSetter__(P){
+    var O = toObject(this)
+      , K = toPrimitive(P, true)
+      , D;
+    do {
+      if(D = getOwnPropertyDescriptor(O, K))return D.set;
+    } while(O = getPrototypeOf(O));
+  }
+});
+},{"108":108,"109":109,"27":27,"31":31,"68":68,"69":69,"73":73}],268:[function(_dereq_,module,exports){
+// https://github.com/tc39/proposal-object-values-entries
+var $export = _dereq_(31)
+  , $values = _dereq_(78)(false);
 
 $export($export.S, 'Object', {
   values: function values(it){
     return $values(it);
   }
 });
-},{"23":23,"56":56}],178:[function(_dereq_,module,exports){
-// https://github.com/benjamingr/RexExp.escape
-var $export = _dereq_(23)
-  , $re     = _dereq_(63)(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+},{"31":31,"78":78}],269:[function(_dereq_,module,exports){
+var metadata                  = _dereq_(62)
+  , anObject                  = _dereq_(8)
+  , toMetaKey                 = metadata.key
+  , ordinaryDefineOwnMetadata = metadata.set;
 
-$export($export.S, 'RegExp', {escape: function escape(it){ return $re(it); }});
+metadata.exp({defineMetadata: function defineMetadata(metadataKey, metadataValue, target, targetKey){
+  ordinaryDefineOwnMetadata(metadataKey, metadataValue, anObject(target), toMetaKey(targetKey));
+}});
+},{"62":62,"8":8}],270:[function(_dereq_,module,exports){
+var metadata               = _dereq_(62)
+  , anObject               = _dereq_(8)
+  , toMetaKey              = metadata.key
+  , getOrCreateMetadataMap = metadata.map
+  , store                  = metadata.store;
 
-},{"23":23,"63":63}],179:[function(_dereq_,module,exports){
+metadata.exp({deleteMetadata: function deleteMetadata(metadataKey, target /*, targetKey */){
+  var targetKey   = arguments.length < 3 ? undefined : toMetaKey(arguments[2])
+    , metadataMap = getOrCreateMetadataMap(anObject(target), targetKey, false);
+  if(metadataMap === undefined || !metadataMap['delete'](metadataKey))return false;
+  if(metadataMap.size)return true;
+  var targetMetadata = store.get(target);
+  targetMetadata['delete'](targetKey);
+  return !!targetMetadata.size || store['delete'](target);
+}});
+},{"62":62,"8":8}],271:[function(_dereq_,module,exports){
+var Set                     = _dereq_(218)
+  , from                    = _dereq_(11)
+  , metadata                = _dereq_(62)
+  , anObject                = _dereq_(8)
+  , getPrototypeOf          = _dereq_(73)
+  , ordinaryOwnMetadataKeys = metadata.keys
+  , toMetaKey               = metadata.key;
+
+var ordinaryMetadataKeys = function(O, P){
+  var oKeys  = ordinaryOwnMetadataKeys(O, P)
+    , parent = getPrototypeOf(O);
+  if(parent === null)return oKeys;
+  var pKeys  = ordinaryMetadataKeys(parent, P);
+  return pKeys.length ? oKeys.length ? from(new Set(oKeys.concat(pKeys))) : pKeys : oKeys;
+};
+
+metadata.exp({getMetadataKeys: function getMetadataKeys(target /*, targetKey */){
+  return ordinaryMetadataKeys(anObject(target), arguments.length < 2 ? undefined : toMetaKey(arguments[1]));
+}});
+},{"11":11,"218":218,"62":62,"73":73,"8":8}],272:[function(_dereq_,module,exports){
+var metadata               = _dereq_(62)
+  , anObject               = _dereq_(8)
+  , getPrototypeOf         = _dereq_(73)
+  , ordinaryHasOwnMetadata = metadata.has
+  , ordinaryGetOwnMetadata = metadata.get
+  , toMetaKey              = metadata.key;
+
+var ordinaryGetMetadata = function(MetadataKey, O, P){
+  var hasOwn = ordinaryHasOwnMetadata(MetadataKey, O, P);
+  if(hasOwn)return ordinaryGetOwnMetadata(MetadataKey, O, P);
+  var parent = getPrototypeOf(O);
+  return parent !== null ? ordinaryGetMetadata(MetadataKey, parent, P) : undefined;
+};
+
+metadata.exp({getMetadata: function getMetadata(metadataKey, target /*, targetKey */){
+  return ordinaryGetMetadata(metadataKey, anObject(target), arguments.length < 3 ? undefined : toMetaKey(arguments[2]));
+}});
+},{"62":62,"73":73,"8":8}],273:[function(_dereq_,module,exports){
+var metadata                = _dereq_(62)
+  , anObject                = _dereq_(8)
+  , ordinaryOwnMetadataKeys = metadata.keys
+  , toMetaKey               = metadata.key;
+
+metadata.exp({getOwnMetadataKeys: function getOwnMetadataKeys(target /*, targetKey */){
+  return ordinaryOwnMetadataKeys(anObject(target), arguments.length < 2 ? undefined : toMetaKey(arguments[1]));
+}});
+},{"62":62,"8":8}],274:[function(_dereq_,module,exports){
+var metadata               = _dereq_(62)
+  , anObject               = _dereq_(8)
+  , ordinaryGetOwnMetadata = metadata.get
+  , toMetaKey              = metadata.key;
+
+metadata.exp({getOwnMetadata: function getOwnMetadata(metadataKey, target /*, targetKey */){
+  return ordinaryGetOwnMetadata(metadataKey, anObject(target)
+    , arguments.length < 3 ? undefined : toMetaKey(arguments[2]));
+}});
+},{"62":62,"8":8}],275:[function(_dereq_,module,exports){
+var metadata               = _dereq_(62)
+  , anObject               = _dereq_(8)
+  , getPrototypeOf         = _dereq_(73)
+  , ordinaryHasOwnMetadata = metadata.has
+  , toMetaKey              = metadata.key;
+
+var ordinaryHasMetadata = function(MetadataKey, O, P){
+  var hasOwn = ordinaryHasOwnMetadata(MetadataKey, O, P);
+  if(hasOwn)return true;
+  var parent = getPrototypeOf(O);
+  return parent !== null ? ordinaryHasMetadata(MetadataKey, parent, P) : false;
+};
+
+metadata.exp({hasMetadata: function hasMetadata(metadataKey, target /*, targetKey */){
+  return ordinaryHasMetadata(metadataKey, anObject(target), arguments.length < 3 ? undefined : toMetaKey(arguments[2]));
+}});
+},{"62":62,"73":73,"8":8}],276:[function(_dereq_,module,exports){
+var metadata               = _dereq_(62)
+  , anObject               = _dereq_(8)
+  , ordinaryHasOwnMetadata = metadata.has
+  , toMetaKey              = metadata.key;
+
+metadata.exp({hasOwnMetadata: function hasOwnMetadata(metadataKey, target /*, targetKey */){
+  return ordinaryHasOwnMetadata(metadataKey, anObject(target)
+    , arguments.length < 3 ? undefined : toMetaKey(arguments[2]));
+}});
+},{"62":62,"8":8}],277:[function(_dereq_,module,exports){
+var metadata                  = _dereq_(62)
+  , anObject                  = _dereq_(8)
+  , aFunction                 = _dereq_(4)
+  , toMetaKey                 = metadata.key
+  , ordinaryDefineOwnMetadata = metadata.set;
+
+metadata.exp({metadata: function metadata(metadataKey, metadataValue){
+  return function decorator(target, targetKey){
+    ordinaryDefineOwnMetadata(
+      metadataKey, metadataValue,
+      (targetKey !== undefined ? anObject : aFunction)(target),
+      toMetaKey(targetKey)
+    );
+  };
+}});
+},{"4":4,"62":62,"8":8}],278:[function(_dereq_,module,exports){
 // https://github.com/DavidBruant/Map-Set.prototype.toJSON
-var $export  = _dereq_(23);
+var $export  = _dereq_(31);
 
-$export($export.P, 'Set', {toJSON: _dereq_(14)('Set')});
-},{"14":14,"23":23}],180:[function(_dereq_,module,exports){
+$export($export.P + $export.R, 'Set', {toJSON: _dereq_(20)('Set')});
+},{"20":20,"31":31}],279:[function(_dereq_,module,exports){
 'use strict';
 // https://github.com/mathiasbynens/String.prototype.at
-var $export = _dereq_(23)
-  , $at     = _dereq_(71)(true);
+var $export = _dereq_(31)
+  , $at     = _dereq_(96)(true);
 
 $export($export.P, 'String', {
   at: function at(pos){
     return $at(this, pos);
   }
 });
-},{"23":23,"71":71}],181:[function(_dereq_,module,exports){
+},{"31":31,"96":96}],280:[function(_dereq_,module,exports){
 'use strict';
-var $export = _dereq_(23)
-  , $pad    = _dereq_(73);
+// https://tc39.github.io/String.prototype.matchAll/
+var $export     = _dereq_(31)
+  , defined     = _dereq_(26)
+  , toLength    = _dereq_(107)
+  , isRegExp    = _dereq_(49)
+  , getFlags    = _dereq_(35)
+  , RegExpProto = RegExp.prototype;
+
+var $RegExpStringIterator = function(regexp, string){
+  this._r = regexp;
+  this._s = string;
+};
+
+_dereq_(51)($RegExpStringIterator, 'RegExp String', function next(){
+  var match = this._r.exec(this._s);
+  return {value: match, done: match === null};
+});
 
 $export($export.P, 'String', {
-  padLeft: function padLeft(maxLength /*, fillString = ' ' */){
-    return $pad(this, maxLength, arguments.length > 1 ? arguments[1] : undefined, true);
+  matchAll: function matchAll(regexp){
+    defined(this);
+    if(!isRegExp(regexp))throw TypeError(regexp + ' is not a regexp!');
+    var S     = String(this)
+      , flags = 'flags' in RegExpProto ? String(regexp.flags) : getFlags.call(regexp)
+      , rx    = new RegExp(regexp.source, ~flags.indexOf('g') ? flags : 'g' + flags);
+    rx.lastIndex = toLength(regexp.lastIndex);
+    return new $RegExpStringIterator(rx, S);
   }
 });
-},{"23":23,"73":73}],182:[function(_dereq_,module,exports){
+},{"107":107,"26":26,"31":31,"35":35,"49":49,"51":51}],281:[function(_dereq_,module,exports){
 'use strict';
-var $export = _dereq_(23)
-  , $pad    = _dereq_(73);
+// https://github.com/tc39/proposal-string-pad-start-end
+var $export = _dereq_(31)
+  , $pad    = _dereq_(99);
 
 $export($export.P, 'String', {
-  padRight: function padRight(maxLength /*, fillString = ' ' */){
+  padEnd: function padEnd(maxLength /*, fillString = ' ' */){
     return $pad(this, maxLength, arguments.length > 1 ? arguments[1] : undefined, false);
   }
 });
-},{"23":23,"73":73}],183:[function(_dereq_,module,exports){
+},{"31":31,"99":99}],282:[function(_dereq_,module,exports){
+'use strict';
+// https://github.com/tc39/proposal-string-pad-start-end
+var $export = _dereq_(31)
+  , $pad    = _dereq_(99);
+
+$export($export.P, 'String', {
+  padStart: function padStart(maxLength /*, fillString = ' ' */){
+    return $pad(this, maxLength, arguments.length > 1 ? arguments[1] : undefined, true);
+  }
+});
+},{"31":31,"99":99}],283:[function(_dereq_,module,exports){
 'use strict';
 // https://github.com/sebmarkbage/ecmascript-string-left-right-trim
-_dereq_(75)('trimLeft', function($trim){
+_dereq_(101)('trimLeft', function($trim){
   return function trimLeft(){
     return $trim(this, 1);
   };
-});
-},{"75":75}],184:[function(_dereq_,module,exports){
+}, 'trimStart');
+},{"101":101}],284:[function(_dereq_,module,exports){
 'use strict';
 // https://github.com/sebmarkbage/ecmascript-string-left-right-trim
-_dereq_(75)('trimRight', function($trim){
+_dereq_(101)('trimRight', function($trim){
   return function trimRight(){
     return $trim(this, 2);
   };
-});
-},{"75":75}],185:[function(_dereq_,module,exports){
-// JavaScript 1.6 / Strawman array statics shim
-var $       = _dereq_(47)
-  , $export = _dereq_(23)
-  , $ctx    = _dereq_(18)
-  , $Array  = _dereq_(17).Array || Array
-  , statics = {};
-var setStatics = function(keys, length){
-  $.each.call(keys.split(','), function(key){
-    if(length == undefined && key in $Array)statics[key] = $Array[key];
-    else if(key in [])statics[key] = $ctx(Function.call, [][key], length);
-  });
-};
-setStatics('pop,reverse,shift,keys,values,entries', 1);
-setStatics('indexOf,every,some,forEach,map,filter,find,findIndex,includes', 3);
-setStatics('join,slice,concat,push,splice,unshift,sort,lastIndexOf,' +
-           'reduce,reduceRight,copyWithin,fill');
-$export($export.S, 'Array', statics);
-},{"17":17,"18":18,"23":23,"47":47}],186:[function(_dereq_,module,exports){
-_dereq_(92);
-var global      = _dereq_(30)
-  , hide        = _dereq_(32)
-  , Iterators   = _dereq_(46)
-  , ITERATOR    = _dereq_(84)('iterator')
-  , NL          = global.NodeList
-  , HTC         = global.HTMLCollection
-  , NLProto     = NL && NL.prototype
-  , HTCProto    = HTC && HTC.prototype
-  , ArrayValues = Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
-if(NLProto && !NLProto[ITERATOR])hide(NLProto, ITERATOR, ArrayValues);
-if(HTCProto && !HTCProto[ITERATOR])hide(HTCProto, ITERATOR, ArrayValues);
-},{"30":30,"32":32,"46":46,"84":84,"92":92}],187:[function(_dereq_,module,exports){
-var $export = _dereq_(23)
-  , $task   = _dereq_(76);
+}, 'trimEnd');
+},{"101":101}],285:[function(_dereq_,module,exports){
+// https://github.com/ljharb/proposal-global
+var $export = _dereq_(31);
+
+$export($export.S, 'System', {global: _dereq_(37)});
+},{"31":31,"37":37}],286:[function(_dereq_,module,exports){
+var $iterators    = _dereq_(128)
+  , redefine      = _dereq_(86)
+  , global        = _dereq_(37)
+  , hide          = _dereq_(39)
+  , Iterators     = _dereq_(55)
+  , wks           = _dereq_(114)
+  , ITERATOR      = wks('iterator')
+  , TO_STRING_TAG = wks('toStringTag')
+  , ArrayValues   = Iterators.Array;
+
+for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList', 'CSSRuleList'], i = 0; i < 5; i++){
+  var NAME       = collections[i]
+    , Collection = global[NAME]
+    , proto      = Collection && Collection.prototype
+    , key;
+  if(proto){
+    if(!proto[ITERATOR])hide(proto, ITERATOR, ArrayValues);
+    if(!proto[TO_STRING_TAG])hide(proto, TO_STRING_TAG, NAME);
+    Iterators[NAME] = ArrayValues;
+    for(key in $iterators)if(!proto[key])redefine(proto, key, $iterators[key], true);
+  }
+}
+},{"114":114,"128":128,"37":37,"39":39,"55":55,"86":86}],287:[function(_dereq_,module,exports){
+var $export = _dereq_(31)
+  , $task   = _dereq_(103);
 $export($export.G + $export.B, {
   setImmediate:   $task.set,
   clearImmediate: $task.clear
 });
-},{"23":23,"76":76}],188:[function(_dereq_,module,exports){
+},{"103":103,"31":31}],288:[function(_dereq_,module,exports){
 // ie9- setTimeout & setInterval additional parameters fix
-var global     = _dereq_(30)
-  , $export    = _dereq_(23)
-  , invoke     = _dereq_(34)
-  , partial    = _dereq_(58)
+var global     = _dereq_(37)
+  , $export    = _dereq_(31)
+  , invoke     = _dereq_(43)
+  , partial    = _dereq_(82)
   , navigator  = global.navigator
   , MSIE       = !!navigator && /MSIE .\./.test(navigator.userAgent); // <- dirty ie9- check
 var wrap = function(set){
@@ -3649,112 +5619,180 @@ $export($export.G + $export.B + $export.F * MSIE, {
   setTimeout:  wrap(global.setTimeout),
   setInterval: wrap(global.setInterval)
 });
-},{"23":23,"30":30,"34":34,"58":58}],189:[function(_dereq_,module,exports){
-_dereq_(86);
-_dereq_(170);
-_dereq_(125);
-_dereq_(133);
-_dereq_(137);
-_dereq_(138);
-_dereq_(126);
-_dereq_(136);
-_dereq_(135);
-_dereq_(131);
-_dereq_(132);
-_dereq_(130);
-_dereq_(127);
-_dereq_(129);
-_dereq_(134);
-_dereq_(128);
-_dereq_(96);
-_dereq_(95);
-_dereq_(115);
-_dereq_(116);
-_dereq_(117);
-_dereq_(118);
-_dereq_(119);
-_dereq_(120);
-_dereq_(121);
-_dereq_(122);
-_dereq_(123);
-_dereq_(124);
-_dereq_(98);
-_dereq_(99);
-_dereq_(100);
-_dereq_(101);
-_dereq_(102);
-_dereq_(103);
-_dereq_(104);
-_dereq_(105);
-_dereq_(106);
-_dereq_(107);
-_dereq_(108);
-_dereq_(109);
-_dereq_(110);
-_dereq_(111);
-_dereq_(112);
-_dereq_(113);
-_dereq_(114);
-_dereq_(163);
-_dereq_(166);
-_dereq_(169);
+},{"31":31,"37":37,"43":43,"82":82}],289:[function(_dereq_,module,exports){
+_dereq_(241);
+_dereq_(178);
+_dereq_(180);
+_dereq_(179);
+_dereq_(182);
+_dereq_(184);
+_dereq_(189);
+_dereq_(183);
+_dereq_(181);
+_dereq_(191);
+_dereq_(190);
+_dereq_(186);
+_dereq_(187);
+_dereq_(185);
+_dereq_(177);
+_dereq_(188);
+_dereq_(192);
+_dereq_(193);
+_dereq_(144);
+_dereq_(146);
+_dereq_(145);
+_dereq_(195);
+_dereq_(194);
 _dereq_(165);
-_dereq_(161);
-_dereq_(162);
-_dereq_(164);
+_dereq_(175);
+_dereq_(176);
+_dereq_(166);
 _dereq_(167);
 _dereq_(168);
-_dereq_(91);
-_dereq_(93);
-_dereq_(92);
-_dereq_(94);
-_dereq_(87);
-_dereq_(88);
-_dereq_(90);
-_dereq_(89);
+_dereq_(169);
+_dereq_(170);
+_dereq_(171);
+_dereq_(172);
+_dereq_(173);
+_dereq_(174);
+_dereq_(148);
+_dereq_(149);
+_dereq_(150);
+_dereq_(151);
+_dereq_(152);
+_dereq_(153);
 _dereq_(154);
 _dereq_(155);
 _dereq_(156);
 _dereq_(157);
 _dereq_(158);
 _dereq_(159);
-_dereq_(139);
-_dereq_(97);
 _dereq_(160);
-_dereq_(171);
-_dereq_(172);
-_dereq_(140);
+_dereq_(161);
+_dereq_(162);
+_dereq_(163);
+_dereq_(164);
+_dereq_(228);
+_dereq_(233);
+_dereq_(240);
+_dereq_(231);
+_dereq_(223);
+_dereq_(224);
+_dereq_(229);
+_dereq_(234);
+_dereq_(236);
+_dereq_(219);
+_dereq_(220);
+_dereq_(221);
+_dereq_(222);
+_dereq_(225);
+_dereq_(226);
+_dereq_(227);
+_dereq_(230);
+_dereq_(232);
+_dereq_(235);
+_dereq_(237);
+_dereq_(238);
+_dereq_(239);
+_dereq_(139);
 _dereq_(141);
-_dereq_(142);
+_dereq_(140);
 _dereq_(143);
-_dereq_(144);
+_dereq_(142);
+_dereq_(127);
+_dereq_(125);
+_dereq_(132);
+_dereq_(129);
+_dereq_(135);
+_dereq_(137);
+_dereq_(124);
+_dereq_(131);
+_dereq_(121);
+_dereq_(136);
+_dereq_(119);
+_dereq_(134);
+_dereq_(133);
+_dereq_(126);
+_dereq_(130);
+_dereq_(118);
+_dereq_(120);
+_dereq_(123);
+_dereq_(122);
+_dereq_(138);
+_dereq_(128);
+_dereq_(211);
+_dereq_(217);
+_dereq_(212);
+_dereq_(213);
+_dereq_(214);
+_dereq_(215);
+_dereq_(216);
+_dereq_(196);
 _dereq_(147);
-_dereq_(145);
-_dereq_(146);
-_dereq_(148);
-_dereq_(149);
-_dereq_(150);
-_dereq_(151);
-_dereq_(153);
-_dereq_(152);
-_dereq_(173);
-_dereq_(180);
-_dereq_(181);
-_dereq_(182);
-_dereq_(183);
-_dereq_(184);
-_dereq_(178);
-_dereq_(176);
-_dereq_(177);
-_dereq_(175);
-_dereq_(174);
-_dereq_(179);
-_dereq_(185);
-_dereq_(188);
-_dereq_(187);
-_dereq_(186);
-module.exports = _dereq_(17);
-},{"100":100,"101":101,"102":102,"103":103,"104":104,"105":105,"106":106,"107":107,"108":108,"109":109,"110":110,"111":111,"112":112,"113":113,"114":114,"115":115,"116":116,"117":117,"118":118,"119":119,"120":120,"121":121,"122":122,"123":123,"124":124,"125":125,"126":126,"127":127,"128":128,"129":129,"130":130,"131":131,"132":132,"133":133,"134":134,"135":135,"136":136,"137":137,"138":138,"139":139,"140":140,"141":141,"142":142,"143":143,"144":144,"145":145,"146":146,"147":147,"148":148,"149":149,"150":150,"151":151,"152":152,"153":153,"154":154,"155":155,"156":156,"157":157,"158":158,"159":159,"160":160,"161":161,"162":162,"163":163,"164":164,"165":165,"166":166,"167":167,"168":168,"169":169,"17":17,"170":170,"171":171,"172":172,"173":173,"174":174,"175":175,"176":176,"177":177,"178":178,"179":179,"180":180,"181":181,"182":182,"183":183,"184":184,"185":185,"186":186,"187":187,"188":188,"86":86,"87":87,"88":88,"89":89,"90":90,"91":91,"92":92,"93":93,"94":94,"95":95,"96":96,"97":97,"98":98,"99":99}],190:[function(_dereq_,module,exports){
+_dereq_(218);
+_dereq_(253);
+_dereq_(254);
+_dereq_(242);
+_dereq_(243);
+_dereq_(248);
+_dereq_(251);
+_dereq_(252);
+_dereq_(246);
+_dereq_(249);
+_dereq_(247);
+_dereq_(250);
+_dereq_(244);
+_dereq_(245);
+_dereq_(197);
+_dereq_(198);
+_dereq_(199);
+_dereq_(200);
+_dereq_(201);
+_dereq_(204);
+_dereq_(202);
+_dereq_(203);
+_dereq_(205);
+_dereq_(206);
+_dereq_(207);
+_dereq_(208);
+_dereq_(210);
+_dereq_(209);
+_dereq_(255);
+_dereq_(279);
+_dereq_(282);
+_dereq_(281);
+_dereq_(283);
+_dereq_(284);
+_dereq_(280);
+_dereq_(265);
+_dereq_(268);
+_dereq_(264);
+_dereq_(262);
+_dereq_(263);
+_dereq_(266);
+_dereq_(267);
+_dereq_(257);
+_dereq_(278);
+_dereq_(285);
+_dereq_(256);
+_dereq_(258);
+_dereq_(260);
+_dereq_(259);
+_dereq_(261);
+_dereq_(269);
+_dereq_(270);
+_dereq_(272);
+_dereq_(271);
+_dereq_(274);
+_dereq_(273);
+_dereq_(275);
+_dereq_(276);
+_dereq_(277);
+_dereq_(288);
+_dereq_(287);
+_dereq_(286);
+module.exports = _dereq_(23);
+},{"118":118,"119":119,"120":120,"121":121,"122":122,"123":123,"124":124,"125":125,"126":126,"127":127,"128":128,"129":129,"130":130,"131":131,"132":132,"133":133,"134":134,"135":135,"136":136,"137":137,"138":138,"139":139,"140":140,"141":141,"142":142,"143":143,"144":144,"145":145,"146":146,"147":147,"148":148,"149":149,"150":150,"151":151,"152":152,"153":153,"154":154,"155":155,"156":156,"157":157,"158":158,"159":159,"160":160,"161":161,"162":162,"163":163,"164":164,"165":165,"166":166,"167":167,"168":168,"169":169,"170":170,"171":171,"172":172,"173":173,"174":174,"175":175,"176":176,"177":177,"178":178,"179":179,"180":180,"181":181,"182":182,"183":183,"184":184,"185":185,"186":186,"187":187,"188":188,"189":189,"190":190,"191":191,"192":192,"193":193,"194":194,"195":195,"196":196,"197":197,"198":198,"199":199,"200":200,"201":201,"202":202,"203":203,"204":204,"205":205,"206":206,"207":207,"208":208,"209":209,"210":210,"211":211,"212":212,"213":213,"214":214,"215":215,"216":216,"217":217,"218":218,"219":219,"220":220,"221":221,"222":222,"223":223,"224":224,"225":225,"226":226,"227":227,"228":228,"229":229,"23":23,"230":230,"231":231,"232":232,"233":233,"234":234,"235":235,"236":236,"237":237,"238":238,"239":239,"240":240,"241":241,"242":242,"243":243,"244":244,"245":245,"246":246,"247":247,"248":248,"249":249,"250":250,"251":251,"252":252,"253":253,"254":254,"255":255,"256":256,"257":257,"258":258,"259":259,"260":260,"261":261,"262":262,"263":263,"264":264,"265":265,"266":266,"267":267,"268":268,"269":269,"270":270,"271":271,"272":272,"273":273,"274":274,"275":275,"276":276,"277":277,"278":278,"279":279,"280":280,"281":281,"282":282,"283":283,"284":284,"285":285,"286":286,"287":287,"288":288}],290:[function(_dereq_,module,exports){
 (function (global){
 /**
  * Copyright (c) 2014, Facebook, Inc.
@@ -4417,2181 +6455,2354 @@ module.exports = _dereq_(17);
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}]},{},[1]);
 
-/*! angular-vertxbus - v4.0.0 - 2016-02-13
-* http://github.com/knalli/angular-vertxbus
-* Copyright (c) 2016 Jan Philipp; Licensed MIT */
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
+/*! angular-vertxbus - v5.0.0 - 2016-03-25
+ * http://github.com/knalli/angular-vertxbus
+ * Copyright (c) 2016 Jan Philipp
+ * @license MIT */
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("vertx-eventbus"));
+	else if(typeof define === 'function' && define.amd)
+		define(["vertx-eventbus"], factory);
+	else {
+		var a = typeof exports === 'object' ? factory(require("vertx-eventbus")) : factory(root["EventBus"]);
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function(__WEBPACK_EXTERNAL_MODULE_8__) {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _module = __webpack_require__(1);
+
+	var _module2 = _interopRequireDefault(_module);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = _module2.default;
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _config = __webpack_require__(2);
+
+	var _VertxEventBusWrapperProvider = __webpack_require__(3);
+
+	var _VertxEventBusWrapperProvider2 = _interopRequireDefault(_VertxEventBusWrapperProvider);
+
+	var _VertxEventBusServiceProvider = __webpack_require__(9);
+
+	var _VertxEventBusServiceProvider2 = _interopRequireDefault(_VertxEventBusServiceProvider);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * @ngdoc overview
+	 * @module knalli.angular-vertxbus
+	 * @name knalli.angular-vertxbus
+	 * @description
+	 *
+	 * Client side library using VertX Event Bus as an Angular Service module
+	 *
+	 * You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
+	 *
+	 * <pre>
+	 *   angular.module('app', ['knalli.angular-vertxbus'])
+	 *     .controller('MyCtrl', function(vertxEventBus, vertxEventBusService) {
+	 *
+	 *       // using the EventBus directly
+	 *       vertxEventBus.send('my.address', {data: 123}, function (reply) {
+	 *         // your reply comes here
+	 *       });
+	 *
+	 *       // using the service
+	 *       vertxEventBusService.send('my.address', {data: 123}, {timeout: 500})
+	 *         .then(function (reply) {
+	 *           // your reply comes here
+	 *         })
+	 *         .catch(function (err) {
+	 *           // something went wrong, no connection, no login, timed out, or so
+	 *         });
+	 *     });
+	 * </pre>
+	 *
+	 * The module itself provides following components:
+	 * - {@link knalli.angular-vertxbus.vertxEventBus vertxEventBus}: a low level wrapper around `vertx.EventBus`
+	 * - {@link knalli.angular-vertxbus.vertxEventBusService vertxEventBusService}: a high level service around the wrapper
+	 *
+	 * While the wrapper only provides one single instance (even on reconnects), the service supports automatically
+	 * reconnect management, authorization and a clean promise based api.
+	 *
+	 * If you are looking for a low integration of `vertxbus.EventBus` as an AngularJS component, the wrapper will be your
+	 * choice. The only difference (and requirement for the wrapper actually) is how it will manage and replace the
+	 * underlying instance of the current `vertx.EventBus`.
+	 *
+	 * However, if you are looking for a simple, clean and promised based high api, the service is much better you.
+	 */
+	exports.default = angular.module(_config.moduleName, ['ng']).provider('vertxEventBus', _VertxEventBusWrapperProvider2.default).provider('vertxEventBusService', _VertxEventBusServiceProvider2.default).name;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var moduleName = 'knalli.angular-vertxbus';
+
+	exports.moduleName = moduleName;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _EventBusAdapter = __webpack_require__(4);
+
+	var _EventBusAdapter2 = _interopRequireDefault(_EventBusAdapter);
+
+	var _NoopAdapter = __webpack_require__(7);
+
+	var _NoopAdapter2 = _interopRequireDefault(_NoopAdapter);
+
+	var _ConnectionConfigHolder = __webpack_require__(6);
+
+	var _ConnectionConfigHolder2 = _interopRequireDefault(_ConnectionConfigHolder);
+
+	var _vertxEventbus = __webpack_require__(8);
+
+	var _vertxEventbus2 = _interopRequireDefault(_vertxEventbus);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * @ngdoc service
+	 * @module knalli.angular-vertxbus
+	 * @name knalli.angular-vertxbus.vertxEventBusProvider
+	 * @description
+	 * An AngularJS wrapper for projects using the VertX Event Bus
+	 */
+
+	var DEFAULTS = {
+	  enabled: true,
+	  debugEnabled: false,
+	  initialConnectEnabled: true,
+	  urlServer: location.protocol + '//' + location.hostname + (function () {
+	    if (location.port) {
+	      return ':' + location.port;
+	    }
+	  }() || ''),
+	  urlPath: '/eventbus',
+	  reconnectEnabled: true,
+	  sockjsReconnectInterval: 10000,
+	  sockjsOptions: {}
+	};
+
+	var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
+	  var _this = this;
+
+	  // options (globally, application-wide)
+	  var options = angular.extend({}, DEFAULTS);
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#enable
+	   *
+	   * @description
+	   * Enables or disables the service. This setup is immutable.
+	   *
+	   * @param {boolean} [value=true] service is enabled on startup
+	   * @returns {object} this
+	   */
+	  this.enable = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
+
+	    options.enabled = value === true;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#disableAutoConnect
+	   *
+	   * @description
+	   * Disables the auto connection feature.
+	   *
+	   * This feature will be only available if `enable == true`.
+	   *
+	   * @param {boolean} [value=true] auto connect on startup
+	   * @returns {object} this
+	   */
+	  this.disableAutoConnect = function () {
+	    options.initialConnectEnabled = false;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#useDebug
+	   *
+	   * @description
+	   * Enables a verbose mode in which certain events will be logged to `$log`.
+	   *
+	   * @param {boolean} [value=false] verbose mode (using `$log`)
+	   * @returns {object} this
+	   */
+	  this.useDebug = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
+
+	    options.debugEnabled = value === true;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#useUrlServer
+	   *
+	   * @description
+	   * Overrides the url part "server" for connecting. The default is based on
+	   * - `location.protocol`
+	   * - `location.hostname`
+	   * - `location.port`
+	   *
+	   * i.e. `http://domain.tld` or `http://domain.tld:port`
+	   *
+	   * @param {boolean} [value=$computed] server to connect (default based on `location.protocol`, `location.hostname` and `location.port`)
+	   * @returns {object} this
+	   */
+	  this.useUrlServer = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.urlServer : arguments[0];
+
+	    options.urlServer = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#useUrlPath
+	   *
+	   * @description
+	   * Overrides the url part "path" for connection.
+	   *
+	   * @param {boolean} [value='/eventbus'] path to connect
+	   * @returns {object} this
+	   */
+	  this.useUrlPath = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.urlPath : arguments[0];
+
+	    options.urlPath = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#useReconnect
+	   *
+	   * @description
+	   * Enables or disables the automatic reconnect handling.
+	   *
+	   * @param {boolean} [value=true] if a disconnect was being noted, a reconnect will be enforced automatically
+	   * @returns {object} this
+	   */
+	  this.useReconnect = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.reconnectEnabled : arguments[0];
+
+	    options.reconnectEnabled = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#useSockJsReconnectInterval
+	   *
+	   * @description
+	   * Overrides the timeout for reconnecting after a disconnect was found.
+	   *
+	   * @param {boolean} [value=10000] time between a disconnect and the next try to reconnect (in ms)
+	   * @returns {object} this
+	   */
+	  this.useSockJsReconnectInterval = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsReconnectInterval : arguments[0];
+
+	    options.sockjsReconnectInterval = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
+	   * @name .#useSockJsOptions
+	   *
+	   * @description
+	   * Sets additional params for the `SockJS` instance.
+	   *
+	   * Internally, it will be applied (as `options`) like `new SockJS(url, undefined, options)`.
+	   *
+	   * @param {boolean} [value={}]  optional params for raw SockJS options
+	   * @returns {object} this
+	   */
+	  this.useSockJsOptions = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsOptions : arguments[0];
+
+	    options.sockjsOptions = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc service
+	   * @module knalli.angular-vertxbus
+	   * @name knalli.angular-vertxbus.vertxEventBus
+	   * @description
+	   * A stub representing the Vert.x EventBus (core functionality)
+	   *
+	   * Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a
+	   * new instance of the bus have to be created.
+	   * This stub ensures only one object holding the current active instance of the bus.
+	   *
+	   * The stub supports theses Vert.x Event Bus APIs:
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_close close()}
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_send send(address, message, handler)}
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_publish publish(address, message)}
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_registerHandler registerHandler(adress, handler)}
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_unregisterHandler unregisterHandler(address, handler)}
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_readyState readyState()}
+	   *
+	   * Furthermore, the stub supports theses extra APIs:
+	   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_reconnect reconnect()}
+	   *
+	   * @requires $timeout
+	   * @requires $log
+	   */
+	  /* @ngInject */
+	  this.$get = function ($timeout, $log, $q) {
+	    // Current options (merged defaults with application-wide settings)
+	    var instanceOptions = angular.extend({}, DEFAULTS, options);
+	    if (instanceOptions.enabled && _vertxEventbus2.default) {
+	      if (instanceOptions.debugEnabled) {
+	        $log.debug('[Vert.x EB Stub] Enabled');
+	      }
+
+	      // aggregate server connection params
+	      instanceOptions.connectionConfig = new _ConnectionConfigHolder2.default({
+	        urlServer: instanceOptions.urlServer,
+	        urlPath: instanceOptions.urlPath
+	      });
+	      delete instanceOptions.urlServer;
+	      delete instanceOptions.urlPath;
+
+	      return new _EventBusAdapter2.default(_vertxEventbus2.default, $timeout, $log, $q, instanceOptions);
+	    } else {
+	      if (instanceOptions.debugEnabled) {
+	        $log.debug('[Vert.x EB Stub] Disabled');
+	      }
+	      return new _NoopAdapter2.default(_vertxEventbus2.default, $q);
+	    }
+	  };
+	  this.$get.$inject = ["$timeout", "$log", "$q"];
+	};
+
+	exports.default = VertxEventBusWrapperProvider;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _config = __webpack_require__(2);
+
+	var _BaseAdapter2 = __webpack_require__(5);
+
+	var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
+
+	var _ConnectionConfigHolder = __webpack_require__(6);
+
+	var _ConnectionConfigHolder2 = _interopRequireDefault(_ConnectionConfigHolder);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @ngdoc service
+	 * @module global
+	 * @name global.EventBus
+	 *
+	 * @description
+	 * This is the interface of `EventBus`. It is not included.
+	 */
+
+	/**
+	 * @ngdoc method
+	 * @module global
+	 * @methodOf global.EventBus
+	 * @name .#close
+	 */
+
+	/**
+	 * @ngdoc method
+	 * @module global
+	 * @methodOf global.EventBus
+	 * @name .#send
+	 *
+	 * @param {string} address target address
+	 * @param {object} message payload message
+	 * @param {function=} replyHandler optional callback
+	 * @param {function=} failureHandler optional callback
+	 */
+
+	/**
+	 * @ngdoc method
+	 * @module global
+	 * @methodOf global.EventBus
+	 * @name .#publish
+	 *
+	 * @param {string} address target address
+	 * @param {object} message payload message
+	 */
+
+	/**
+	 * @ngdoc method
+	 * @module global
+	 * @methodOf global.EventBus
+	 * @name .#registerHandler
+	 *
+	 * @param {string} address target address
+	 * @param {function} handler callback handler
+	 */
+
+	/**
+	 * @ngdoc method
+	 * @module global
+	 * @methodOf global.EventBus
+	 * @name .#unregisterHandler
+	 *
+	 * @param {string} address target address
+	 * @param {function} handler callback handler to be removed
+	 */
+
+	/**
+	 * @ngdoc property
+	 * @module global
+	 * @propertyOf global.EventBus
+	 * @name .#onopen
+	 * @description
+	 * Defines the callback called on opening the connection.
+	 */
+
+	/**
+	 * @ngdoc property
+	 * @module global
+	 * @propertyOf global.EventBus
+	 * @name .#onclose
+	 * @description
+	 * Defines the callback called on closing the connection.
+	 */
+
+	/**
+	 * @ngdoc property
+	 * @module global
+	 * @propertyOf global.EventBus
+	 * @name .#onerror
+	 * @description
+	 * Defines the callback called on any error.
+	 */
+
+	var EventBusAdapter = function (_BaseAdapter) {
+	  _inherits(EventBusAdapter, _BaseAdapter);
+
+	  function EventBusAdapter(EventBus, $timeout, $log, $q, _ref) {
+	    var enabled = _ref.enabled;
+	    var debugEnabled = _ref.debugEnabled;
+	    var initialConnectEnabled = _ref.initialConnectEnabled;
+	    var connectionConfig = _ref.connectionConfig;
+	    var reconnectEnabled = _ref.reconnectEnabled;
+	    var sockjsReconnectInterval = _ref.sockjsReconnectInterval;
+	    var sockjsOptions = _ref.sockjsOptions;
+
+	    _classCallCheck(this, EventBusAdapter);
+
+	    // actual EventBus type
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusAdapter).call(this, $q));
+
+	    _this.EventBus = EventBus;
+	    _this.$timeout = $timeout;
+	    _this.$log = $log;
+	    _this.$q = $q;
+	    _this.options = {
+	      enabled: enabled,
+	      debugEnabled: debugEnabled,
+	      initialConnectEnabled: initialConnectEnabled,
+	      connectionConfig: connectionConfig,
+	      reconnectEnabled: reconnectEnabled,
+	      sockjsReconnectInterval: sockjsReconnectInterval,
+	      sockjsOptions: sockjsOptions
+	    };
+	    _this.disconnectTimeoutEnabled = true;
+	    if (initialConnectEnabled) {
+	      // asap create connection
+	      _this.connect();
+	    }
+	    return _this;
+	  }
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBus
+	   * @name .#configureConnect
+	   *
+	   * @description
+	   * Reconfigure the connection details.
+	   *
+	   * @param {string} urlServer see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlServer vertxEventBusProvider.useUrlServer()}
+	   * @param {string} [urlPath=/eventbus] see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlPath vertxEventBusProvider.useUrlPath()}
+	   */
+
+
+	  _createClass(EventBusAdapter, [{
+	    key: 'configureConnection',
+	    value: function configureConnection(urlServer) {
+	      var urlPath = arguments.length <= 1 || arguments[1] === undefined ? '/eventbus' : arguments[1];
+
+	      this.options.connectionConfig = new _ConnectionConfigHolder2.default({ urlServer: urlServer, urlPath: urlPath });
+	      return this;
+	    }
+	  }, {
+	    key: 'connect',
+	    value: function connect() {
+	      var _this2 = this;
+
+	      // connect promise
+	      var deferred = this.$q.defer();
+	      // currently valid url
+	      var url = '' + this.options.connectionConfig.urlServer + this.options.connectionConfig.urlPath;
+	      if (this.options.debugEnabled) {
+	        this.$log.debug('[Vert.x EB Stub] Enabled: connecting \'' + url + '\'');
+	      }
+	      // Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
+	      // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
+	      this.instance = new this.EventBus(url, this.options.sockjsOptions);
+	      this.instance.onopen = function () {
+	        if (_this2.options.debugEnabled) {
+	          _this2.$log.debug('[Vert.x EB Stub] Connected');
+	        }
+	        if (angular.isFunction(_this2.onopen)) {
+	          _this2.onopen();
+	        }
+	        deferred.resolve();
+	      };
+	      // instance onClose handler
+	      this.instance.onclose = function () {
+	        if (_this2.options.debugEnabled) {
+	          _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
+	        }
+	        if (angular.isFunction(_this2.onclose)) {
+	          _this2.onclose();
+	        }
+	        _this2.instance = undefined;
+
+	        if (!_this2.disconnectTimeoutEnabled) {
+	          // reconnect required asap
+	          if (_this2.options.debugEnabled) {
+	            _this2.$log.debug('[Vert.x EB Stub] Reconnect immediately');
+	          }
+	          _this2.disconnectTimeoutEnabled = true;
+	          _this2.connect();
+	        } else if (_this2.options.reconnectEnabled) {
+	          // automatic reconnect after timeout
+	          if (_this2.options.debugEnabled) {
+	            _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
+	          }
+	          _this2.$timeout(function () {
+	            return _this2.connect();
+	          }, _this2.options.sockjsReconnectInterval);
+	        }
+	      };
+	      // instance onError handler
+	      this.instance.onerror = function (message) {
+	        if (angular.isFunction(_this2.onerror)) {
+	          _this2.onerror(message);
+	        }
+	      };
+	      return deferred.promise;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#reconnect
+	     *
+	     * @description
+	     * Reconnects the underlying connection.
+	     *
+	     * Unless a connection is open, it will connect using a new one.
+	     *
+	     * If a connection is already open, it will close this one and opens a new one. If `immediately` is `true`, the
+	     * default timeout for reconnect will be skipped.
+	     *
+	     * @param {boolean} [immediately=false] optionally enforce a reconnect asap instead of using the timeout
+	     */
+
+	  }, {
+	    key: 'reconnect',
+	    value: function reconnect() {
+	      var immediately = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+	      if (this.instance && this.instance.state === this.EventBus.OPEN) {
+	        if (immediately) {
+	          this.disconnectTimeoutEnabled = false;
+	        }
+	        this.instance.close();
+	      } else {
+	        this.connect();
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#close
+	     *
+	     * @description
+	     * Closes the underlying connection.
+	     *
+	     * Note: If automatic reconnection is active, a new connection will be established after the {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useReconnect reconnect timeout}.
+	     *
+	     * See also:
+	     * - {@link EventBus#methods_close EventBus.close()}
+	     */
+
+	  }, {
+	    key: 'close',
+	    value: function close() {
+	      if (this.instance) {
+	        this.instance.close();
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#send
+	     *
+	     * @description
+	     * Sends a message
+	     *
+	     * See also:
+	     * - {@link global.EventBus#methods_send EventBus.send()}
+	     *
+	     * @param {string} address target address
+	     * @param {object} message payload message
+	     * @param {object=} headers
+	     * @param {function=} replyHandler optional callback
+	     * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
+	     */
+
+	  }, {
+	    key: 'send',
+	    value: function send(address, message, headers, replyHandler, failureHandler) {
+	      if (this.instance) {
+	        if (angular.isFunction(headers)) {
+	          failureHandler = replyHandler;
+	          replyHandler = headers;
+	          headers = undefined;
+	        }
+	        this.instance.send(address, message, headers, replyHandler, failureHandler);
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#publish
+	     *
+	     * @description
+	     * Publishes a message
+	     *
+	     * See also:
+	     * - {@link global.EventBus#methods_publish EventBus.publish()}
+	     *
+	     * @param {string} address target address
+	     * @param {object} message payload message
+	     * @param {object=} headers optional headers
+	     */
+
+	  }, {
+	    key: 'publish',
+	    value: function publish(address, message, headers) {
+	      if (this.instance) {
+	        this.instance.publish(address, message, headers);
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#registerHandler
+	     *
+	     * @description
+	     * Registers a listener
+	     *
+	     * See also:
+	     * - {@link global.EventBus#methods_registerHandler EventBus.registerHandler()}
+	     *
+	     * @param {string} address target address
+	     * @param {object} headers optional headers
+	     * @param {function} handler callback handler
+	     */
+
+	  }, {
+	    key: 'registerHandler',
+	    value: function registerHandler(address, headers, handler) {
+	      var _this3 = this;
+
+	      if (this.instance) {
+	        if (angular.isFunction(headers) && !handler) {
+	          handler = headers;
+	          headers = undefined;
+	        }
+	        this.instance.registerHandler(address, headers, handler);
+	        // and return the deregister callback
+	        var deconstructor = function deconstructor() {
+	          _this3.unregisterHandler(address, headers, handler);
+	        };
+	        deconstructor.displayName = _config.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
+	        return deconstructor;
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#unregisterHandler
+	     *
+	     * @description
+	     * Removes a registered a listener
+	     *
+	     * See also:
+	     * - {@link global.EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
+	     *
+	     * @param {string} address target address
+	     * @param {object} headers optional headers
+	     * @param {function} handler callback handler to be removed
+	     */
+
+	  }, {
+	    key: 'unregisterHandler',
+	    value: function unregisterHandler(address, headers, handler) {
+	      if (this.instance && this.instance.state === this.EventBus.OPEN) {
+	        if (angular.isFunction(headers) && !handler) {
+	          handler = headers;
+	          headers = undefined;
+	        }
+	        this.instance.unregisterHandler(address, headers, handler);
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#readyState
+	     *
+	     * @description
+	     * Returns the current connection state
+	     *
+	     * @returns {number} value of vertx-eventbus connection states
+	     */
+
+	  }, {
+	    key: 'readyState',
+	    value: function readyState() {
+	      if (this.instance) {
+	        return this.instance.state;
+	      } else {
+	        return this.EventBus.CLOSED;
+	      }
+	    }
+	  }, {
+	    key: 'getOptions',
+
+
+	    // private
+	    value: function getOptions() {
+	      // clone options
+	      return angular.extend({}, this.options);
+	    }
+	  }, {
+	    key: 'state',
+	    get: function get() {
+	      return this.readyState();
+	    }
+	  }]);
+
+	  return EventBusAdapter;
+	}(_BaseAdapter3.default);
+
+	exports.default = EventBusAdapter;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var BaseAdapter = function () {
+	  function BaseAdapter($q) {
+	    _classCallCheck(this, BaseAdapter);
+
+	    this.$q = $q;
+	  }
+
+	  _createClass(BaseAdapter, [{
+	    key: "configureConnection",
+	    value: function configureConnection() {}
+	  }, {
+	    key: "connect",
+	    value: function connect() {
+	      return this.$q.reject();
+	    }
+	  }, {
+	    key: "reconnect",
+	    value: function reconnect() {}
+	  }, {
+	    key: "close",
+	    value: function close() {}
+	  }, {
+	    key: "send",
+	    value: function send() {}
+	  }, {
+	    key: "publish",
+	    value: function publish() {}
+	  }, {
+	    key: "registerHandler",
+	    value: function registerHandler() {}
+	  }, {
+	    key: "unregisterHandler",
+	    value: function unregisterHandler() {}
+	  }, {
+	    key: "readyState",
+	    value: function readyState() {}
+	  }, {
+	    key: "getOptions",
+	    value: function getOptions() {
+	      return {};
+	    }
+
+	    // empty: can be overriden by externals
+
+	  }, {
+	    key: "onopen",
+	    value: function onopen() {}
+
+	    // empty: can be overriden by externals
+
+	  }, {
+	    key: "onclose",
+	    value: function onclose() {}
+	  }]);
+
+	  return BaseAdapter;
+	}();
+
+	exports.default = BaseAdapter;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var ConnectionConfigHolder = function () {
+	  function ConnectionConfigHolder(_ref) {
+	    var urlServer = _ref.urlServer;
+	    var urlPath = _ref.urlPath;
+
+	    _classCallCheck(this, ConnectionConfigHolder);
+
+	    this._urlServer = urlServer;
+	    this._urlPath = urlPath;
+	  }
+
+	  _createClass(ConnectionConfigHolder, [{
+	    key: "urlServer",
+	    get: function get() {
+	      return this._urlServer;
+	    }
+	  }, {
+	    key: "urlPath",
+	    get: function get() {
+	      return this._urlPath;
+	    }
+	  }]);
+
+	  return ConnectionConfigHolder;
+	}();
+
+	exports.default = ConnectionConfigHolder;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BaseAdapter2 = __webpack_require__(5);
+
+	var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var NoopAdapter = function (_BaseAdapter) {
+	  _inherits(NoopAdapter, _BaseAdapter);
+
+	  function NoopAdapter(EventBus, $q) {
+	    _classCallCheck(this, NoopAdapter);
+
+	    // actual EventBus type
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(NoopAdapter).call(this, $q));
+
+	    _this.EventBus = EventBus;
+	    return _this;
+	  }
+
+	  return NoopAdapter;
+	}(_BaseAdapter3.default);
+
+	exports.default = NoopAdapter;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_8__;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _EventBusDelegate = __webpack_require__(10);
+
+	var _EventBusDelegate2 = _interopRequireDefault(_EventBusDelegate);
+
+	var _NoopDelegate = __webpack_require__(14);
+
+	var _NoopDelegate2 = _interopRequireDefault(_NoopDelegate);
+
+	var _Delegator = __webpack_require__(15);
+
+	var _Delegator2 = _interopRequireDefault(_Delegator);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * @ngdoc service
+	 * @module knalli.angular-vertxbus
+	 * @name knalli.angular-vertxbus.vertxEventBusServiceProvider
+	 * @description
+	 * This is the configuration provider for {@link knalli.angular-vertxbus.vertxEventBusService}.
+	 */
+
+	var DEFAULTS = {
+	  enabled: true,
+	  debugEnabled: false,
+	  prefix: 'vertx-eventbus.',
+	  sockjsStateInterval: 10000,
+	  messageBuffer: 10000
+	};
+
+	var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
+	  var _this = this;
+
+	  // options (globally, application-wide)
+	  var options = angular.extend({}, DEFAULTS);
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+	   * @name .#enable
+	   *
+	   * @description
+	   * Enables or disables the service. This setup is immutable.
+	   *
+	   * @param {boolean} [value=true] service is enabled on startup
+	   * @returns {object} this
+	   */
+	  this.enable = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
+
+	    options.enabled = value === true;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+	   * @name .#useDebug
+	   *
+	   * @description
+	   * Enables a verbose mode in which certain events will be logged to `$log`.
+	   *
+	   * @param {boolean} [value=false] verbose mode (using `$log`)
+	   * @returns {object} this
+	   */
+	  this.useDebug = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
+
+	    options.debugEnabled = value === true;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+	   * @name .#usePrefix
+	   *
+	   * @description
+	   * Overrides the default prefix which will be used for emitted events.
+	   *
+	   * @param {string} [value='vertx-eventbus.'] prefix used in event names
+	   * @returns {object} this
+	   */
+	  this.usePrefix = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.prefix : arguments[0];
+
+	    options.prefix = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+	   * @name .#useSockJsStateInterval
+	   *
+	   *
+	   * @description
+	   * Overrides the interval of checking the connection is still valid (required for reconnecting automatically).
+	   *
+	   * @param {boolean} [value=10000] interval of checking the underlying connection's state (in ms)
+	   * @returns {object} this
+	   */
+	  this.useSockJsStateInterval = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsStateInterval : arguments[0];
+
+	    options.sockjsStateInterval = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc method
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+	   * @name .#useMessageBuffer
+	   *
+	   * @description
+	   * Enables buffering of (sending) messages.
+	   *
+	   * The setting defines the total amount of buffered messages (`0` no buffering). A message will be buffered if
+	   * connection is still in progress, the connection is stale or a login is required/pending.
+	   *
+	   * @param {boolean} [value=0] allowed total amount of messages in the buffer
+	   * @returns {object} this
+	   */
+	  this.useMessageBuffer = function () {
+	    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.messageBuffer : arguments[0];
+
+	    options.messageBuffer = value;
+	    return _this;
+	  };
+
+	  /**
+	   * @ngdoc service
+	   * @module knalli.angular-vertxbus
+	   * @name knalli.angular-vertxbus.vertxEventBusService
+	   * @description
+	   * A service utilizing an underlying Vert.x Event Bus
+	   *
+	   * The advanced features of this service are:
+	   *  - broadcasting the connection changes (vertx-eventbus.system.connected, vertx-eventbus.system.disconnected) on $rootScope
+	   *  - registering all handlers again when a reconnect had been required
+	   *  - supporting a promise when using send()
+	   *  - adding aliases on (registerHandler), un (unregisterHandler) and emit (publish)
+	   *
+	   * Basic usage:
+	   * <pre>
+	   * module.controller('MyController', function('vertxEventService') {
+	  *   vertxEventService.on('my.address', function(message) {
+	  *     console.log("JSON Message received: ", message)
+	  *   });
+	  *   vertxEventService.publish('my.other.address', {type: 'foo', data: 'bar'});
+	  * });
+	   * </pre>
+	   *
+	   * Note the additional {@link knalli.angular-vertxbus.vertxEventBusServiceProvider configuration} of the module itself.
+	   *
+	   * @requires knalli.angular-vertxbus.vertxEventBus
+	   * @requires $rootScope
+	   * @requires $q
+	   * @requires $interval
+	   * @requires $log
+	   */
+	  /* @ngInject */
+	  this.$get = function ($rootScope, $q, $interval, vertxEventBus, $log) {
+	    // Current options (merged defaults with application-wide settings)
+	    var instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
+	    if (instanceOptions.enabled) {
+	      return new _Delegator2.default(new _EventBusDelegate2.default($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions), $log);
+	    } else {
+	      return new _Delegator2.default(new _NoopDelegate2.default());
+	    }
+	  };
+	  this.$get.$inject = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log"];
+	};
+
+	exports.default = VertxEventBusServiceProvider;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _config = __webpack_require__(2);
+
+	var _Queue = __webpack_require__(11);
+
+	var _Queue2 = _interopRequireDefault(_Queue);
+
+	var _SimpleMap = __webpack_require__(12);
+
+	var _SimpleMap2 = _interopRequireDefault(_SimpleMap);
+
+	var _BaseDelegate2 = __webpack_require__(13);
+
+	var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @ngdoc event
+	 * @module knalli.angular-vertxbus
+	 * @eventOf knalli.angular-vertxbus.vertxEventBusService
+	 * @eventType broadcast on $rootScope
+	 * @name disconnected
+	 *
+	 * @description
+	 * After a connection was being terminated.
+	 *
+	 * Event name is `prefix + 'system.disconnected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+	 */
+
+	/**
+	 * @ngdoc event
+	 * @module knalli.angular-vertxbus
+	 * @eventOf knalli.angular-vertxbus.vertxEventBusService
+	 * @eventType broadcast on $rootScope
+	 * @name connected
+	 *
+	 * @description
+	 * After a connection was being established
+	 *
+	 * Event name is `prefix + 'system.connected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+	 */
+
+	/**
+	 * @ngdoc event
+	 * @module knalli.angular-vertxbus
+	 * @eventOf knalli.angular-vertxbus.vertxEventBusService
+	 * @eventType broadcast on $rootScope
+	 * @name login-succeeded
+	 *
+	 * @description
+	 * After a login has been validated successfully
+	 *
+	 * Event name is `prefix + 'system.login.succeeded'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+	 *
+	 * @param {object} data data
+	 * @param {boolean} data.status must be `'ok'`
+	 */
+
+	/**
+	 * @ngdoc event
+	 * @module knalli.angular-vertxbus
+	 * @eventOf knalli.angular-vertxbus.vertxEventBusService
+	 * @eventType broadcast on $rootScope
+	 * @name login-failed
+	 *
+	 * @description
+	 * After a login has been destroyed or was invalidated
+	 *
+	 * Event name is `prefix + 'system.login.failed'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+	 *
+	 * @param {object} data data
+	 * @param {boolean} data.status must be not`'ok'`
+	 */
+
+	var EventBusDelegate = function (_BaseDelegate) {
+	  _inherits(EventBusDelegate, _BaseDelegate);
+
+	  function EventBusDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
+	    var enabled = _ref.enabled;
+	    var debugEnabled = _ref.debugEnabled;
+	    var prefix = _ref.prefix;
+	    var sockjsStateInterval = _ref.sockjsStateInterval;
+	    var messageBuffer = _ref.messageBuffer;
+	    var loginRequired = _ref.loginRequired;
+	    var loginInterceptor = _ref.loginInterceptor;
+
+	    _classCallCheck(this, EventBusDelegate);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusDelegate).call(this));
+
+	    _this.$rootScope = $rootScope;
+	    _this.$interval = $interval;
+	    _this.$log = $log;
+	    _this.$q = $q;
+	    _this.eventBus = eventBus;
+	    _this.options = {
+	      enabled: enabled,
+	      debugEnabled: debugEnabled,
+	      prefix: prefix,
+	      sockjsStateInterval: sockjsStateInterval,
+	      messageBuffer: messageBuffer,
+	      loginRequired: loginRequired
+	    };
+	    _this.loginInterceptor = loginInterceptor;
+	    _this.connectionState = _this.eventBus.EventBus.CLOSED;
+	    _this.states = {
+	      connected: false,
+	      validSession: false
+	    };
+	    _this.observers = [];
+	    // internal store of buffered messages
+	    _this.messageQueue = new _Queue2.default(_this.options.messageBuffer);
+	    // internal map of callbacks
+	    _this.callbackMap = new _SimpleMap2.default();
+	    // asap
+	    _this.initialize();
+	    return _this;
+	  }
+
+	  // internal
+
+
+	  _createClass(EventBusDelegate, [{
+	    key: 'initialize',
+	    value: function initialize() {
+	      var _this2 = this;
+
+	      this.eventBus.onopen = function () {
+	        return _this2.onEventbusOpen();
+	      };
+	      this.eventBus.onclose = function () {
+	        return _this2.onEventbusClose();
+	      };
+
+	      // Update the current connection state periodically.
+	      var connectionIntervalCheck = function connectionIntervalCheck() {
+	        return _this2.getConnectionState(true);
+	      };
+	      connectionIntervalCheck.displayName = 'connectionIntervalCheck';
+	      this.$interval(function () {
+	        return connectionIntervalCheck();
+	      }, this.options.sockjsStateInterval);
+	    }
+
+	    // internal
+
+	  }, {
+	    key: 'onEventbusOpen',
+	    value: function onEventbusOpen() {
+	      var connectionStateFlipped = false;
+	      this.getConnectionState(true);
+	      if (!this.states.connected) {
+	        this.states.connected = true;
+	        connectionStateFlipped = true;
+	      }
+	      // Ensure all events will be re-attached
+	      this.afterEventbusConnected();
+	      // Everything is online and registered again, let's notify everybody
+	      if (connectionStateFlipped) {
+	        this.$rootScope.$broadcast(this.options.prefix + 'system.connected');
+	      }
+	      this.$rootScope.$digest(); // explicitly
+	      // consume message queue?
+	      if (this.options.messageBuffer && this.messageQueue.size()) {
+	        while (this.messageQueue.size()) {
+	          var fn = this.messageQueue.first();
+	          if (angular.isFunction(fn)) {
+	            fn();
+	          }
+	        }
+	        this.$rootScope.$digest();
+	      }
+	    }
+
+	    // internal
+
+	  }, {
+	    key: 'onEventbusClose',
+	    value: function onEventbusClose() {
+	      this.getConnectionState(true);
+	      if (this.states.connected) {
+	        this.states.connected = false;
+	        this.$rootScope.$broadcast(this.options.prefix + 'system.disconnected');
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#observe
+	     *
+	     * @description
+	     * Adds an observer
+	     *
+	     * @param {object} observer observer
+	     * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
+	     */
+
+	  }, {
+	    key: 'observe',
+	    value: function observe(observer) {
+	      this.observers.push(observer);
+	    }
+
+	    // internal
+
+	  }, {
+	    key: 'afterEventbusConnected',
+	    value: function afterEventbusConnected() {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = this.observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var observer = _step.value;
+
+	          if (angular.isFunction(observer.afterEventbusConnected)) {
+	            observer.afterEventbusConnected();
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#registerHandler
+	     *
+	     * @description
+	     * Registers a callback handler for the specified address match.
+	     *
+	     * @param {string} address target address
+	     * @param {object} headers optional headers
+	     * @param {function} callback handler with params `(message, replyTo)`
+	     * @returns {function=} deconstructor
+	     */
+
+	  }, {
+	    key: 'registerHandler',
+	    value: function registerHandler(address, headers, callback) {
+	      var _this3 = this;
+
+	      if (angular.isFunction(headers) && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      if (!angular.isFunction(callback)) {
+	        return;
+	      }
+	      if (this.options.debugEnabled) {
+	        this.$log.debug('[Vert.x EB Service] Register handler for ' + address);
+	      }
+	      var callbackWrapper = function callbackWrapper(err, _ref2, replyTo) {
+	        var body = _ref2.body;
+
+	        callback(body, replyTo);
+	        _this3.$rootScope.$digest();
+	      };
+	      callbackWrapper.displayName = _config.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
+	      this.callbackMap.put(callback, callbackWrapper);
+	      return this.eventBus.registerHandler(address, headers, callbackWrapper);
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#unregisterHandler
+	     *
+	     * @description
+	     * Removes a callback handler for the specified address match.
+	     *
+	     * @param {string} address target address
+	     * @param {object} headers optional headers
+	     * @param {function} callback handler with params `(message, replyTo)`
+	     */
+
+	  }, {
+	    key: 'unregisterHandler',
+	    value: function unregisterHandler(address, headers, callback) {
+	      if (angular.isFunction(headers) && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      if (!angular.isFunction(callback)) {
+	        return;
+	      }
+	      if (this.options.debugEnabled) {
+	        this.$log.debug('[Vert.x EB Service] Unregister handler for ' + address);
+	      }
+	      this.eventBus.unregisterHandler(address, headers, this.callbackMap.get(callback));
+	      this.callbackMap.remove(callback);
+	    }
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#send
+	     *
+	     * @description
+	     * Sends a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_send vertxEventBus.send()}).
+	     *
+	     * @param {string} address target address
+	     * @param {object} message payload message
+	     * @param {object=} headers
+	     * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
+	     * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
+	     *                                       no replyHandler will be created
+	     * @returns {object} promise
+	     */
+
+	  }, {
+	    key: 'send',
+	    value: function send(address, message, headers) {
+	      var _this4 = this;
+
+	      var timeout = arguments.length <= 3 || arguments[3] === undefined ? 10000 : arguments[3];
+	      var expectReply = arguments.length <= 4 || arguments[4] === undefined ? true : arguments[4];
+
+	      if (angular.isNumber(headers)) {
+	        if (typeof timeout === 'boolean') {
+	          expectReply = timeout;
+	        }
+	        timeout = headers;
+	        headers = undefined;
+	      }
+	      var deferred = this.$q.defer();
+	      var next = function next() {
+	        if (expectReply) {
+	          (function () {
+	            // Register timeout for promise rejecting
+	            var timer = _this4.$interval(function () {
+	              if (_this4.options.debugEnabled) {
+	                _this4.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
+	              }
+	              deferred.reject();
+	            }, timeout, 1);
+	            // Send message
+	            _this4.eventBus.send(address, message, headers, function (err, reply) {
+	              _this4.$interval.cancel(timer); // because it's resolved
+	              if (err) {
+	                deferred.reject(err);
+	              } else {
+	                deferred.resolve(reply);
+	              }
+	            }, function (err) {
+	              _this4.$interval.cancel(timer); // because it's resolved
+	              deferred.reject(err);
+	            });
+	          })();
+	        } else {
+	          _this4.eventBus.send(address, message, headers);
+	          deferred.resolve(); // we don't care
+	        }
+	      };
+	      next.displayName = _config.moduleName + '.service.delegate.live.send.next';
+	      if (!this.ensureOpenAuthConnection(next)) {
+	        deferred.reject();
+	      }
+	      return deferred.promise;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#publish
+	     *
+	     * @description
+	     * Publishes a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_publish vertxEventBus.publish()}).
+	     *
+	     * @param {string} address target address
+	     * @param {object} message payload message
+	     * @param {object=} headers optional headers
+	     * @returns {boolean} false if cannot be send or queued
+	     */
+
+	  }, {
+	    key: 'publish',
+	    value: function publish(address, message, headers) {
+	      var _this5 = this;
+
+	      return this.ensureOpenAuthConnection(function () {
+	        return _this5.eventBus.publish(address, message, headers);
+	      });
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#ensureOpenConnection
+	     *
+	     * @description
+	     * Ensures the callback will be performed with an open connection.
+	     *
+	     * Unless an open connection was found, the callback will be queued in the message buffer (if available).
+	     *
+	     * @param {function} fn callback
+	     * @returns {boolean} false if the callback cannot be performed or queued
+	     */
+
+	  }, {
+	    key: 'ensureOpenConnection',
+	    value: function ensureOpenConnection(fn) {
+	      if (this.isConnectionOpen()) {
+	        fn();
+	        return true;
+	      } else if (this.options.messageBuffer) {
+	        this.messageQueue.push(fn);
+	        return true;
+	      }
+	      return false;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#ensureOpenAuthConnection
+	     *
+	     * @description
+	     * Ensures the callback will be performed with a valid session.
+	     *
+	     * Unless `loginRequired` is enabled, this will be simple forward.
+	     *
+	     * Unless a valid session exist (but required), the callback will be not invoked.
+	     *
+	     * @param {function} fn callback
+	     * @returns {boolean} false if the callback cannot be performed or queued
+	     */
+
+	  }, {
+	    key: 'ensureOpenAuthConnection',
+	    value: function ensureOpenAuthConnection(fn) {
+	      var _this6 = this;
+
+	      if (!this.options.loginRequired) {
+	        // easy: no login required
+	        return this.ensureOpenConnection(fn);
+	      } else {
+	        var fnWrapper = function fnWrapper() {
+	          if (_this6.states.validSession) {
+	            fn();
+	            return true;
+	          } else {
+	            // ignore this message
+	            if (_this6.options.debugEnabled) {
+	              _this6.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
+	            }
+	            return false;
+	          }
+	        };
+	        fnWrapper.displayName = _config.moduleName + '.service.delegate.live.ensureOpenAuthConnection.fnWrapper';
+	        return this.ensureOpenConnection(fnWrapper);
+	      }
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#getConnectionState
+	     *
+	     * @description
+	     * Returns the current connection state. The state is being cached internally.
+	     *
+	     * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
+	     * @returns {number} state type of vertx.EventBus
+	     */
+
+	  }, {
+	    key: 'getConnectionState',
+	    value: function getConnectionState(immediate) {
+	      if (this.options.enabled) {
+	        if (immediate) {
+	          this.connectionState = this.eventBus.state;
+	        }
+	      } else {
+	        this.connectionState = this.eventBus.EventBus.CLOSED;
+	      }
+	      return this.connectionState;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isConnectionOpen
+	     *
+	     * @description
+	     * Returns true if the current connection state ({@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()}) is `OPEN`.
+	     *
+	     * @returns {boolean} connection open state
+	     */
+
+	  }, {
+	    key: 'isConnectionOpen',
+	    value: function isConnectionOpen() {
+	      return this.getConnectionState() === this.eventBus.EventBus.OPEN;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isValidSession
+	     *
+	     * @description
+	     * Returns true if the session is valid
+	     *
+	     * @returns {boolean} state
+	     */
+
+	  }, {
+	    key: 'isValidSession',
+	    value: function isValidSession() {
+	      return this.states.validSession;
+	    }
+
+	    // internal
+
+	  }, {
+	    key: 'isConnected',
+	    value: function isConnected() {
+	      return this.states.connected;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isEnabled
+	     *
+	     * @description
+	     * Returns true if service is being enabled.
+	     *
+	     * @returns {boolean} state
+	     */
+
+	  }, {
+	    key: 'isEnabled',
+	    value: function isEnabled() {
+	      return this.options.enabled;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isConnectionOpen
+	     *
+	     * @description
+	     * Returns the current amount of messages in the internal buffer.
+	     *
+	     * @returns {number} amount
+	     */
+
+	  }, {
+	    key: 'getMessageQueueLength',
+	    value: function getMessageQueueLength() {
+	      return this.messageQueue.size();
+	    }
+	  }]);
+
+	  return EventBusDelegate;
+	}(_BaseDelegate3.default);
+
+	exports.default = EventBusDelegate;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/*
+	 Simple queue implementation
+
+	 FIFO: #push() + #first()
+	 LIFO: #push() + #last()
+	 */
+
+	var Queue = function () {
+	  function Queue() {
+	    var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
+
+	    _classCallCheck(this, Queue);
+
+	    this.maxSize = maxSize;
+	    this.items = [];
+	  }
+
+	  _createClass(Queue, [{
+	    key: "push",
+	    value: function push(item) {
+	      this.items.push(item);
+	      return this.recalibrateBufferSize();
+	    }
+	  }, {
+	    key: "recalibrateBufferSize",
+	    value: function recalibrateBufferSize() {
+	      while (this.items.length > this.maxSize) {
+	        this.first();
+	      }
+	      return this;
+	    }
+	  }, {
+	    key: "last",
+	    value: function last() {
+	      return this.items.pop();
+	    }
+	  }, {
+	    key: "first",
+	    value: function first() {
+	      return this.items.shift(0);
+	    }
+	  }, {
+	    key: "size",
+	    value: function size() {
+	      return this.items.length;
+	    }
+	  }]);
+
+	  return Queue;
+	}();
+
+	exports.default = Queue;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/*
+	 Simple Map implementation
+
+	 This implementation allows usage of non serializable keys for values.
+	 */
+
+	var SimpleMap = function () {
+	  function SimpleMap() {
+	    _classCallCheck(this, SimpleMap);
+
+	    this.clear();
+	  }
+
+	  // Stores the value under the key.
+	  // Chainable
+
+
+	  _createClass(SimpleMap, [{
+	    key: "put",
+	    value: function put(key, value) {
+	      var idx = this._indexForKey(key);
+	      if (idx > -1) {
+	        this.values[idx] = value;
+	      } else {
+	        this.keys.push(key);
+	        this.values.push(value);
+	      }
+	      return this;
+	    }
+
+	    // Returns value for key, otherwise undefined.
+
+	  }, {
+	    key: "get",
+	    value: function get(key) {
+	      var idx = this._indexForKey(key);
+	      if (idx > -1) {
+	        return this.values[idx];
+	      }
+	    }
+
+	    // Returns true if the key exists.
+
+	  }, {
+	    key: "containsKey",
+	    value: function containsKey(key) {
+	      var idx = this._indexForKey(key);
+	      return idx > -1;
+	    }
+
+	    // Returns true if the value exists.
+
+	  }, {
+	    key: "containsValue",
+	    value: function containsValue(value) {
+	      var idx = this._indexForValue(value);
+	      return idx > -1;
+	    }
+
+	    // Removes the key and its value.
+
+	  }, {
+	    key: "remove",
+	    value: function remove(key) {
+	      var idx = this._indexForKey(key);
+	      if (idx > -1) {
+	        this.keys[idx] = undefined;
+	        this.values[idx] = undefined;
+	      }
+	    }
+
+	    // Clears all keys and values.
+
+	  }, {
+	    key: "clear",
+	    value: function clear() {
+	      this.keys = [];
+	      this.values = [];
+	      return this;
+	    }
+
+	    // Returns index of key, otherwise -1.
+
+	  }, {
+	    key: "_indexForKey",
+	    value: function _indexForKey(key) {
+	      for (var i in this.keys) {
+	        if (key === this.keys[i]) {
+	          return i;
+	        }
+	      }
+	      return -1;
+	    }
+	  }, {
+	    key: "_indexForValue",
+	    value: function _indexForValue(value) {
+	      for (var i in this.values) {
+	        if (value === this.values[i]) {
+	          return i;
+	        }
+	      }
+	      return -1;
+	    }
+	  }]);
+
+	  return SimpleMap;
+	}();
+
+	exports.default = SimpleMap;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var BaseDelegate = function () {
+	  function BaseDelegate() {
+	    _classCallCheck(this, BaseDelegate);
+	  }
+
+	  _createClass(BaseDelegate, [{
+	    key: "getConnectionState",
+	    value: function getConnectionState() {
+	      return 3; // CLOSED
+	    }
+	  }, {
+	    key: "isConnectionOpen",
+	    value: function isConnectionOpen() {
+	      return false;
+	    }
+	  }, {
+	    key: "isValidSession",
+	    value: function isValidSession() {
+	      return false;
+	    }
+	  }, {
+	    key: "isEnabled",
+	    value: function isEnabled() {
+	      return false;
+	    }
+	  }, {
+	    key: "isConnected",
+	    value: function isConnected() {
+	      return false;
+	    }
+	  }, {
+	    key: "send",
+	    value: function send() {}
+	  }, {
+	    key: "publish",
+	    value: function publish() {}
+	  }]);
+
+	  return BaseDelegate;
+	}();
+
+	exports.default = BaseDelegate;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BaseDelegate2 = __webpack_require__(13);
+
+	var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var NoopDelegate = function (_BaseDelegate) {
+	  _inherits(NoopDelegate, _BaseDelegate);
+
+	  function NoopDelegate() {
+	    _classCallCheck(this, NoopDelegate);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NoopDelegate).apply(this, arguments));
+	  }
+
+	  return NoopDelegate;
+	}(_BaseDelegate3.default);
+
+	exports.default = NoopDelegate;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _config = __webpack_require__(2);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Delegator = function () {
+	  function Delegator(delegate, $log) {
+	    var _this = this;
+
+	    _classCallCheck(this, Delegator);
+
+	    this.delegate = delegate;
+	    this.$log = $log;
+	    this.handlers = [];
+	    this.delegate.observe({
+	      afterEventbusConnected: function afterEventbusConnected() {
+	        return _this.afterEventbusConnected();
+	      }
+	    });
+	  }
+
+	  _createClass(Delegator, [{
+	    key: 'afterEventbusConnected',
+	    value: function afterEventbusConnected() {
+	      for (var address in this.handlers) {
+	        var callbacks = this.handlers[address];
+	        if (callbacks && callbacks.length) {
+	          var _iteratorNormalCompletion = true;
+	          var _didIteratorError = false;
+	          var _iteratorError = undefined;
+
+	          try {
+	            for (var _iterator = callbacks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	              var _step$value = _step.value;
+	              var headers = _step$value.headers;
+	              var callback = _step$value.callback;
+
+	              this.delegate.registerHandler(address, headers, callback);
+	            }
+	          } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	          } finally {
+	            try {
+	              if (!_iteratorNormalCompletion && _iterator.return) {
+	                _iterator.return();
+	              }
+	            } finally {
+	              if (_didIteratorError) {
+	                throw _iteratorError;
+	              }
+	            }
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'registerHandler',
+	    value: function registerHandler(address, headers, callback) {
+	      var _this2 = this;
+
+	      if (angular.isFunction(headers) && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      if (!this.handlers[address]) {
+	        this.handlers[address] = [];
+	      }
+	      var handler = { headers: headers, callback: callback };
+	      this.handlers[address].push(handler);
+	      var unregisterFn = null;
+	      if (this.delegate.isConnectionOpen()) {
+	        this.delegate.registerHandler(address, headers, callback);
+	        unregisterFn = function unregisterFn() {
+	          return _this2.delegate.unregisterHandler(address, headers, callback);
+	        };
+	      }
+	      // and return the deregister callback
+	      var deconstructor = function deconstructor() {
+	        if (unregisterFn) {
+	          unregisterFn();
+	          unregisterFn = undefined;
+	        }
+	        // Remove from internal map
+	        if (_this2.handlers[address]) {
+	          var index = _this2.handlers[address].indexOf(handler);
+	          if (index > -1) {
+	            _this2.handlers[address].splice(index, 1);
+	          }
+	          if (_this2.handlers[address].length < 1) {
+	            _this2.handlers[address] = undefined;
+	          }
+	        }
+	      };
+	      deconstructor.displayName = _config.moduleName + '.service.registerHandler.deconstructor';
+	      return deconstructor;
+	    }
+	  }, {
+	    key: 'on',
+	    value: function on(address, headers, callback) {
+	      if (typeof headers === 'function' && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      return this.registerHandler(address, headers, callback);
+	    }
+	  }, {
+	    key: 'addListener',
+	    value: function addListener(address, headers, callback) {
+	      if (typeof headers === 'function' && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      return this.registerHandler(address, headers, callback);
+	    }
+	  }, {
+	    key: 'unregisterHandler',
+	    value: function unregisterHandler(address, headers, callback) {
+	      if (typeof headers === 'function' && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      // Remove from internal map
+	      if (this.handlers[address]) {
+	        var index = this.handlers[address].indexOf({ headers: headers, callback: callback });
+	        if (index > -1) {
+	          this.handlers[address].splice(index, 1);
+	        }
+	        if (this.handlers[address].length < 1) {
+	          this.handlers[address] = undefined;
+	        }
+	      }
+	      // Remove from real instance
+	      if (this.delegate.isConnectionOpen()) {
+	        this.delegate.unregisterHandler(address, headers, callback);
+	      }
+	    }
+	  }, {
+	    key: 'un',
+	    value: function un(address, headers, callback) {
+	      if (typeof headers === 'function' && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      return this.unregisterHandler(address, headers, callback);
+	    }
+	  }, {
+	    key: 'removeListener',
+	    value: function removeListener(address, headers, callback) {
+	      if (typeof headers === 'function' && !callback) {
+	        callback = headers;
+	        headers = undefined;
+	      }
+	      return this.unregisterHandler(address, headers, callback);
+	    }
+	  }, {
+	    key: 'send',
+	    value: function send(address, message) {
+	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+
+	      // FALLBACK: signature change since 2.0
+	      if (!angular.isObject(options)) {
+	        this.$log.error(_config.moduleName + ': Signature of vertxEventBusService.send() has been changed!');
+	        return this.send(address, message, {
+	          timeout: arguments[2] !== undefined ? arguments[2] : 10000,
+	          expectReply: arguments[3] !== undefined ? arguments[3] : true
+	        });
+	      }
+
+	      return this.delegate.send(address, message, options.timeout, options.expectReply);
+	    }
+	  }, {
+	    key: 'publish',
+	    value: function publish(address, message) {
+	      return this.delegate.publish(address, message);
+	    }
+	  }, {
+	    key: 'emit',
+	    value: function emit(address, message) {
+	      return this.publish(address, message);
+	    }
+	  }, {
+	    key: 'getConnectionState',
+	    value: function getConnectionState() {
+	      return this.delegate.getConnectionState();
+	    }
+	  }, {
+	    key: 'readyState',
+	    value: function readyState() {
+	      return this.getConnectionState();
+	    }
+	  }, {
+	    key: 'isEnabled',
+	    value: function isEnabled() {
+	      return this.delegate.isEnabled();
+	    }
+	  }, {
+	    key: 'isConnected',
+	    value: function isConnected() {
+	      return this.delegate.isConnected();
+	    }
+	  }, {
+	    key: 'login',
+	    value: function login(username, password, timeout) {
+	      return this.delegate.login(username, password, timeout);
+	    }
+	  }]);
+
+	  return Delegator;
+	}();
+
+	exports.default = Delegator;
+
+/***/ }
+/******/ ])
 });
-var moduleName = 'knalli.angular-vertxbus';
-
-exports.moduleName = moduleName;
-
-},{}],2:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _module = require('./module');
-
-var _module2 = _interopRequireDefault(_module);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = _module2.default;
-
-},{"./module":15}],3:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _EventBusDelegate = require('./service/delegate/EventBusDelegate');
-
-var _EventBusDelegate2 = _interopRequireDefault(_EventBusDelegate);
-
-var _NoopDelegate = require('./service/delegate/NoopDelegate');
-
-var _NoopDelegate2 = _interopRequireDefault(_NoopDelegate);
-
-var _Delegator = require('./service/Delegator');
-
-var _Delegator2 = _interopRequireDefault(_Delegator);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @ngdoc service
- * @module knalli.angular-vertxbus
- * @name knalli.angular-vertxbus.vertxEventBusServiceProvider
- * @description
- * This is the configuration provider for {@link knalli.angular-vertxbus.vertxEventBusService}.
- */
-
-var DEFAULTS = {
-  enabled: true,
-  debugEnabled: false,
-  prefix: 'vertx-eventbus.',
-  sockjsStateInterval: 10000,
-  messageBuffer: 10000
-};
-
-var VertxEventBusServiceProvider = function VertxEventBusServiceProvider() {
-  var _this = this;
-
-  // options (globally, application-wide)
-  var options = angular.extend({}, DEFAULTS);
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#enable
-   *
-   * @description
-   * Enables or disables the service. This setup is immutable.
-   *
-   * @param {boolean} [value=true] service is enabled on startup
-   * @returns {object} this
-   */
-  this.enable = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
-
-    options.enabled = value === true;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#useDebug
-   *
-   * @description
-   * Enables a verbose mode in which certain events will be logged to `$log`.
-   *
-   * @param {boolean} [value=false] verbose mode (using `$log`)
-   * @returns {object} this
-   */
-  this.useDebug = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
-
-    options.debugEnabled = value === true;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#usePrefix
-   *
-   * @description
-   * Overrides the default prefix which will be used for emitted events.
-   *
-   * @param {string} [value='vertx-eventbus.'] prefix used in event names
-   * @returns {object} this
-   */
-  this.usePrefix = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.prefix : arguments[0];
-
-    options.prefix = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#useSockJsStateInterval
-   *
-   *
-   * @description
-   * Overrides the interval of checking the connection is still valid (required for reconnecting automatically).
-   *
-   * @param {boolean} [value=10000] interval of checking the underlying connection's state (in ms)
-   * @returns {object} this
-   */
-  this.useSockJsStateInterval = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsStateInterval : arguments[0];
-
-    options.sockjsStateInterval = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
-   * @name .#useMessageBuffer
-   *
-   * @description
-   * Enables buffering of (sending) messages.
-   *
-   * The setting defines the total amount of buffered messages (`0` no buffering). A message will be buffered if
-   * connection is still in progress, the connection is stale or a login is required/pending.
-   *
-   * @param {boolean} [value=0] allowed total amount of messages in the buffer
-   * @returns {object} this
-   */
-  this.useMessageBuffer = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.messageBuffer : arguments[0];
-
-    options.messageBuffer = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc service
-   * @module knalli.angular-vertxbus
-   * @name knalli.angular-vertxbus.vertxEventBusService
-   * @description
-   * A service utilizing an underlying Vert.x Event Bus
-   *
-   * The advanced features of this service are:
-   *  - broadcasting the connection changes (vertx-eventbus.system.connected, vertx-eventbus.system.disconnected) on $rootScope
-   *  - registering all handlers again when a reconnect had been required
-   *  - supporting a promise when using send()
-   *  - adding aliases on (registerHandler), un (unregisterHandler) and emit (publish)
-   *
-   * Basic usage:
-   * <pre>
-   * module.controller('MyController', function('vertxEventService') {
-  *   vertxEventService.on('my.address', function(message) {
-  *     console.log("JSON Message received: ", message)
-  *   });
-  *   vertxEventService.publish('my.other.address', {type: 'foo', data: 'bar'});
-  * });
-   * </pre>
-   *
-   * Note the additional {@link knalli.angular-vertxbus.vertxEventBusServiceProvider configuration} of the module itself.
-   *
-   * @requires knalli.angular-vertxbus.vertxEventBus
-   * @requires $rootScope
-   * @requires $q
-   * @requires $interval
-   * @requires $log
-   */
-  /* @ngInject */
-  this.$get = function ($rootScope, $q, $interval, vertxEventBus, $log) {
-    // Current options (merged defaults with application-wide settings)
-    var instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
-    if (instanceOptions.enabled) {
-      return new _Delegator2.default(new _EventBusDelegate2.default($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions), $log);
-    } else {
-      return new _Delegator2.default(new _NoopDelegate2.default());
-    }
-  };
-  this.$get.$inject = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log"];
-};
-
-exports.default = VertxEventBusServiceProvider;
-
-},{"./service/Delegator":8,"./service/delegate/EventBusDelegate":10,"./service/delegate/NoopDelegate":11}],4:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _EventBusAdapter = require('./adapter/EventBusAdapter');
-
-var _EventBusAdapter2 = _interopRequireDefault(_EventBusAdapter);
-
-var _NoopAdapter = require('./adapter/NoopAdapter');
-
-var _NoopAdapter2 = _interopRequireDefault(_NoopAdapter);
-
-var _ConnectionConfigHolder = require('./support/ConnectionConfigHolder');
-
-var _ConnectionConfigHolder2 = _interopRequireDefault(_ConnectionConfigHolder);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @ngdoc service
- * @module knalli.angular-vertxbus
- * @name knalli.angular-vertxbus.vertxEventBusProvider
- * @description
- * An AngularJS wrapper for projects using the VertX Event Bus
- */
-
-var DEFAULTS = {
-  enabled: true,
-  debugEnabled: false,
-  initialConnectEnabled: true,
-  urlServer: location.protocol + '//' + location.hostname + (function () {
-    if (location.port) {
-      return ':' + location.port;
-    }
-  }() || ''),
-  urlPath: '/eventbus',
-  reconnectEnabled: true,
-  sockjsReconnectInterval: 10000,
-  sockjsOptions: {}
-};
-
-var VertxEventBusWrapperProvider = function VertxEventBusWrapperProvider() {
-  var _this = this;
-
-  // options (globally, application-wide)
-  var options = angular.extend({}, DEFAULTS);
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#enable
-   *
-   * @description
-   * Enables or disables the service. This setup is immutable.
-   *
-   * @param {boolean} [value=true] service is enabled on startup
-   * @returns {object} this
-   */
-  this.enable = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.enabled : arguments[0];
-
-    options.enabled = value === true;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#disableAutoConnect
-   *
-   * @description
-   * Disables the auto connection feature.
-   *
-   * This feature will be only available if `enable == true`.
-   *
-   * @param {boolean} [value=true] auto connect on startup
-   * @returns {object} this
-   */
-  this.disableAutoConnect = function () {
-    options.initialConnectEnabled = false;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#useDebug
-   *
-   * @description
-   * Enables a verbose mode in which certain events will be logged to `$log`.
-   *
-   * @param {boolean} [value=false] verbose mode (using `$log`)
-   * @returns {object} this
-   */
-  this.useDebug = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.debugEnabled : arguments[0];
-
-    options.debugEnabled = value === true;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#useUrlServer
-   *
-   * @description
-   * Overrides the url part "server" for connecting. The default is based on
-   * - `location.protocol`
-   * - `location.hostname`
-   * - `location.port`
-   *
-   * i.e. `http://domain.tld` or `http://domain.tld:port`
-   *
-   * @param {boolean} [value=$computed] server to connect (default based on `location.protocol`, `location.hostname` and `location.port`)
-   * @returns {object} this
-   */
-  this.useUrlServer = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.urlServer : arguments[0];
-
-    options.urlServer = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#useUrlPath
-   *
-   * @description
-   * Overrides the url part "path" for connection.
-   *
-   * @param {boolean} [value='/eventbus'] path to connect
-   * @returns {object} this
-   */
-  this.useUrlPath = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.urlPath : arguments[0];
-
-    options.urlPath = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#useReconnect
-   *
-   * @description
-   * Enables or disables the automatic reconnect handling.
-   *
-   * @param {boolean} [value=true] if a disconnect was being noted, a reconnect will be enforced automatically
-   * @returns {object} this
-   */
-  this.useReconnect = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.reconnectEnabled : arguments[0];
-
-    options.reconnectEnabled = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#useSockJsReconnectInterval
-   *
-   * @description
-   * Overrides the timeout for reconnecting after a disconnect was found.
-   *
-   * @param {boolean} [value=10000] time between a disconnect and the next try to reconnect (in ms)
-   * @returns {object} this
-   */
-  this.useSockJsReconnectInterval = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsReconnectInterval : arguments[0];
-
-    options.sockjsReconnectInterval = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusProvider
-   * @name .#useSockJsOptions
-   *
-   * @description
-   * Sets additional params for the `SockJS` instance.
-   *
-   * Internally, it will be applied (as `options`) like `new SockJS(url, undefined, options)`.
-   *
-   * @param {boolean} [value={}]  optional params for raw SockJS options
-   * @returns {object} this
-   */
-  this.useSockJsOptions = function () {
-    var value = arguments.length <= 0 || arguments[0] === undefined ? DEFAULTS.sockjsOptions : arguments[0];
-
-    options.sockjsOptions = value;
-    return _this;
-  };
-
-  /**
-   * @ngdoc service
-   * @module knalli.angular-vertxbus
-   * @name knalli.angular-vertxbus.vertxEventBus
-   * @description
-   * A stub representing the Vert.x EventBus (core functionality)
-   *
-   * Because the Event Bus cannot handle a reconnect (because of the underlaying SockJS), a
-   * new instance of the bus have to be created.
-   * This stub ensures only one object holding the current active instance of the bus.
-   *
-   * The stub supports theses Vert.x Event Bus APIs:
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_close close()}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_send send(address, message, handler)}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_publish publish(address, message)}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_registerHandler registerHandler(adress, handler)}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_unregisterHandler unregisterHandler(address, handler)}
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_readyState readyState()}
-   *
-   * Furthermore, the stub supports theses extra APIs:
-   *  - {@link knalli.angular-vertxbus.vertxEventBus#methods_reconnect reconnect()}
-   *
-   * @requires $timeout
-   * @requires $log
-   */
-  /* @ngInject */
-  this.$get = function ($timeout, $log, $q, $injector) {
-    // Current options (merged defaults with application-wide settings)
-    var instanceOptions = angular.extend({}, DEFAULTS, options);
-    if (!window.EventBus && $injector.has('__knalli__angularVertxbus__EventBus')) {
-      window.EventBus = $injector.get('__knalli__angularVertxbus__EventBus');
-    }
-    if (instanceOptions.enabled && EventBus) {
-      if (instanceOptions.debugEnabled) {
-        $log.debug('[Vert.x EB Stub] Enabled');
-      }
-
-      // aggregate server connection params
-      instanceOptions.connectionConfig = new _ConnectionConfigHolder2.default({
-        urlServer: instanceOptions.urlServer,
-        urlPath: instanceOptions.urlPath
-      });
-      delete instanceOptions.urlServer;
-      delete instanceOptions.urlPath;
-
-      return new _EventBusAdapter2.default(EventBus, $timeout, $log, $q, instanceOptions);
-    } else {
-      if (instanceOptions.debugEnabled) {
-        $log.debug('[Vert.x EB Stub] Disabled');
-      }
-      return new _NoopAdapter2.default(EventBus, $q);
-    }
-  };
-  this.$get.$inject = ["$timeout", "$log", "$q", "$injector"];
-};
-
-exports.default = VertxEventBusWrapperProvider;
-
-},{"./adapter/EventBusAdapter":6,"./adapter/NoopAdapter":7,"./support/ConnectionConfigHolder":12}],5:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var BaseAdapter = function () {
-  function BaseAdapter($q) {
-    _classCallCheck(this, BaseAdapter);
-
-    this.$q = $q;
-  }
-
-  _createClass(BaseAdapter, [{
-    key: "configureConnection",
-    value: function configureConnection() {}
-  }, {
-    key: "connect",
-    value: function connect() {
-      return this.$q.reject();
-    }
-  }, {
-    key: "reconnect",
-    value: function reconnect() {}
-  }, {
-    key: "close",
-    value: function close() {}
-  }, {
-    key: "send",
-    value: function send() {}
-  }, {
-    key: "publish",
-    value: function publish() {}
-  }, {
-    key: "registerHandler",
-    value: function registerHandler() {}
-  }, {
-    key: "unregisterHandler",
-    value: function unregisterHandler() {}
-  }, {
-    key: "readyState",
-    value: function readyState() {}
-  }, {
-    key: "getOptions",
-    value: function getOptions() {
-      return {};
-    }
-
-    // empty: can be overriden by externals
-
-  }, {
-    key: "onopen",
-    value: function onopen() {}
-
-    // empty: can be overriden by externals
-
-  }, {
-    key: "onclose",
-    value: function onclose() {}
-  }]);
-
-  return BaseAdapter;
-}();
-
-exports.default = BaseAdapter;
-
-},{}],6:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _config = require('../../config.js');
-
-var _BaseAdapter2 = require('./BaseAdapter');
-
-var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
-
-var _ConnectionConfigHolder = require('./../support/ConnectionConfigHolder');
-
-var _ConnectionConfigHolder2 = _interopRequireDefault(_ConnectionConfigHolder);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * @ngdoc service
- * @module vertx
- * @name EventBus
- *
- * @description
- * This is the interface of `EventBus`. It is not included.
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf EventBus
- * @name .#close
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf EventBus
- * @name .#send
- *
- * @param {string} address target address
- * @param {object} message payload message
- * @param {function=} replyHandler optional callback
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf EventBus
- * @name .#publish
- *
- * @param {string} address target address
- * @param {object} message payload message
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf EventBus
- * @name .#registerHandler
- *
- * @param {string} address target address
- * @param {function} handler callback handler
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @methodOf EventBus
- * @name .#unregisterHandler
- *
- * @param {string} address target address
- * @param {function} handler callback handler to be removed
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @propertyOf EventBus
- * @name .#onopen
- *
- * Defines the callback called on opening the connection.
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @propertyOf EventBus
- * @name .#onclose
- *
- * Defines the callback called on closing the connection.
- */
-
-/**
- * @ngdoc method
- * @module vertx
- * @propertyOf EventBus
- * @name .#onerror
- *
- * Defines the callback called on any error.
- */
-
-var EventBusAdapter = function (_BaseAdapter) {
-  _inherits(EventBusAdapter, _BaseAdapter);
-
-  function EventBusAdapter(EventBus, $timeout, $log, $q, _ref) {
-    var enabled = _ref.enabled;
-    var debugEnabled = _ref.debugEnabled;
-    var initialConnectEnabled = _ref.initialConnectEnabled;
-    var connectionConfig = _ref.connectionConfig;
-    var reconnectEnabled = _ref.reconnectEnabled;
-    var sockjsReconnectInterval = _ref.sockjsReconnectInterval;
-    var sockjsOptions = _ref.sockjsOptions;
-
-    _classCallCheck(this, EventBusAdapter);
-
-    // actual EventBus type
-
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusAdapter).call(this, $q));
-
-    _this.EventBus = EventBus;
-    _this.$timeout = $timeout;
-    _this.$log = $log;
-    _this.$q = $q;
-    _this.options = {
-      enabled: enabled,
-      debugEnabled: debugEnabled,
-      initialConnectEnabled: initialConnectEnabled,
-      connectionConfig: connectionConfig,
-      reconnectEnabled: reconnectEnabled,
-      sockjsReconnectInterval: sockjsReconnectInterval,
-      sockjsOptions: sockjsOptions
-    };
-    _this.disconnectTimeoutEnabled = true;
-    if (initialConnectEnabled) {
-      // asap create connection
-      _this.connect();
-    }
-    return _this;
-  }
-
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBus
-   * @name .#configureConnect
-   *
-   * @description
-   * Reconfigure the connection details.
-   *
-   * @param {string} urlServer see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlServer vertxEventBusProvider.useUrlServer()}
-   * @param {string} [urlPath=/eventbus] see {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useUrlPath vertxEventBusProvider.useUrlPath()}
-   */
-
-
-  _createClass(EventBusAdapter, [{
-    key: 'configureConnection',
-    value: function configureConnection(urlServer) {
-      var urlPath = arguments.length <= 1 || arguments[1] === undefined ? '/eventbus' : arguments[1];
-
-      this.options.connectionConfig = new _ConnectionConfigHolder2.default({ urlServer: urlServer, urlPath: urlPath });
-      return this;
-    }
-  }, {
-    key: 'connect',
-    value: function connect() {
-      var _this2 = this;
-
-      // connect promise
-      var deferred = this.$q.defer();
-      // currently valid url
-      var url = '' + this.options.connectionConfig.urlServer + this.options.connectionConfig.urlPath;
-      if (this.options.debugEnabled) {
-        this.$log.debug('[Vert.x EB Stub] Enabled: connecting \'' + url + '\'');
-      }
-      // Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
-      // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
-      this.instance = new this.EventBus(url, this.options.sockjsOptions);
-      this.instance.onopen = function () {
-        if (_this2.options.debugEnabled) {
-          _this2.$log.debug('[Vert.x EB Stub] Connected');
-        }
-        if (angular.isFunction(_this2.onopen)) {
-          _this2.onopen();
-        }
-        deferred.resolve();
-      };
-      // instance onClose handler
-      this.instance.onclose = function () {
-        if (_this2.options.debugEnabled) {
-          _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
-        }
-        if (angular.isFunction(_this2.onclose)) {
-          _this2.onclose();
-        }
-        _this2.instance = undefined;
-
-        if (!_this2.disconnectTimeoutEnabled) {
-          // reconnect required asap
-          if (_this2.options.debugEnabled) {
-            _this2.$log.debug('[Vert.x EB Stub] Reconnect immediately');
-          }
-          _this2.disconnectTimeoutEnabled = true;
-          _this2.connect();
-        } else if (_this2.options.reconnectEnabled) {
-          // automatic reconnect after timeout
-          if (_this2.options.debugEnabled) {
-            _this2.$log.debug('[Vert.x EB Stub] Reconnect in ' + _this2.options.sockjsReconnectInterval + 'ms');
-          }
-          _this2.$timeout(function () {
-            return _this2.connect();
-          }, _this2.options.sockjsReconnectInterval);
-        }
-      };
-      // instance onError handler
-      this.instance.onerror = function (message) {
-        if (angular.isFunction(_this2.onerror)) {
-          _this2.onerror(message);
-        }
-      };
-      return deferred.promise;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#reconnect
-     *
-     * @description
-     * Reconnects the underlying connection.
-     *
-     * Unless a connection is open, it will connect using a new one.
-     *
-     * If a connection is already open, it will close this one and opens a new one. If `immediately` is `true`, the
-     * default timeout for reconnect will be skipped.
-     *
-     * @param {boolean} [immediately=false] optionally enforce a reconnect asap instead of using the timeout
-     */
-
-  }, {
-    key: 'reconnect',
-    value: function reconnect() {
-      var immediately = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-      if (this.instance && this.instance.state === this.EventBus.OPEN) {
-        if (immediately) {
-          this.disconnectTimeoutEnabled = false;
-        }
-        this.instance.close();
-      } else {
-        this.connect();
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#close
-     *
-     * @description
-     * Closes the underlying connection.
-     *
-     * Note: If automatic reconnection is active, a new connection will be established after the {@link knalli.angular-vertxbus.vertxEventBusProvider#methods_useReconnect reconnect timeout}.
-     *
-     * See also:
-     * - {@link EventBus#methods_close EventBus.close()}
-     */
-
-  }, {
-    key: 'close',
-    value: function close() {
-      if (this.instance) {
-        this.instance.close();
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#send
-     *
-     * @description
-     * Sends a message
-     *
-     * See also:
-     * - {@link EventBus#methods_send EventBus.send()}
-     *
-     * @param {string} address target address
-     * @param {object} message payload message
-     * @param {function=} replyHandler optional callback
-     * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
-     */
-
-  }, {
-    key: 'send',
-    value: function send(address, message, replyHandler, failureHandler) {
-      if (this.instance) {
-        this.instance.send(address, message, replyHandler, failureHandler);
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#publish
-     *
-     * @description
-     * Publishes a message
-     *
-     * See also:
-     * - {@link EventBus#methods_publish EventBus.publish()}
-     *
-     * @param {string} address target address
-     * @param {object} message payload message
-     */
-
-  }, {
-    key: 'publish',
-    value: function publish(address, message) {
-      if (this.instance) {
-        this.instance.publish(address, message);
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#registerHandler
-     *
-     * @description
-     * Registers a listener
-     *
-     * See also:
-     * - {@link EventBus#methods_registerHandler EventBus.registerHandler()}
-     *
-     * @param {string} address target address
-     * @param {function} handler callback handler
-     */
-
-  }, {
-    key: 'registerHandler',
-    value: function registerHandler(address, handler) {
-      var _this3 = this;
-
-      if (this.instance) {
-        this.instance.registerHandler(address, handler);
-        // and return the deregister callback
-        var deconstructor = function deconstructor() {
-          _this3.unregisterHandler(address, handler);
-        };
-        deconstructor.displayName = _config.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
-        return deconstructor;
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#unregisterHandler
-     *
-     * @description
-     * Removes a registered a listener
-     *
-     * See also:
-     * - {@link EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
-     *
-     * @param {string} address target address
-     * @param {function} handler callback handler to be removed
-     */
-
-  }, {
-    key: 'unregisterHandler',
-    value: function unregisterHandler(address, handler) {
-      if (this.instance && this.instance.state === this.EventBus.OPEN) {
-        this.instance.unregisterHandler(address, handler);
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBus
-     * @name .#readyState
-     *
-     * @description
-     * Returns the current connection state
-     *
-     * @returns {number} value of vertx-eventbus connection states
-     */
-
-  }, {
-    key: 'readyState',
-    value: function readyState() {
-      if (this.instance) {
-        return this.instance.state;
-      } else {
-        return this.EventBus.CLOSED;
-      }
-    }
-  }, {
-    key: 'getOptions',
-
-
-    // private
-    value: function getOptions() {
-      // clone options
-      return angular.extend({}, this.options);
-    }
-  }, {
-    key: 'state',
-    get: function get() {
-      return this.readyState();
-    }
-  }]);
-
-  return EventBusAdapter;
-}(_BaseAdapter3.default);
-
-exports.default = EventBusAdapter;
-
-},{"../../config.js":1,"./../support/ConnectionConfigHolder":12,"./BaseAdapter":5}],7:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _BaseAdapter2 = require('./BaseAdapter');
-
-var _BaseAdapter3 = _interopRequireDefault(_BaseAdapter2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var NoopAdapter = function (_BaseAdapter) {
-  _inherits(NoopAdapter, _BaseAdapter);
-
-  function NoopAdapter(EventBus, $q) {
-    _classCallCheck(this, NoopAdapter);
-
-    // actual EventBus type
-
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(NoopAdapter).call(this, $q));
-
-    _this.EventBus = EventBus;
-    return _this;
-  }
-
-  return NoopAdapter;
-}(_BaseAdapter3.default);
-
-exports.default = NoopAdapter;
-
-},{"./BaseAdapter":5}],8:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _config = require('../../config');
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Delegator = function () {
-  function Delegator(delegate, $log) {
-    var _this = this;
-
-    _classCallCheck(this, Delegator);
-
-    this.delegate = delegate;
-    this.$log = $log;
-    this.handlers = [];
-    this.delegate.observe({
-      afterEventbusConnected: function afterEventbusConnected() {
-        return _this.afterEventbusConnected();
-      }
-    });
-  }
-
-  _createClass(Delegator, [{
-    key: 'afterEventbusConnected',
-    value: function afterEventbusConnected() {
-      for (var address in this.handlers) {
-        var callbacks = this.handlers[address];
-        if (callbacks && callbacks.length) {
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = callbacks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var callback = _step.value;
-
-              this.delegate.registerHandler(address, callback);
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-        }
-      }
-    }
-  }, {
-    key: 'registerHandler',
-    value: function registerHandler(address, callback) {
-      var _this2 = this;
-
-      if (!this.handlers[address]) {
-        this.handlers[address] = [];
-      }
-      this.handlers[address].push(callback);
-      var unregisterFn = null;
-      if (this.delegate.isConnectionOpen()) {
-        this.delegate.registerHandler(address, callback);
-        unregisterFn = function unregisterFn() {
-          return _this2.delegate.unregisterHandler(address, callback);
-        };
-      }
-      // and return the deregister callback
-      var deconstructor = function deconstructor() {
-        if (unregisterFn) {
-          unregisterFn();
-          unregisterFn = undefined;
-        }
-        // Remove from internal map
-        if (_this2.handlers[address]) {
-          var index = _this2.handlers[address].indexOf(callback);
-          if (index > -1) {
-            _this2.handlers[address].splice(index, 1);
-          }
-          if (_this2.handlers[address].length < 1) {
-            _this2.handlers[address] = undefined;
-          }
-        }
-      };
-      deconstructor.displayName = _config.moduleName + '.service.registerHandler.deconstructor';
-      return deconstructor;
-    }
-  }, {
-    key: 'on',
-    value: function on(address, callback) {
-      return this.registerHandler(address, callback);
-    }
-  }, {
-    key: 'addListener',
-    value: function addListener(address, callback) {
-      return this.registerHandler(address, callback);
-    }
-  }, {
-    key: 'unregisterHandler',
-    value: function unregisterHandler(address, callback) {
-      // Remove from internal map
-      if (this.handlers[address]) {
-        var index = this.handlers[address].indexOf(callback);
-        if (index > -1) {
-          this.handlers[address].splice(index, 1);
-        }
-        if (this.handlers[address].length < 1) {
-          this.handlers[address] = undefined;
-        }
-      }
-      // Remove from real instance
-      if (this.delegate.isConnectionOpen()) {
-        this.delegate.unregisterHandler(address, callback);
-      }
-    }
-  }, {
-    key: 'un',
-    value: function un(address, callback) {
-      return this.unregisterHandler(address, callback);
-    }
-  }, {
-    key: 'removeListener',
-    value: function removeListener(address, callback) {
-      return this.unregisterHandler(address, callback);
-    }
-  }, {
-    key: 'send',
-    value: function send(address, message) {
-      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-
-      // FALLBACK: signature change since 2.0
-      if (!angular.isObject(options)) {
-        this.$log.error(_config.moduleName + ': Signature of vertxEventBusService.send() has been changed!');
-        return this.send(address, message, {
-          timeout: arguments[2] !== undefined ? arguments[2] : 10000,
-          expectReply: arguments[3] !== undefined ? arguments[3] : true
-        });
-      }
-
-      return this.delegate.send(address, message, options.timeout, options.expectReply);
-    }
-  }, {
-    key: 'publish',
-    value: function publish(address, message) {
-      return this.delegate.publish(address, message);
-    }
-  }, {
-    key: 'emit',
-    value: function emit(address, message) {
-      return this.publish(address, message);
-    }
-  }, {
-    key: 'getConnectionState',
-    value: function getConnectionState() {
-      return this.delegate.getConnectionState();
-    }
-  }, {
-    key: 'readyState',
-    value: function readyState() {
-      return this.getConnectionState();
-    }
-  }, {
-    key: 'isEnabled',
-    value: function isEnabled() {
-      return this.delegate.isEnabled();
-    }
-  }, {
-    key: 'isConnected',
-    value: function isConnected() {
-      return this.delegate.isConnected();
-    }
-  }, {
-    key: 'login',
-    value: function login(username, password, timeout) {
-      return this.delegate.login(username, password, timeout);
-    }
-  }]);
-
-  return Delegator;
-}();
-
-exports.default = Delegator;
-
-},{"../../config":1}],9:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var BaseDelegate = function () {
-  function BaseDelegate() {
-    _classCallCheck(this, BaseDelegate);
-  }
-
-  _createClass(BaseDelegate, [{
-    key: "getConnectionState",
-    value: function getConnectionState() {
-      return 3; // CLOSED
-    }
-  }, {
-    key: "isConnectionOpen",
-    value: function isConnectionOpen() {
-      return false;
-    }
-  }, {
-    key: "isValidSession",
-    value: function isValidSession() {
-      return false;
-    }
-  }, {
-    key: "isEnabled",
-    value: function isEnabled() {
-      return false;
-    }
-  }, {
-    key: "isConnected",
-    value: function isConnected() {
-      return false;
-    }
-  }, {
-    key: "send",
-    value: function send() {}
-  }, {
-    key: "publish",
-    value: function publish() {}
-  }]);
-
-  return BaseDelegate;
-}();
-
-exports.default = BaseDelegate;
-
-},{}],10:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _config = require('../../../config');
-
-var _Queue = require('./../../support/Queue');
-
-var _Queue2 = _interopRequireDefault(_Queue);
-
-var _SimpleMap = require('./../../support/SimpleMap');
-
-var _SimpleMap2 = _interopRequireDefault(_SimpleMap);
-
-var _BaseDelegate2 = require('./BaseDelegate');
-
-var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/**
- * @ngdoc event
- * @module knalli.angular-vertxbus
- * @eventOf knalli.angular-vertxbus.vertxEventBusService
- * @eventType broadcast on $rootScope
- * @name disconnected
- *
- * @description
- * After a connection was being terminated.
- *
- * Event name is `prefix + 'system.disconnected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
- */
-
-/**
- * @ngdoc event
- * @module knalli.angular-vertxbus
- * @eventOf knalli.angular-vertxbus.vertxEventBusService
- * @eventType broadcast on $rootScope
- * @name connected
- *
- * @description
- * After a connection was being established
- *
- * Event name is `prefix + 'system.connected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
- */
-
-/**
- * @ngdoc event
- * @module knalli.angular-vertxbus
- * @eventOf knalli.angular-vertxbus.vertxEventBusService
- * @eventType broadcast on $rootScope
- * @name login-succeeded
- *
- * @description
- * After a login has been validated successfully
- *
- * Event name is `prefix + 'system.login.succeeded'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
- *
- * @param {object} data data
- * @param {boolean} data.status must be `'ok'`
- */
-
-/**
- * @ngdoc event
- * @module knalli.angular-vertxbus
- * @eventOf knalli.angular-vertxbus.vertxEventBusService
- * @eventType broadcast on $rootScope
- * @name login-failed
- *
- * @description
- * After a login has been destroyed or was invalidated
- *
- * Event name is `prefix + 'system.login.failed'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
- *
- * @param {object} data data
- * @param {boolean} data.status must be not`'ok'`
- */
-
-var EventBusDelegate = function (_BaseDelegate) {
-  _inherits(EventBusDelegate, _BaseDelegate);
-
-  function EventBusDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
-    var enabled = _ref.enabled;
-    var debugEnabled = _ref.debugEnabled;
-    var prefix = _ref.prefix;
-    var sockjsStateInterval = _ref.sockjsStateInterval;
-    var messageBuffer = _ref.messageBuffer;
-    var loginRequired = _ref.loginRequired;
-    var loginInterceptor = _ref.loginInterceptor;
-
-    _classCallCheck(this, EventBusDelegate);
-
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusDelegate).call(this));
-
-    _this.$rootScope = $rootScope;
-    _this.$interval = $interval;
-    _this.$log = $log;
-    _this.$q = $q;
-    _this.eventBus = eventBus;
-    _this.options = {
-      enabled: enabled,
-      debugEnabled: debugEnabled,
-      prefix: prefix,
-      sockjsStateInterval: sockjsStateInterval,
-      messageBuffer: messageBuffer,
-      loginRequired: loginRequired
-    };
-    _this.loginInterceptor = loginInterceptor;
-    _this.connectionState = _this.eventBus.EventBus.CLOSED;
-    _this.states = {
-      connected: false,
-      validSession: false
-    };
-    _this.observers = [];
-    // internal store of buffered messages
-    _this.messageQueue = new _Queue2.default(_this.options.messageBuffer);
-    // internal map of callbacks
-    _this.callbackMap = new _SimpleMap2.default();
-    // asap
-    _this.initialize();
-    return _this;
-  }
-
-  // internal
-
-
-  _createClass(EventBusDelegate, [{
-    key: 'initialize',
-    value: function initialize() {
-      var _this2 = this;
-
-      this.eventBus.onopen = function () {
-        return _this2.onEventbusOpen();
-      };
-      this.eventBus.onclose = function () {
-        return _this2.onEventbusClose();
-      };
-
-      // Update the current connection state periodically.
-      var connectionIntervalCheck = function connectionIntervalCheck() {
-        return _this2.getConnectionState(true);
-      };
-      connectionIntervalCheck.displayName = 'connectionIntervalCheck';
-      this.$interval(function () {
-        return connectionIntervalCheck();
-      }, this.options.sockjsStateInterval);
-    }
-
-    // internal
-
-  }, {
-    key: 'onEventbusOpen',
-    value: function onEventbusOpen() {
-      var connectionStateFlipped = false;
-      this.getConnectionState(true);
-      if (!this.states.connected) {
-        this.states.connected = true;
-        connectionStateFlipped = true;
-      }
-      // Ensure all events will be re-attached
-      this.afterEventbusConnected();
-      // Everything is online and registered again, let's notify everybody
-      if (connectionStateFlipped) {
-        this.$rootScope.$broadcast(this.options.prefix + 'system.connected');
-      }
-      this.$rootScope.$digest(); // explicitly
-      // consume message queue?
-      if (this.options.messageBuffer && this.messageQueue.size()) {
-        while (this.messageQueue.size()) {
-          var fn = this.messageQueue.first();
-          if (angular.isFunction(fn)) {
-            fn();
-          }
-        }
-        this.$rootScope.$digest();
-      }
-    }
-
-    // internal
-
-  }, {
-    key: 'onEventbusClose',
-    value: function onEventbusClose() {
-      this.getConnectionState(true);
-      if (this.states.connected) {
-        this.states.connected = false;
-        this.$rootScope.$broadcast(this.options.prefix + 'system.disconnected');
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#observe
-     *
-     * @description
-     * Adds an observer
-     *
-     * @param {object} observer observer
-     * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
-     */
-
-  }, {
-    key: 'observe',
-    value: function observe(observer) {
-      this.observers.push(observer);
-    }
-
-    // internal
-
-  }, {
-    key: 'afterEventbusConnected',
-    value: function afterEventbusConnected() {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = this.observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var observer = _step.value;
-
-          if (angular.isFunction(observer.afterEventbusConnected)) {
-            observer.afterEventbusConnected();
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#registerHandler
-     *
-     * @description
-     * Registers a callback handler for the specified address match.
-     *
-     * @param {string} address target address
-     * @param {function} callback handler with params `(message, replyTo)`
-     * @returns {function=} deconstructor
-     */
-
-  }, {
-    key: 'registerHandler',
-    value: function registerHandler(address, callback) {
-      var _this3 = this;
-
-      if (!angular.isFunction(callback)) {
-        return;
-      }
-      if (this.options.debugEnabled) {
-        this.$log.debug('[Vert.x EB Service] Register handler for ' + address);
-      }
-      var callbackWrapper = function callbackWrapper(err, _ref2, replyTo) {
-        var body = _ref2.body;
-
-        callback(body, replyTo);
-        _this3.$rootScope.$digest();
-      };
-      callbackWrapper.displayName = _config.moduleName + '.service.delegate.live.registerHandler.callbackWrapper';
-      this.callbackMap.put(callback, callbackWrapper);
-      return this.eventBus.registerHandler(address, callbackWrapper);
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#unregisterHandler
-     *
-     * @description
-     * Removes a callback handler for the specified address match.
-     *
-     * @param {string} address target address
-     * @param {function} callback handler with params `(message, replyTo)`
-     */
-
-  }, {
-    key: 'unregisterHandler',
-    value: function unregisterHandler(address, callback) {
-      if (!angular.isFunction(callback)) {
-        return;
-      }
-      if (this.options.debugEnabled) {
-        this.$log.debug('[Vert.x EB Service] Unregister handler for ' + address);
-      }
-      this.eventBus.unregisterHandler(address, this.callbackMap.get(callback));
-      this.callbackMap.remove(callback);
-    }
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#send
-     *
-     * @description
-     * Sends a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_send vertxEventBus.send()}).
-     *
-     * @param {string} address target address
-     * @param {object} message payload message
-     * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
-     * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
-     *                                       no replyHandler will be created
-     * @returns {object} promise
-     */
-
-  }, {
-    key: 'send',
-    value: function send(address, message) {
-      var _this4 = this;
-
-      var timeout = arguments.length <= 2 || arguments[2] === undefined ? 10000 : arguments[2];
-      var expectReply = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
-
-      var deferred = this.$q.defer();
-      var next = function next() {
-        if (expectReply) {
-          (function () {
-            // Register timeout for promise rejecting
-            var timer = _this4.$interval(function () {
-              if (_this4.options.debugEnabled) {
-                _this4.$log.debug('[Vert.x EB Service] send(\'' + address + '\') timed out');
-              }
-              deferred.reject();
-            }, timeout, 1);
-            // Send message
-            _this4.eventBus.send(address, message, function (err, reply) {
-              _this4.$interval.cancel(timer); // because it's resolved
-              if (err) {
-                deferred.reject(err);
-              } else {
-                deferred.resolve(reply);
-              }
-            }, function (err) {
-              _this4.$interval.cancel(timer); // because it's resolved
-              deferred.reject(err);
-            });
-          })();
-        } else {
-          _this4.eventBus.send(address, message);
-          deferred.resolve(); // we don't care
-        }
-      };
-      next.displayName = _config.moduleName + '.service.delegate.live.send.next';
-      if (!this.ensureOpenAuthConnection(next)) {
-        deferred.reject();
-      }
-      return deferred.promise;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#publish
-     *
-     * @description
-     * Publishes a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_publish vertxEventBus.publish()}).
-     *
-     * @param {string} address target address
-     * @param {object} message payload message
-     * @returns {boolean} false if cannot be send or queued
-     */
-
-  }, {
-    key: 'publish',
-    value: function publish(address, message) {
-      var _this5 = this;
-
-      return this.ensureOpenAuthConnection(function () {
-        return _this5.eventBus.publish(address, message);
-      });
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#ensureOpenConnection
-     *
-     * @description
-     * Ensures the callback will be performed with an open connection.
-     *
-     * Unless an open connection was found, the callback will be queued in the message buffer (if available).
-     *
-     * @param {function} fn callback
-     * @returns {boolean} false if the callback cannot be performed or queued
-     */
-
-  }, {
-    key: 'ensureOpenConnection',
-    value: function ensureOpenConnection(fn) {
-      if (this.isConnectionOpen()) {
-        fn();
-        return true;
-      } else if (this.options.messageBuffer) {
-        this.messageQueue.push(fn);
-        return true;
-      }
-      return false;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#ensureOpenAuthConnection
-     *
-     * @description
-     * Ensures the callback will be performed with a valid session.
-     *
-     * Unless `loginRequired` is enabled, this will be simple forward.
-     *
-     * Unless a valid session exist (but required), the callback will be not invoked.
-     *
-     * @param {function} fn callback
-     * @returns {boolean} false if the callback cannot be performed or queued
-     */
-
-  }, {
-    key: 'ensureOpenAuthConnection',
-    value: function ensureOpenAuthConnection(fn) {
-      var _this6 = this;
-
-      if (!this.options.loginRequired) {
-        // easy: no login required
-        return this.ensureOpenConnection(fn);
-      } else {
-        var fnWrapper = function fnWrapper() {
-          if (_this6.states.validSession) {
-            fn();
-            return true;
-          } else {
-            // ignore this message
-            if (_this6.options.debugEnabled) {
-              _this6.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
-            }
-            return false;
-          }
-        };
-        fnWrapper.displayName = _config.moduleName + '.service.delegate.live.ensureOpenAuthConnection.fnWrapper';
-        return this.ensureOpenConnection(fnWrapper);
-      }
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#getConnectionState
-     *
-     * @description
-     * Returns the current connection state. The state is being cached internally.
-     *
-     * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
-     * @returns {number} state type of vertx.EventBus
-     */
-
-  }, {
-    key: 'getConnectionState',
-    value: function getConnectionState(immediate) {
-      if (this.options.enabled) {
-        if (immediate) {
-          this.connectionState = this.eventBus.state;
-        }
-      } else {
-        this.connectionState = this.eventBus.EventBus.CLOSED;
-      }
-      return this.connectionState;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#isConnectionOpen
-     *
-     * @description
-     * Returns true if the current connection state ({@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()}) is `OPEN`.
-     *
-     * @returns {boolean} connection open state
-     */
-
-  }, {
-    key: 'isConnectionOpen',
-    value: function isConnectionOpen() {
-      return this.getConnectionState() === this.eventBus.EventBus.OPEN;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#isValidSession
-     *
-     * @description
-     * Returns true if the session is valid
-     *
-     * @returns {boolean} state
-     */
-
-  }, {
-    key: 'isValidSession',
-    value: function isValidSession() {
-      return this.states.validSession;
-    }
-
-    // internal
-
-  }, {
-    key: 'isConnected',
-    value: function isConnected() {
-      return this.states.connected;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#isEnabled
-     *
-     * @description
-     * Returns true if service is being enabled.
-     *
-     * @returns {boolean} state
-     */
-
-  }, {
-    key: 'isEnabled',
-    value: function isEnabled() {
-      return this.options.enabled;
-    }
-
-    /**
-     * @ngdoc method
-     * @module knalli.angular-vertxbus
-     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-     * @name .#isConnectionOpen
-     *
-     * @description
-     * Returns the current amount of messages in the internal buffer.
-     *
-     * @returns {number} amount
-     */
-
-  }, {
-    key: 'getMessageQueueLength',
-    value: function getMessageQueueLength() {
-      return this.messageQueue.size();
-    }
-  }]);
-
-  return EventBusDelegate;
-}(_BaseDelegate3.default);
-
-exports.default = EventBusDelegate;
-
-},{"../../../config":1,"./../../support/Queue":13,"./../../support/SimpleMap":14,"./BaseDelegate":9}],11:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _BaseDelegate2 = require('./BaseDelegate');
-
-var _BaseDelegate3 = _interopRequireDefault(_BaseDelegate2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var NoopDelegate = function (_BaseDelegate) {
-  _inherits(NoopDelegate, _BaseDelegate);
-
-  function NoopDelegate() {
-    _classCallCheck(this, NoopDelegate);
-
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(NoopDelegate).apply(this, arguments));
-  }
-
-  return NoopDelegate;
-}(_BaseDelegate3.default);
-
-exports.default = NoopDelegate;
-
-},{"./BaseDelegate":9}],12:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ConnectionConfigHolder = function () {
-  function ConnectionConfigHolder(_ref) {
-    var urlServer = _ref.urlServer;
-    var urlPath = _ref.urlPath;
-
-    _classCallCheck(this, ConnectionConfigHolder);
-
-    this._urlServer = urlServer;
-    this._urlPath = urlPath;
-  }
-
-  _createClass(ConnectionConfigHolder, [{
-    key: "urlServer",
-    get: function get() {
-      return this._urlServer;
-    }
-  }, {
-    key: "urlPath",
-    get: function get() {
-      return this._urlPath;
-    }
-  }]);
-
-  return ConnectionConfigHolder;
-}();
-
-exports.default = ConnectionConfigHolder;
-
-},{}],13:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
- Simple queue implementation
-
- FIFO: #push() + #first()
- LIFO: #push() + #last()
- */
-
-var Queue = function () {
-  function Queue() {
-    var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
-
-    _classCallCheck(this, Queue);
-
-    this.maxSize = maxSize;
-    this.items = [];
-  }
-
-  _createClass(Queue, [{
-    key: "push",
-    value: function push(item) {
-      this.items.push(item);
-      return this.recalibrateBufferSize();
-    }
-  }, {
-    key: "recalibrateBufferSize",
-    value: function recalibrateBufferSize() {
-      while (this.items.length > this.maxSize) {
-        this.first();
-      }
-      return this;
-    }
-  }, {
-    key: "last",
-    value: function last() {
-      return this.items.pop();
-    }
-  }, {
-    key: "first",
-    value: function first() {
-      return this.items.shift(0);
-    }
-  }, {
-    key: "size",
-    value: function size() {
-      return this.items.length;
-    }
-  }]);
-
-  return Queue;
-}();
-
-exports.default = Queue;
-
-},{}],14:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
- Simple Map implementation
-
- This implementation allows usage of non serializable keys for values.
- */
-
-var SimpleMap = function () {
-  function SimpleMap() {
-    _classCallCheck(this, SimpleMap);
-
-    this.clear();
-  }
-
-  // Stores the value under the key.
-  // Chainable
-
-
-  _createClass(SimpleMap, [{
-    key: "put",
-    value: function put(key, value) {
-      var idx = this._indexForKey(key);
-      if (idx > -1) {
-        this.values[idx] = value;
-      } else {
-        this.keys.push(key);
-        this.values.push(value);
-      }
-      return this;
-    }
-
-    // Returns value for key, otherwise undefined.
-
-  }, {
-    key: "get",
-    value: function get(key) {
-      var idx = this._indexForKey(key);
-      if (idx > -1) {
-        return this.values[idx];
-      }
-    }
-
-    // Returns true if the key exists.
-
-  }, {
-    key: "containsKey",
-    value: function containsKey(key) {
-      var idx = this._indexForKey(key);
-      return idx > -1;
-    }
-
-    // Returns true if the value exists.
-
-  }, {
-    key: "containsValue",
-    value: function containsValue(value) {
-      var idx = this._indexForValue(value);
-      return idx > -1;
-    }
-
-    // Removes the key and its value.
-
-  }, {
-    key: "remove",
-    value: function remove(key) {
-      var idx = this._indexForKey(key);
-      if (idx > -1) {
-        this.keys[idx] = undefined;
-        this.values[idx] = undefined;
-      }
-    }
-
-    // Clears all keys and values.
-
-  }, {
-    key: "clear",
-    value: function clear() {
-      this.keys = [];
-      this.values = [];
-      return this;
-    }
-
-    // Returns index of key, otherwise -1.
-
-  }, {
-    key: "_indexForKey",
-    value: function _indexForKey(key) {
-      for (var i in this.keys) {
-        if (key === this.keys[i]) {
-          return i;
-        }
-      }
-      return -1;
-    }
-  }, {
-    key: "_indexForValue",
-    value: function _indexForValue(value) {
-      for (var i in this.values) {
-        if (value === this.values[i]) {
-          return i;
-        }
-      }
-      return -1;
-    }
-  }]);
-
-  return SimpleMap;
-}();
-
-exports.default = SimpleMap;
-
-},{}],15:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _config = require('./config');
-
-var _VertxEventBusWrapperProvider = require('./lib/VertxEventBusWrapperProvider');
-
-var _VertxEventBusWrapperProvider2 = _interopRequireDefault(_VertxEventBusWrapperProvider);
-
-var _VertxEventBusServiceProvider = require('./lib/VertxEventBusServiceProvider');
-
-var _VertxEventBusServiceProvider2 = _interopRequireDefault(_VertxEventBusServiceProvider);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * @ngdoc overview
- * @module knalli.angular-vertxbus
- * @name knalli.angular-vertxbus
- * @description
- *
- * Client side library using VertX Event Bus as an Angular Service module
- *
- * You have to define the module dependency, this module is named `knalli.angular-vertxbus`.
- *
- * <pre>
- *   angular.module('app', ['knalli.angular-vertxbus'])
- *     .controller('MyCtrl', function(vertxEventBus, vertxEventBusService) {
- *
- *       // using the EventBus directly
- *       vertxEventBus.send('my.address', {data: 123}, function (reply) {
- *         // your reply comes here
- *       });
- *
- *       // using the service
- *       vertxEventBusService.send('my.address', {data: 123}, {timeout: 500})
- *         .then(function (reply) {
- *           // your reply comes here
- *         })
- *         .catch(function (err) {
- *           // something went wrong, no connection, no login, timed out, or so
- *         });
- *     });
- * </pre>
- *
- * The module itself provides following components:
- * - {@link knalli.angular-vertxbus.vertxEventBus vertxEventBus}: a low level wrapper around `vertx.EventBus`
- * - {@link knalli.angular-vertxbus.vertxEventBusService vertxEventBusService}: a high level service around the wrapper
- *
- * While the wrapper only provides one single instance (even on reconnects), the service supports automatically
- * reconnect management, authorization and a clean promise based api.
- *
- * If you are looking for a low integration of `vertxbus.EventBus` as an AngularJS component, the wrapper will be your
- * choice. The only difference (and requirement for the wrapper actually) is how it will manage and replace the
- * underlying instance of the current `vertx.EventBus`.
- *
- * However, if you are looking for a simple, clean and promised based high api, the service is much better you.
- */
-exports.default = angular.module(_config.moduleName, ['ng']).provider('vertxEventBus', _VertxEventBusWrapperProvider2.default).provider('vertxEventBusService', _VertxEventBusServiceProvider2.default).name;
-
-},{"./config":1,"./lib/VertxEventBusServiceProvider":3,"./lib/VertxEventBusWrapperProvider":4}]},{},[2]);
+;
+//# sourceMappingURL=angular-vertxbus.js.map

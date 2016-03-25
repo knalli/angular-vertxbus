@@ -1,3 +1,23 @@
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/knalli/angular-vertxbus/compare/4.0.0...v5.0.0) (2016-03-25)
+
+
+### Features
+
+* **bundle:** migrate tooling to webpack ([74c6100](https://github.com/knalli/angular-vertxbus/commit/74c6100))
+* **service:** add support for headers (supported since vertxbus v3.1) ([1881de1](https://github.com/knalli/angular-vertxbus/commit/1881de1))
+
+
+### BREAKING CHANGES
+
+* service: The signature of `vertxEventBus.send()` has been changed!
+
+Before, it was `address, message, replyHandler, failureHandler`. This has been changed to `address, message, headers, replyHandler, failureHandler`. Note the additional `headers`.
+
+Actually, all method signatures of `vertxEventBus` and `vertxEventBusService` for sending, publishing, and registering/unregistering handlers have been changed to match the optional `headers` introduced in EventBus 3.1. But only in case of `.send()` it has a broken signature.
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/knalli/angular-vertxbus/compare/3.2.1...v4.0.0) (2016-02-13)
 
