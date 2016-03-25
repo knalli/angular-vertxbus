@@ -1,5 +1,5 @@
-coffee_script:
-  enabled: true
 java_script:
+  enabled: false
+eslint:
   enabled: true
-  config_file: .jshintrc
+  config_file: .eslintrc
