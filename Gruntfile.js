@@ -1,10 +1,12 @@
-var fs = require('fs');
+/*eslint-env node, commonjs */
+/*eslint comma-dangle:0 */
+
+const fs = require('fs');
 
 module.exports = function (grunt) {
   'use strict';
 
   require('load-grunt-tasks')(grunt);
-  var _ = require('lodash');
 
   // Returns configuration for bower-install plugin
   var loadTestScopeConfigurations = function () {

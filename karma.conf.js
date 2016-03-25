@@ -1,12 +1,13 @@
-'use strict';
+/*eslint-env node, commonjs */
+/*eslint comma-dangle:0,no-console:0 */
 
-var fs = require('fs');
-var path = require('path');
-var webpack = require('webpack');
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
 
 var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDefaultScope;
 
-(function (undefined) {
+(function () {
   AVAILABLE_SCOPES = fs.readdirSync('./test_scopes').filter(function (filename) {
     return filename[0] !== '.';
   });
