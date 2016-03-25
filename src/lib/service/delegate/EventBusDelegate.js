@@ -109,7 +109,7 @@ export default class EventBusDelegate extends BaseDelegate {
 
     // Update the current connection state periodically.
     let connectionIntervalCheck = () => this.getConnectionState(true);
-    connectionIntervalCheck.displayName = `connectionIntervalCheck`;
+    connectionIntervalCheck.displayName = 'connectionIntervalCheck';
     this.$interval((() => connectionIntervalCheck()), this.options.sockjsStateInterval);
   }
 
@@ -365,7 +365,7 @@ export default class EventBusDelegate extends BaseDelegate {
         } else {
           // ignore this message
           if (this.options.debugEnabled) {
-            this.$log.debug(`[Vert.x EB Service] Message was not sent because login is required`);
+            this.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
           }
           return false;
         }
