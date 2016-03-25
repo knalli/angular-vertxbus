@@ -1,15 +1,9 @@
 {
   "root": true,
   "extends": "eslint:recommended",
-  "ecmaFeatures": {
-    "arrowFunctions": true,
-    "blockBindings": true,
-    "classes": true,
-    "defaultParams": true,
-    "destructuring": true,
-    "modules": true,
-    "forOf": true,
-    "templateStrings": true
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
   },
   "rules": {
     "no-console": 1,
@@ -29,13 +23,13 @@
     "comma-style": [1, "last"],
     "eol-last": 1,
     "indent": [1, 2, {"SwitchCase": 1}],
-    "space-before-blocks": 1,
-    "space-after-keywords": 1,
+    "keyword-spacing": 1,
     "semi": 2,
     "quotes": [1, "single"]
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "es6": true
   },
   "globals": {
     "angular": false,
