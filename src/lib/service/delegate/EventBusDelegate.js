@@ -246,7 +246,7 @@ export default class EventBusDelegate extends BaseDelegate {
    *
    * @param {string} address target address
    * @param {object} message payload message
-   * @param {object=} headers
+   * @param {object=} headers optional headers
    * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
    * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
    *                                       no replyHandler will be created
