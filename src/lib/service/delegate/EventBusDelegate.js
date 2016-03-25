@@ -109,7 +109,7 @@ export default class EventBusDelegate extends BaseDelegate {
 
     // Update the current connection state periodically.
     let connectionIntervalCheck = () => this.getConnectionState(true);
-    connectionIntervalCheck.displayName = `connectionIntervalCheck`;
+    connectionIntervalCheck.displayName = 'connectionIntervalCheck';
     this.$interval((() => connectionIntervalCheck()), this.options.sockjsStateInterval);
   }
 
@@ -184,10 +184,15 @@ export default class EventBusDelegate extends BaseDelegate {
    * Registers a callback handler for the specified address match.
    *
    * @param {string} address target address
+   * @param {object} headers optional headers
    * @param {function} callback handler with params `(message, replyTo)`
    * @returns {function=} deconstructor
    */
-  registerHandler(address, callback) {
+  registerHandler(address, headers, callback) {
+    if (angular.isFunction(headers) && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
     if (!angular.isFunction(callback)) {
       return;
     }
@@ -200,7 +205,7 @@ export default class EventBusDelegate extends BaseDelegate {
     };
     callbackWrapper.displayName = `${moduleName}.service.delegate.live.registerHandler.callbackWrapper`;
     this.callbackMap.put(callback, callbackWrapper);
-    return this.eventBus.registerHandler(address, callbackWrapper);
+    return this.eventBus.registerHandler(address, headers, callbackWrapper);
   }
 
   /**
@@ -213,16 +218,21 @@ export default class EventBusDelegate extends BaseDelegate {
    * Removes a callback handler for the specified address match.
    *
    * @param {string} address target address
+   * @param {object} headers optional headers
    * @param {function} callback handler with params `(message, replyTo)`
    */
-  unregisterHandler(address, callback) {
+  unregisterHandler(address, headers, callback) {
+    if (angular.isFunction(headers) && !callback) {
+      callback = headers;
+      headers = undefined;
+    }
     if (!angular.isFunction(callback)) {
       return;
     }
     if (this.options.debugEnabled) {
       this.$log.debug(`[Vert.x EB Service] Unregister handler for ${address}`);
     }
-    this.eventBus.unregisterHandler(address, this.callbackMap.get(callback));
+    this.eventBus.unregisterHandler(address, headers, this.callbackMap.get(callback));
     this.callbackMap.remove(callback);
   }
   /**
@@ -236,12 +246,20 @@ export default class EventBusDelegate extends BaseDelegate {
    *
    * @param {string} address target address
    * @param {object} message payload message
+   * @param {object=} headers
    * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
    * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
    *                                       no replyHandler will be created
    * @returns {object} promise
    */
-  send(address, message, timeout = 10000, expectReply = true) {
+  send(address, message, headers, timeout = 10000, expectReply = true) {
+    if (angular.isNumber(headers)) {
+      if (typeof timeout === 'boolean') {
+        expectReply = timeout;
+      }
+      timeout = headers;
+      headers = undefined;
+    }
     let deferred = this.$q.defer();
     let next = () => {
       if (expectReply) {
@@ -253,7 +271,7 @@ export default class EventBusDelegate extends BaseDelegate {
           deferred.reject();
         }), timeout, 1);
         // Send message
-        this.eventBus.send(address, message, (err, reply) => {
+        this.eventBus.send(address, message, headers, (err, reply) => {
           this.$interval.cancel(timer); // because it's resolved
           if (err) {
             deferred.reject(err);
@@ -265,7 +283,7 @@ export default class EventBusDelegate extends BaseDelegate {
           deferred.reject(err);
         });
       } else {
-        this.eventBus.send(address, message);
+        this.eventBus.send(address, message, headers);
         deferred.resolve(); // we don't care
       }
     };
@@ -287,10 +305,11 @@ export default class EventBusDelegate extends BaseDelegate {
    *
    * @param {string} address target address
    * @param {object} message payload message
+   * @param {object=} headers optional headers
    * @returns {boolean} false if cannot be send or queued
    */
-  publish(address, message) {
-    return this.ensureOpenAuthConnection(() => this.eventBus.publish(address, message));
+  publish(address, message, headers) {
+    return this.ensureOpenAuthConnection(() => this.eventBus.publish(address, message, headers));
   }
 
   /**
@@ -346,7 +365,7 @@ export default class EventBusDelegate extends BaseDelegate {
         } else {
           // ignore this message
           if (this.options.debugEnabled) {
-            this.$log.debug(`[Vert.x EB Service] Message was not sent because login is required`);
+            this.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
           }
           return false;
         }

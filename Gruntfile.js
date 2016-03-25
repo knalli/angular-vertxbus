@@ -1,16 +1,12 @@
-var fs = require('fs');
+/*eslint-env node, commonjs */
+/*eslint comma-dangle:0 */
+
+const fs = require('fs');
 
 module.exports = function (grunt) {
   'use strict';
 
   require('load-grunt-tasks')(grunt);
-  var _ = require('lodash');
-
-  var karmaConfig = function (configFile, customOptions) {
-    var options = {configFile : configFile, keepalive : true};
-    var travisOptions = process.env.TRAVIS && {browsers : ['Firefox'], reporters : 'dots'};
-    return _.extend(options, customOptions, travisOptions);
-  };
 
   // Returns configuration for bower-install plugin
   var loadTestScopeConfigurations = function () {
@@ -65,122 +61,21 @@ module.exports = function (grunt) {
         src : ['test/unit/*.js']
       }
     },
-    babel : {
-      options : {
-        sourceMap : false,
-        sourceType : 'module'
-      },
-      src : {
-        expand : true,
-        cwd : 'src/',
-        src : ['**/*.js'],
-        dest : 'temp/',
-        ext : '.js'
-      }
-    },
-    karma : {
-      unit : {
-        options : karmaConfig('karma.conf.js', {
-          singleRun : true
-        })
-      },
-      headless : {
-        options : karmaConfig('karma.conf.js', {
-          singleRun : true,
-          browsers : ['PhantomJS']
-        })
-      },
-      server : {
-        options : karmaConfig('karma.conf.js', {
-          singleRun : false
-        })
-      }
-    },
-    watch : {
-      scripts : {
-        files : ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
-        tasks : ['karma:unit']
-      },
-      lint_chore : {
-        files : ['Gruntfile.js'],
-        tasks : ['eslint:chore']
-      },
-      lint_src : {
-        files : ['src/**/*.js'],
-        tasks : ['eslint:src']
-      },
-      lint_test : {
-        files : ['test/**/*.js'],
-        tasks : ['eslint:test']
-      },
-      ngdocs : {
-        files : ['src/**/*.js'],
-        tasks : ['ngdocs:api']
-      }
-    },
-    browserify : {
-      dist : {
-        options : {
-          browserifyOptions : {
-            fullPaths : false,
-            debug : false // TODO enable sourcemaps
-          },
-          transform : ['babelify', require('browserify-ngannotate')],
-          banner : '<%= meta.banner %>',
-          watch : true
-        },
-        files : {
-          'dist/angular-vertxbus.js' : [
-            'src/index.js'
-          ]
-        }
-      }
-    },
-    extract_sourcemap : {
-      dist : {
-        files : {
-          'dist' : ['dist/angular-vertxbus.js']
-        }
-      },
-      'dist-withpolyfill' : {
-        files : {
-          'dist' : ['dist/angular-vertxbus.withpolyfill.js']
-        }
-      }
-    },
-    uglify : {
-      options : {
-        preserveComments : 'some',
-        sourceMap : false, // TODO enable sourcemaps
-        sourceMapIn : 'dist/angular-vertxbus.js.map'
-      },
-      dist : {
-        files : {
-          'dist/angular-vertxbus.min.js' : 'dist/angular-vertxbus.js'
-        }
-      },
-      'dist-withPolyfill' : {
-        files : {
-          'dist/angular-vertxbus.withpolyfill.min.js' : 'dist/angular-vertxbus.withpolyfill.js'
-        }
-      }
-    },
     concat : {
-      options : {
-        stripBanners : true,
-        banner : '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= pkg.license %> */\n'
-      },
-      'dist-withPolyfill' : {
+      'dist.polyfill' : {
         src : [
           'node_modules/babel-polyfill/dist/polyfill.js',
           'dist/angular-vertxbus.js'
         ],
         dest : 'dist/angular-vertxbus.withpolyfill.js'
-      }
+      },
+      'dist.min.polyfill' : {
+        src : [
+          'node_modules/babel-polyfill/dist/polyfill.min.js',
+          'dist/angular-vertxbus.min.js'
+        ],
+        dest : 'dist/angular-vertxbus.withpolyfill.min.js'
+      },
     },
     conventionalChangelog : {
       options : {
@@ -210,8 +105,6 @@ module.exports = function (grunt) {
 
   });
 
-  grunt.loadNpmTasks('gruntify-eslint');
-
   // Compile and test (use "build" for dist/*)
   grunt.registerTask('default', [
     'clean',
@@ -224,42 +117,20 @@ module.exports = function (grunt) {
     'eslint'
   ]);
 
-  // Testing
-  grunt.registerTask('test', [
-    'eslint',
-    'karma:unit'
-  ]);
   grunt.registerTask('install-test', [
     'bower-install-simple'
-  ]);
-  grunt.registerTask('test-server', [
-    'karma:server'
   ]);
 
   grunt.registerTask('docs', [
     'ngdocs:api'
   ]);
 
-  grunt.registerTask('watch-docs', [
-    'docs', 'watch:ngdocs'
-  ]);
-
   // Building & releasing
-  grunt.registerTask('compile', [
-    'browserify:dist',
-    'concat:dist-withPolyfill',
-    // 'extract_sourcemap:dist',// TODO enable sourcemaps
-    // 'extract_sourcemap:dist-withPolyfill',// TODO enable sourcemaps
-    'uglify:dist',
-    'uglify:dist-withPolyfill'
-  ]);
-  grunt.registerTask('build', [
-    'clean',
-    'test',
-    'compile'
+  grunt.registerTask('build-post', [
+    'concat:dist.polyfill',
+    'concat:dist.min.polyfill',
   ]);
   grunt.registerTask('release', [
     'conventionalChangelog',
-    'build'
   ]);
 };

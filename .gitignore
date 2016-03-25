@@ -12,3 +12,4 @@ temp
 /test/e2e/vertx/app/mods/io.vertx~mod-auth-mgr~2.0.0-final
 /test/e2e/vertx/app/mods/io.vertx~mod-web-server~2.0.0-final
 /test/e2e/vertx/vert.x-*
+/test/e2e/vertx/runtime

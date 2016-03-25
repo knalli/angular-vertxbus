@@ -5,8 +5,8 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 /**
  * @ngdoc service
- * @module vertx
- * @name EventBus
+ * @module global
+ * @name global.EventBus
  *
  * @description
  * This is the interface of `EventBus`. It is not included.
@@ -14,26 +14,27 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 /**
  * @ngdoc method
- * @module vertx
- * @methodOf EventBus
+ * @module global
+ * @methodOf global.EventBus
  * @name .#close
  */
 
 /**
  * @ngdoc method
- * @module vertx
- * @methodOf EventBus
+ * @module global
+ * @methodOf global.EventBus
  * @name .#send
  *
  * @param {string} address target address
  * @param {object} message payload message
  * @param {function=} replyHandler optional callback
+ * @param {function=} failureHandler optional callback
  */
 
 /**
  * @ngdoc method
- * @module vertx
- * @methodOf EventBus
+ * @module global
+ * @methodOf global.EventBus
  * @name .#publish
  *
  * @param {string} address target address
@@ -42,8 +43,8 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 /**
  * @ngdoc method
- * @module vertx
- * @methodOf EventBus
+ * @module global
+ * @methodOf global.EventBus
  * @name .#registerHandler
  *
  * @param {string} address target address
@@ -52,8 +53,8 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 /**
  * @ngdoc method
- * @module vertx
- * @methodOf EventBus
+ * @module global
+ * @methodOf global.EventBus
  * @name .#unregisterHandler
  *
  * @param {string} address target address
@@ -61,29 +62,29 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  */
 
 /**
- * @ngdoc method
- * @module vertx
- * @propertyOf EventBus
+ * @ngdoc property
+ * @module global
+ * @propertyOf global.EventBus
  * @name .#onopen
- *
+ * @description
  * Defines the callback called on opening the connection.
  */
 
 /**
- * @ngdoc method
- * @module vertx
- * @propertyOf EventBus
+ * @ngdoc property
+ * @module global
+ * @propertyOf global.EventBus
  * @name .#onclose
- *
+ * @description
  * Defines the callback called on closing the connection.
  */
 
 /**
- * @ngdoc method
- * @module vertx
- * @propertyOf EventBus
+ * @ngdoc property
+ * @module global
+ * @propertyOf global.EventBus
  * @name .#onerror
- *
+ * @description
  * Defines the callback called on any error.
  */
 
@@ -248,16 +249,22 @@ export default class EventBusAdapter extends BaseAdapter {
    * Sends a message
    *
    * See also:
-   * - {@link EventBus#methods_send EventBus.send()}
+   * - {@link global.EventBus#methods_send EventBus.send()}
    *
    * @param {string} address target address
    * @param {object} message payload message
+   * @param {object=} headers
    * @param {function=} replyHandler optional callback
    * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
    */
-  send(address, message, replyHandler, failureHandler) {
+  send(address, message, headers, replyHandler, failureHandler) {
     if (this.instance) {
-      this.instance.send(address, message, replyHandler, failureHandler);
+      if (angular.isFunction(headers)) {
+        failureHandler = replyHandler;
+        replyHandler = headers;
+        headers = undefined;
+      }
+      this.instance.send(address, message, headers, replyHandler, failureHandler);
     }
   }
 
@@ -271,14 +278,15 @@ export default class EventBusAdapter extends BaseAdapter {
    * Publishes a message
    *
    * See also:
-   * - {@link EventBus#methods_publish EventBus.publish()}
+   * - {@link global.EventBus#methods_publish EventBus.publish()}
    *
    * @param {string} address target address
    * @param {object} message payload message
+   * @param {object=} headers optional headers
    */
-  publish(address, message) {
+  publish(address, message, headers) {
     if (this.instance) {
-      this.instance.publish(address, message);
+      this.instance.publish(address, message, headers);
     }
   }
 
@@ -292,17 +300,22 @@ export default class EventBusAdapter extends BaseAdapter {
    * Registers a listener
    *
    * See also:
-   * - {@link EventBus#methods_registerHandler EventBus.registerHandler()}
+   * - {@link global.EventBus#methods_registerHandler EventBus.registerHandler()}
    *
    * @param {string} address target address
+   * @param {object} headers optional headers
    * @param {function} handler callback handler
    */
-  registerHandler(address, handler) {
+  registerHandler(address, headers, handler) {
     if (this.instance) {
-      this.instance.registerHandler(address, handler);
+      if (angular.isFunction(headers) && !handler) {
+        handler = headers;
+        headers = undefined;
+      }
+      this.instance.registerHandler(address, headers, handler);
       // and return the deregister callback
       let deconstructor = () => {
-        this.unregisterHandler(address, handler);
+        this.unregisterHandler(address, headers, handler);
       };
       deconstructor.displayName = `${moduleName}.wrapper.eventbus.registerHandler.deconstructor`;
       return deconstructor;
@@ -319,14 +332,19 @@ export default class EventBusAdapter extends BaseAdapter {
    * Removes a registered a listener
    *
    * See also:
-   * - {@link EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
+   * - {@link global.EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
    *
    * @param {string} address target address
+   * @param {object} headers optional headers
    * @param {function} handler callback handler to be removed
    */
-  unregisterHandler(address, handler) {
+  unregisterHandler(address, headers, handler) {
     if (this.instance && this.instance.state === this.EventBus.OPEN) {
-      this.instance.unregisterHandler(address, handler);
+      if (angular.isFunction(headers) && !handler) {
+        handler = headers;
+        headers = undefined;
+      }
+      this.instance.unregisterHandler(address, headers, handler);
     }
   }
 

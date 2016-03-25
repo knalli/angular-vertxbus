@@ -1,10 +1,13 @@
-'use strict';
+/*eslint-env node, commonjs */
+/*eslint comma-dangle:0,no-console:0 */
 
-var fs = require('fs');
+const fs = require('fs');
+const path = require('path');
+const webpack = require('webpack');
 
 var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDefaultScope;
 
-(function(undefined){
+(function () {
   AVAILABLE_SCOPES = fs.readdirSync('./test_scopes').filter(function (filename) {
     return filename[0] !== '.';
   });
@@ -26,96 +29,121 @@ var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDef
     }
     return prefix + 'bower_components/' + path;
   },
-  isDefaultScope = function (scope) {
-    return !isValidScope(scope);
-  };
+    isDefaultScope = function (scope) {
+      return !isValidScope(scope);
+    };
 })();
 
-module.exports = function(config) {
+module.exports = function (config) {
 
   var scope = process.env.TEST_SCOPE;
   console.log('Available test scopes: ', AVAILABLE_SCOPES);
   console.log('Currently selected scope: ', getAffectiveScope(scope));
 
+  var vertxEventBusFile = injectByScope(scope, 'vertx3-eventbus-client/vertx-eventbus.js');
+
   config.set({
 
-    // base path, that will be used to resolve files and exclude
-    basePath: '',
-
     // list of files / patterns to load in the browser
-    files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
-      injectByScope(scope, 'angular/angular.js'),
-      injectByScope(scope, 'angular-mocks/angular-mocks.js'),
-      injectByScope(scope, 'vertx3-eventbus-client/vertx-eventbus.js'),
-      'src/lib/**/*.js',
-      'src/module.js',
-      'test/**/*.spec.js'
+    files : [
+      'bower_components/angular/angular.js',
+      'bower_components/angular-mocks/angular-mocks.js',
+      'node_modules/babel-polyfill/browser.js',
+      'test/unit/test_index.js',
     ],
 
-    frameworks: ['browserify', 'mocha', 'expect', 'jasmine'],
+    frameworks : ['expect', 'mocha', 'jasmine'],
 
+    reporters : isDefaultScope(scope) ? ['progress', 'coverage'] : ['progress'],
 
-    // list of files to exclude
-    exclude: [
-
-    ],
-
-
-    // test results reporter to use
-    // possible values: 'dots', 'progress', 'junit'
-    reporters: isDefaultScope(scope) ? ['progress', 'coverage'] : ['progress'],
-
-    preprocessors: (function () {
-      var config = {
-        'src/**/*.js': [ 'browserify' ],
-        'test/unit/binding/**/*.js': [ 'browserify' ],
-        'test/unit/lib/**/*.js': [ 'browserify' ],
-        'test/unit/mock/sockjs.js': [ 'browserify' ]
-      };
-
-      config[injectByScope(scope, 'vertx3-eventbus-client/vertx-eventbus.js')] = ['browserify'];
-
-      if (isDefaultScope(scope)) {
-        config['src/**/*.js'].push('coverage');
-      }
-
-      return config;
-    }()),
-
-    // browserify configuration
-    browserify: {
-      debug: true,
-      extensions: ['.js'],
-      transform: [ 'babelify', 'browserify-shim' ]
+    preprocessors : {
+      'test/unit/test_index.js' : ['webpack'],
     },
 
-    coverageReporter: isDefaultScope(scope) ? {
-      dir: 'build/coverage',
-      subdir: 'report',
-      type: 'lcov'
+    webpack : {
+      debug : true,
+      devtool : 'source-map',
+      //entry: [],
+      resolve : {
+        root : [
+          path.join(__dirname, ''),
+          path.join(__dirname, 'src'),
+          path.join(__dirname, 'test'),
+        ],
+        alias : {
+          'sockjs-client' : 'test/unit/mock/sockjs.js',
+          'vertx-eventbus' : vertxEventBusFile
+        }
+      },
+      module : {
+        preLoaders : [
+          {
+            test : /\.js$/,
+            exclude : [
+              /(node_modules|bower_components)/,
+            ],
+            loader : 'babel',
+            query : 'presets[]=es2015',
+            plugins : [
+              'transform-runtime'
+            ]
+          },
+          {
+            test : /\.js$/,
+            include : [
+              path.resolve('src/')
+            ],
+            exclude : [
+              /(node_modules|bower_components)/,
+            ],
+            loader : 'babel-istanbul',
+          },
+        ],
+        loaders : [
+          {
+            test : /vertx-eventbus\.js$/,
+            loaders : [
+              'imports?SockJS=sockjs-client'
+            ]
+          },
+        ]
+      },
+      plugins : [
+        //new JasmineWebpackPlugin(),
+        new webpack.ProvidePlugin({
+          'EventBus' : 'vertx-eventbus',
+          'SockJS' : 'sockjs-client',
+          'window.EventBus' : 'vertx-eventbus',
+          'global.EventBus' : 'vertx-eventbus'
+        })
+      ]
+    },
+
+    webpackMiddleware : {
+      noInfo : true
+    },
+
+    coverageReporter : isDefaultScope(scope) ? {
+      dir : 'build/coverage',
+      subdir : 'report',
+      type : 'lcov'
     } : undefined,
 
     // web server port
-    port: 9876,
-
+    port : 9876,
 
     // cli runner port
-    runnerPort: 9100,
-
+    runnerPort : 9100,
 
     // enable / disable colors in the output (reporters and logs)
-    colors: true,
-
+    colors : true,
 
     // level of logging
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-    logLevel: config.LOG_INFO,
-
+    logLevel : config.LOG_INFO,
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
-
+    autoWatch : true,
 
     // Start these browsers, currently available:
     // - Chrome
@@ -125,14 +153,13 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
+    browsers : process.env.WATCH ? [] : [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
 
     // If browser does not capture in given timeout [ms], kill it
-    captureTimeout: 60000,
-
+    captureTimeout : 60000,
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false
+    singleRun : process.env.WATCH ? false : true
   });
 };
