@@ -119,6 +119,7 @@ export default class EventBusAdapter extends BaseAdapter {
       sockjsOptions
     };
     this.disconnectTimeoutEnabled = true;
+    this.applyDefaultHeaders();
     if (initialConnectEnabled) {
       // asap create connection
       this.connect();
@@ -262,7 +263,8 @@ export default class EventBusAdapter extends BaseAdapter {
    */
   send(address, message, headers, replyHandler) {
     if (this.instance) {
-      this.instance.send(address, message, headers, replyHandler);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.send(address, message, mergedHeaders, replyHandler);
     }
   }
 
@@ -284,7 +286,8 @@ export default class EventBusAdapter extends BaseAdapter {
    */
   publish(address, message, headers) {
     if (this.instance) {
-      this.instance.publish(address, message, headers);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.publish(address, message, mergedHeaders);
     }
   }
 
@@ -301,7 +304,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * - {@link global.EventBus#methods_registerHandler EventBus.registerHandler()}
    *
    * @param {string} address target address
-   * @param {object} headers optional headers
+   * @param {object=} headers optional headers
    * @param {function} handler callback handler
    */
   registerHandler(address, headers, handler) {
@@ -310,10 +313,11 @@ export default class EventBusAdapter extends BaseAdapter {
         handler = headers;
         headers = undefined;
       }
-      this.instance.registerHandler(address, headers, handler);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.registerHandler(address, mergedHeaders, handler);
       // and return the deregister callback
       let deconstructor = () => {
-        this.unregisterHandler(address, headers, handler);
+        this.unregisterHandler(address, mergedHeaders, handler);
       };
       deconstructor.displayName = `${moduleName}.wrapper.eventbus.registerHandler.deconstructor`;
       return deconstructor;
@@ -333,7 +337,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * - {@link global.EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
    *
    * @param {string} address target address
-   * @param {object} headers optional headers
+   * @param {object=} headers optional headers
    * @param {function} handler callback handler to be removed
    */
   unregisterHandler(address, headers, handler) {
@@ -342,7 +346,8 @@ export default class EventBusAdapter extends BaseAdapter {
         handler = headers;
         headers = undefined;
       }
-      this.instance.unregisterHandler(address, headers, handler);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.unregisterHandler(address, mergedHeaders, handler);
     }
   }
 

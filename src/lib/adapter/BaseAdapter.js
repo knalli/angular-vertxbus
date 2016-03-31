@@ -44,4 +44,29 @@ export default class BaseAdapter {
   onclose() {
   }
 
+  // private
+  getDefaultHeaders() {
+    return this.defaultHeaders;
+  }
+
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBus
+   * @name .#applyDefaultHeaders
+   *
+   * @description
+   * Stores the given default headers
+   *
+   * @param {object} headers additional standard headers
+   */
+  applyDefaultHeaders(headers = {}) {
+    this.defaultHeaders = angular.extend({}, headers);
+  }
+
+  // private
+  getMergedHeaders(headers = {}) {
+    return angular.extend({}, this.defaultHeaders, headers);
+  }
+
 }
