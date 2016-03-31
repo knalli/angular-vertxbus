@@ -257,18 +257,12 @@ export default class EventBusAdapter extends BaseAdapter {
    *
    * @param {string} address target address
    * @param {object} message payload message
-   * @param {object=} headers optional headers
+   * @param {object} headers optional headers
    * @param {function=} replyHandler optional callback
-   * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
    */
-  send(address, message, headers, replyHandler, failureHandler) {
+  send(address, message, headers, replyHandler) {
     if (this.instance) {
-      if (angular.isFunction(headers)) {
-        failureHandler = replyHandler;
-        replyHandler = headers;
-        headers = undefined;
-      }
-      this.instance.send(address, message, headers, replyHandler, failureHandler);
+      this.instance.send(address, message, headers, replyHandler);
     }
   }
 

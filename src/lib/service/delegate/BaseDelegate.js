@@ -1,5 +1,7 @@
 export default class BaseDelegate {
 
+  observe() {}
+
   getConnectionState() {
     return 3; // CLOSED
   }

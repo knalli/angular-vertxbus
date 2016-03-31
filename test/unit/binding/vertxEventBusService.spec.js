@@ -137,7 +137,7 @@ describe('integration of module::vertxEventBusService', function () {
           return _vertxEventBus_.EventBus.CLOSED;
         };
         var sendCalls = 0;
-        _vertxEventBus_.send = function (address, message, replyHandler) {
+        _vertxEventBus_.send = function (address, message, headers, replyHandler) {
           ++sendCalls;
           result = {
             reply : message
@@ -182,7 +182,7 @@ describe('integration of module::vertxEventBusService', function () {
           return vertxEventBus.EventBus.CLOSED;
         };
         var sendCalls = 0;
-        vertxEventBus.send = function (address, message, replyHandler) {
+        vertxEventBus.send = function (address, message, headers, replyHandler) {
           ++sendCalls;
           result = {
             reply : message
@@ -292,7 +292,7 @@ describe('integration of module::vertxEventBusService', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data : 1}, {timeout : 10}).then(function () {
+            vertxEventBusService.send('xyz', {data : 1}, {}, {timeout : 10}).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -311,7 +311,7 @@ describe('integration of module::vertxEventBusService', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data : 1}, {timeout : 10, expectReply : false}).then(function () {
+            vertxEventBusService.send('xyz', {data : 1}, {}, {timeout : 10, expectReply : false}).then(function () {
               successCalled = true;
             }, function () {
               errorCalled = true;
@@ -330,7 +330,7 @@ describe('integration of module::vertxEventBusService', function () {
           var successCalled, errorCalled;
           setTimeout(function () {
             // very short timeout: 10
-            vertxEventBusService.send('xyz', {data : 1}, {timeout : 10}).then(function () {
+            vertxEventBusService.send('xyz', {data : 1}, {}, {timeout : 10}).then(function () {
               successCalled = true;
             })['catch'](function () {
               errorCalled = true;

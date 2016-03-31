@@ -149,18 +149,7 @@ export default class EventBusDelegate extends BaseDelegate {
     }
   }
 
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#observe
-   *
-   * @description
-   * Adds an observer
-   *
-   * @param {object} observer observer
-   * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
-   */
+  // internal
   observe(observer) {
     this.observers.push(observer);
   }
@@ -174,20 +163,6 @@ export default class EventBusDelegate extends BaseDelegate {
     }
   }
 
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#registerHandler
-   *
-   * @description
-   * Registers a callback handler for the specified address match.
-   *
-   * @param {string} address target address
-   * @param {object} headers optional headers
-   * @param {function} callback handler with params `(message, replyTo)`
-   * @returns {function=} deconstructor
-   */
   registerHandler(address, headers, callback) {
     if (angular.isFunction(headers) && !callback) {
       callback = headers;
@@ -208,19 +183,6 @@ export default class EventBusDelegate extends BaseDelegate {
     return this.eventBus.registerHandler(address, headers, callbackWrapper);
   }
 
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#unregisterHandler
-   *
-   * @description
-   * Removes a callback handler for the specified address match.
-   *
-   * @param {string} address target address
-   * @param {object} headers optional headers
-   * @param {function} callback handler with params `(message, replyTo)`
-   */
   unregisterHandler(address, headers, callback) {
     if (angular.isFunction(headers) && !callback) {
       callback = headers;
@@ -235,31 +197,8 @@ export default class EventBusDelegate extends BaseDelegate {
     this.eventBus.unregisterHandler(address, headers, this.callbackMap.get(callback));
     this.callbackMap.remove(callback);
   }
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#send
-   *
-   * @description
-   * Sends a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_send vertxEventBus.send()}).
-   *
-   * @param {string} address target address
-   * @param {object} message payload message
-   * @param {object=} headers optional headers
-   * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
-   * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
-   *                                       no replyHandler will be created
-   * @returns {object} promise
-   */
+
   send(address, message, headers, timeout = 10000, expectReply = true) {
-    if (angular.isNumber(headers)) {
-      if (typeof timeout === 'boolean') {
-        expectReply = timeout;
-      }
-      timeout = headers;
-      headers = undefined;
-    }
     let deferred = this.$q.defer();
     let next = () => {
       if (expectReply) {
@@ -278,9 +217,6 @@ export default class EventBusDelegate extends BaseDelegate {
           } else {
             deferred.resolve(reply);
           }
-        }, (err) => {
-          this.$interval.cancel(timer); // because it's resolved
-          deferred.reject(err);
         });
       } else {
         this.eventBus.send(address, message, headers);
@@ -294,31 +230,11 @@ export default class EventBusDelegate extends BaseDelegate {
     return deferred.promise;
   }
 
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#publish
-   *
-   * @description
-   * Publishes a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_publish vertxEventBus.publish()}).
-   *
-   * @param {string} address target address
-   * @param {object} message payload message
-   * @param {object=} headers optional headers
-   * @returns {boolean} false if cannot be send or queued
-   */
   publish(address, message, headers) {
     return this.ensureOpenAuthConnection(() => this.eventBus.publish(address, message, headers));
   }
 
   /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#ensureOpenConnection
-   *
-   * @description
    * Ensures the callback will be performed with an open connection.
    *
    * Unless an open connection was found, the callback will be queued in the message buffer (if available).
@@ -338,12 +254,6 @@ export default class EventBusDelegate extends BaseDelegate {
   }
 
   /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#ensureOpenAuthConnection
-   *
-   * @description
    * Ensures the callback will be performed with a valid session.
    *
    * Unless `loginRequired` is enabled, this will be simple forward.
@@ -376,12 +286,6 @@ export default class EventBusDelegate extends BaseDelegate {
   }
 
   /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#getConnectionState
-   *
-   * @description
    * Returns the current connection state. The state is being cached internally.
    *
    * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
@@ -399,12 +303,6 @@ export default class EventBusDelegate extends BaseDelegate {
   }
 
   /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#isConnectionOpen
-   *
-   * @description
    * Returns true if the current connection state ({@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()}) is `OPEN`.
    *
    * @returns {boolean} connection open state
@@ -414,12 +312,6 @@ export default class EventBusDelegate extends BaseDelegate {
   }
 
   /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#isValidSession
-   *
-   * @description
    * Returns true if the session is valid
    *
    * @returns {boolean} state
@@ -433,28 +325,11 @@ export default class EventBusDelegate extends BaseDelegate {
     return this.states.connected;
   }
 
-  /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#isEnabled
-   *
-   * @description
-   * Returns true if service is being enabled.
-   *
-   * @returns {boolean} state
-   */
   isEnabled() {
     return this.options.enabled;
   }
 
   /**
-   * @ngdoc method
-   * @module knalli.angular-vertxbus
-   * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#isConnectionOpen
-   *
-   * @description
    * Returns the current amount of messages in the internal buffer.
    *
    * @returns {number} amount
