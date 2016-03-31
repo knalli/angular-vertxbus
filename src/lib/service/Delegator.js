@@ -281,15 +281,27 @@ export default class Delegator {
    * @ngdoc method
    * @module knalli.angular-vertxbus
    * @methodOf knalli.angular-vertxbus.vertxEventBusService
-   * @name .#isValidSession
+   * @name .#isAuthorized
    *
    * @description
-   * Returns true if the session is valid
+   * Returns true if the authorization is valid
    *
    * @returns {boolean} state
    */
+  isAuthorized() {
+    return this.delegate.isAuthorized();
+  }
+
+  /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusService
+   * @name .#isValidSession
+   *
+   * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_isAuthorized isAuthorized()})
+   */
   isValidSession() {
-    return this.delegate.isValidSession();
+    return this.delegate.isAuthorized();
   }
 
   /**
@@ -305,10 +317,6 @@ export default class Delegator {
    */
   getMessageQueueLength() {
     return this.delegate.getMessageQueueLength();
-  }
-
-  login(username, password, timeout) {
-    return this.delegate.login(username, password, timeout);
   }
 
 }

@@ -10,7 +10,7 @@ export default class BaseDelegate {
     return false;
   }
 
-  isValidSession() {
+  isAuthorized() {
     return false;
   }
 

@@ -64,14 +64,14 @@ import BaseDelegate from './BaseDelegate';
 
 export default class EventBusDelegate extends BaseDelegate {
 
-  constructor($rootScope, $interval, $log, $q, eventBus, {
+  constructor($rootScope, $interval, $log, $q, $injector, eventBus, {
     enabled,
     debugEnabled,
     prefix,
     sockjsStateInterval,
     messageBuffer,
-    loginRequired,
-    loginInterceptor
+    authRequired,
+    authHandler
     }) {
     super();
     this.$rootScope = $rootScope;
@@ -85,13 +85,23 @@ export default class EventBusDelegate extends BaseDelegate {
       prefix,
       sockjsStateInterval,
       messageBuffer,
-      loginRequired
+      authRequired
     };
-    this.loginInterceptor = loginInterceptor;
+    if (angular.isFunction(authHandler)) {
+      this.authHandler = authHandler;
+    } else if (angular.isString(authHandler)) {
+      try {
+        this.authHandler = $injector.get(authHandler);
+      } catch (e) {
+        if (this.options.debugEnabled) {
+          this.$log.debug('[Vert.x EB Service] Failed to resolve authHandler: %s', e.message);
+        }
+      }
+    }
     this.connectionState = this.eventBus.EventBus.CLOSED;
     this.states = {
       connected: false,
-      validSession: false
+      authorized: false
     };
     this.observers = [];
     // internal store of buffered messages
@@ -256,7 +266,7 @@ export default class EventBusDelegate extends BaseDelegate {
   /**
    * Ensures the callback will be performed with a valid session.
    *
-   * Unless `loginRequired` is enabled, this will be simple forward.
+   * Unless `authRequired` is enabled, this will be simple forward.
    *
    * Unless a valid session exist (but required), the callback will be not invoked.
    *
@@ -264,20 +274,42 @@ export default class EventBusDelegate extends BaseDelegate {
    * @returns {boolean} false if the callback cannot be performed or queued
    */
   ensureOpenAuthConnection(fn) {
-    if (!this.options.loginRequired) {
+    if (!this.options.authRequired) {
       // easy: no login required
       return this.ensureOpenConnection(fn);
     } else {
       let fnWrapper = () => {
-        if (this.states.validSession) {
+        if (this.states.authorized) {
           fn();
           return true;
         } else {
-          // ignore this message
-          if (this.options.debugEnabled) {
-            this.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
+          if (this.authHandler) {
+            const onValidAuth = () => {
+              this.states.authorized = true;
+              fn();
+            };
+            const onInvalidAuth = () => {
+              this.states.authorized = false;
+              if (this.options.debugEnabled) {
+                this.$log.debug('[Vert.x EB Service] Message was not sent due authHandler rejected');
+              }
+            };
+            const authResult = this.authHandler(this.eventBus);
+            if (!(authResult && angular.isFunction(authResult.then))) {
+              if (this.options.debugEnabled) {
+                this.$log.debug('[Vert.x EB Service] Message was not sent because authHandler is returning not a promise');
+              }
+              return false;
+            }
+            authResult.then(onValidAuth, onInvalidAuth);
+            return true;
+          } else {
+            // ignore this message
+            if (this.options.debugEnabled) {
+              this.$log.debug('[Vert.x EB Service] Message was not sent because no authHandler is defined');
+            }
+            return false;
           }
-          return false;
         }
       };
       fnWrapper.displayName = `${moduleName}.service.delegate.live.ensureOpenAuthConnection.fnWrapper`;
@@ -316,8 +348,8 @@ export default class EventBusDelegate extends BaseDelegate {
    *
    * @returns {boolean} state
    */
-  isValidSession() {
-    return this.states.validSession;
+  isAuthorized() {
+    return this.states.authorized;
   }
 
   // internal
