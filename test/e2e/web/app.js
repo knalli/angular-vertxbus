@@ -7,7 +7,9 @@
     vertxEventBusProvider
     .useDebug(true)
     .useUrlServer('http://localhost:8080');
-    vertxEventBusServiceProvider.useDebug(true);
+    vertxEventBusServiceProvider
+      .useDebug(true)
+      .authHandler('myCustomAuthHandler');
   })
   .run(function ($rootScope, vertxEventBus, vertxEventBusService, $interval) {
     $rootScope.sessionIsValid = false;
@@ -23,6 +25,7 @@
         $rootScope.moduleStats.service.getConnectionState = vertxEventBusService.getConnectionState();
         $rootScope.moduleStats.service.isEnabled = vertxEventBusService.isEnabled();
         $rootScope.moduleStats.service.isConnected = vertxEventBusService.isConnected();
+        $rootScope.moduleStats.service.isAuthorized = vertxEventBusService.isAuthorized();
       } catch (e) {}
     }, 1000);
   })
@@ -32,38 +35,90 @@
       return states[value] || value;
     };
   })
-  .controller('MyController', function($scope, vertxEventBusService) {
-    var holder = {};
-    $scope.timeServiceActive = false;
-    $scope.registerTimeService = function () {
-      holder.timeServiceDeconstructor = vertxEventBusService.on('what-time-is-it', function (data) {
-        $scope.currentDateTime = new Date(data.time);
+  .service('myCustomAuthHandler', function (vertxEventBus, $q) {
+    var states = {
+      enabled: false
+    };
+    var service = function () {
+      console.log('authHandler invoked', states);
+      return $q(function (resolve, reject) {
+        if (states.enabled) {
+          vertxEventBus.applyDefaultHeaders({
+            token: 'VALID-123'
+          });
+          resolve();
+        } else {
+          reject();
+        }
       });
-      $scope.timeServiceActive = true;
     };
-    $scope.deregisterTimeService = function () {
+    service.start = function () {
+      states.enabled = true;
+    };
+    service.stop = function () {
+      states.enabled = false;
+      vertxEventBus.applyDefaultHeaders({});
+    };
+    return service;
+  })
+  .controller('MyController', function($scope, vertxEventBus, vertxEventBusService, myCustomAuthHandler) {
+    var me = this;
+    var holder = {};
+    me.timeServiceActive = false;
+    me.registerTimeService = function () {
+      holder.timeServiceDeconstructor = vertxEventBusService.on('what-time-is-it', function (data) {
+        me.currentDateTime = new Date(data.time);
+      });
+      me.timeServiceActive = true;
+    };
+    me.deregisterTimeService = function () {
       holder.timeServiceDeconstructor();
       holder.timeServiceDeconstructor = undefined;
-      $scope.timeServiceActive = false;
+      me.timeServiceActive = false;
     };
-    $scope.deregisterTimeService2x = function () {
+    me.deregisterTimeService2x = function () {
       holder.timeServiceDeconstructor();
       holder.timeServiceDeconstructor();
       holder.timeServiceDeconstructor = undefined;
-      $scope.timeServiceActive = false;
+      me.timeServiceActive = false;
     };
 
-    $scope.timeServiceActive = false;
-    $scope.registerTimeService = function () {
+    me.timeServiceActive = false;
+    me.registerTimeService = function () {
       holder.timeServiceDeconstructor = vertxEventBusService.on('what-time-is-it', function (data) {
-        $scope.currentDateTime = new Date(data.time);
+        me.currentDateTime = new Date(data.time);
       });
-      $scope.timeServiceActive = true;
+      me.timeServiceActive = true;
     };
-    $scope.deregisterTimeService = function () {
+    me.deregisterTimeService = function () {
       holder.timeServiceDeconstructor();
       holder.timeServiceDeconstructor = undefined;
-      $scope.timeServiceActive = false;
+      me.timeServiceActive = false;
+    };
+    me.refreshDefaultHeaders = function(token) {
+      vertxEventBus.applyDefaultHeaders({
+        token: token
+      });
+    };
+    var sendCommand = function (type) {
+      vertxEventBusService.send('commands', {type: type})
+        .then(function (message) {
+          console.log('Command succeeded: ' + message.body.type)
+        }, function () {
+          console.log('Command failed')
+        });
+    };
+    me.sendPing = function () {
+      sendCommand('PING');
+    };
+    me.sendNonPing = function () {
+      sendCommand('INVALID');
+    };
+    me.enableAuthHandler = function () {
+      myCustomAuthHandler.start();
+    };
+    me.disableAuthHandler = function () {
+      myCustomAuthHandler.stop();
     };
   });
 }());
