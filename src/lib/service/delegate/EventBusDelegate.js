@@ -279,37 +279,32 @@ export default class EventBusDelegate extends BaseDelegate {
       return this.ensureOpenConnection(fn);
     } else {
       let fnWrapper = () => {
-        if (this.states.authorized) {
-          fn();
-          return true;
-        } else {
-          if (this.authHandler) {
-            const onValidAuth = () => {
-              this.states.authorized = true;
-              fn();
-            };
-            const onInvalidAuth = () => {
-              this.states.authorized = false;
-              if (this.options.debugEnabled) {
-                this.$log.debug('[Vert.x EB Service] Message was not sent due authHandler rejected');
-              }
-            };
-            const authResult = this.authHandler(this.eventBus);
-            if (!(authResult && angular.isFunction(authResult.then))) {
-              if (this.options.debugEnabled) {
-                this.$log.debug('[Vert.x EB Service] Message was not sent because authHandler is returning not a promise');
-              }
-              return false;
-            }
-            authResult.then(onValidAuth, onInvalidAuth);
-            return true;
-          } else {
-            // ignore this message
+        if (this.authHandler) {
+          const onValidAuth = () => {
+            this.states.authorized = true;
+            fn();
+          };
+          const onInvalidAuth = () => {
+            this.states.authorized = false;
             if (this.options.debugEnabled) {
-              this.$log.debug('[Vert.x EB Service] Message was not sent because no authHandler is defined');
+              this.$log.debug('[Vert.x EB Service] Message was not sent due authHandler rejected');
+            }
+          };
+          const authResult = this.authHandler(this.eventBus);
+          if (!(authResult && angular.isFunction(authResult.then))) {
+            if (this.options.debugEnabled) {
+              this.$log.debug('[Vert.x EB Service] Message was not sent because authHandler is returning not a promise');
             }
             return false;
           }
+          authResult.then(onValidAuth, onInvalidAuth);
+          return true;
+        } else {
+          // ignore this message
+          if (this.options.debugEnabled) {
+            this.$log.debug('[Vert.x EB Service] Message was not sent because no authHandler is defined');
+          }
+          return false;
         }
       };
       fnWrapper.displayName = `${moduleName}.service.delegate.live.ensureOpenAuthConnection.fnWrapper`;
