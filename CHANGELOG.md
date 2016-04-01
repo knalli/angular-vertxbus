@@ -1,3 +1,32 @@
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/knalli/angular-vertxbus/compare/5.0.0...v6.0.0) (2016-04-01)
+
+
+### Bug Fixes
+
+* **service:** ensure authHandler will be invoked on each request ([e692d36](https://github.com/knalli/angular-vertxbus/commit/e692d36))
+* **service:** fix several serious invalid api signatures and docs #157 ([bf773fa](https://github.com/knalli/angular-vertxbus/commit/bf773fa)), closes [#157](https://github.com/knalli/angular-vertxbus/issues/157)
+
+### Features
+
+* **adapter:** introduce `vertxEventBus.applyDefaultHeaders(headers)` ([ced8e74](https://github.com/knalli/angular-vertxbus/commit/ced8e74))
+* **demo:** add demo demostrating using headers and authHandler ([5a9345e](https://github.com/knalli/angular-vertxbus/commit/5a9345e))
+* **dependencies:** allow vertx3-eventbus patch updates by spec ([9b7d437](https://github.com/knalli/angular-vertxbus/commit/9b7d437))
+* **service:** internal ensure*Connection handlers returning promises now ([551f5c3](https://github.com/knalli/angular-vertxbus/commit/551f5c3))
+* **service:** introduce authHandler ([0e8e036](https://github.com/knalli/angular-vertxbus/commit/0e8e036))
+
+
+### BREAKING CHANGES
+
+* service: The return of `vertxEventBusService.publish()` has changed from boolean to Promise (just like `send()` already).
+* service: The argument `failureHandler` of `EventBus.send()` has been removed
+
+This callback has been obsolete since vertx-eventbus 3.1.0+.
+Solves #152
+* service: Remove fallback in signatures again. `headers` is not skipable anymore.
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/knalli/angular-vertxbus/compare/4.0.0...v5.0.0) (2016-03-25)
 

@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v5.0.0 - 2016-03-25
+/*! angular-vertxbus - v6.0.0 - 2016-04-01
  * http://github.com/knalli/angular-vertxbus
  * Copyright (c) 2016 Jan Philipp
  * @license MIT */
@@ -433,6 +433,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _config = __webpack_require__(2);
@@ -477,6 +479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {string} address target address
 	 * @param {object} message payload message
+	 * @param {object=} headers headers
 	 * @param {function=} replyHandler optional callback
 	 * @param {function=} failureHandler optional callback
 	 */
@@ -489,6 +492,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {string} address target address
 	 * @param {object} message payload message
+	 * @param {object=} headers headers
 	 */
 
 	/**
@@ -499,6 +503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {string} address target address
 	 * @param {function} handler callback handler
+	 * @param {object=} headers headers
 	 */
 
 	/**
@@ -509,6 +514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {string} address target address
 	 * @param {function} handler callback handler to be removed
+	 * @param {object=} headers headers
 	 */
 
 	/**
@@ -570,6 +576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      sockjsOptions: sockjsOptions
 	    };
 	    _this.disconnectTimeoutEnabled = true;
+	    _this.applyDefaultHeaders();
 	    if (initialConnectEnabled) {
 	      // asap create connection
 	      _this.connect();
@@ -728,21 +735,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @param {string} address target address
 	     * @param {object} message payload message
-	     * @param {object=} headers
+	     * @param {object} headers optional headers
 	     * @param {function=} replyHandler optional callback
-	     * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
 	     */
 
 	  }, {
 	    key: 'send',
-	    value: function send(address, message, headers, replyHandler, failureHandler) {
+	    value: function send(address, message, headers, replyHandler) {
 	      if (this.instance) {
-	        if (angular.isFunction(headers)) {
-	          failureHandler = replyHandler;
-	          replyHandler = headers;
-	          headers = undefined;
-	        }
-	        this.instance.send(address, message, headers, replyHandler, failureHandler);
+	        var mergedHeaders = this.getMergedHeaders(headers);
+	        this.instance.send(address, message, mergedHeaders, replyHandler);
 	      }
 	    }
 
@@ -767,7 +769,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'publish',
 	    value: function publish(address, message, headers) {
 	      if (this.instance) {
-	        this.instance.publish(address, message, headers);
+	        var mergedHeaders = this.getMergedHeaders(headers);
+	        this.instance.publish(address, message, mergedHeaders);
 	      }
 	    }
 
@@ -784,7 +787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * - {@link global.EventBus#methods_registerHandler EventBus.registerHandler()}
 	     *
 	     * @param {string} address target address
-	     * @param {object} headers optional headers
+	     * @param {object=} headers optional headers
 	     * @param {function} handler callback handler
 	     */
 
@@ -794,17 +797,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this3 = this;
 
 	      if (this.instance) {
-	        if (angular.isFunction(headers) && !handler) {
-	          handler = headers;
-	          headers = undefined;
-	        }
-	        this.instance.registerHandler(address, headers, handler);
-	        // and return the deregister callback
-	        var deconstructor = function deconstructor() {
-	          _this3.unregisterHandler(address, headers, handler);
-	        };
-	        deconstructor.displayName = _config.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
-	        return deconstructor;
+	        var _ret = function () {
+	          if (angular.isFunction(headers) && !handler) {
+	            handler = headers;
+	            headers = undefined;
+	          }
+	          var mergedHeaders = _this3.getMergedHeaders(headers);
+	          _this3.instance.registerHandler(address, mergedHeaders, handler);
+	          // and return the deregister callback
+	          var deconstructor = function deconstructor() {
+	            _this3.unregisterHandler(address, mergedHeaders, handler);
+	          };
+	          deconstructor.displayName = _config.moduleName + '.wrapper.eventbus.registerHandler.deconstructor';
+	          return {
+	            v: deconstructor
+	          };
+	        }();
+
+	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 	      }
 	    }
 
@@ -821,7 +831,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * - {@link global.EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
 	     *
 	     * @param {string} address target address
-	     * @param {object} headers optional headers
+	     * @param {object=} headers optional headers
 	     * @param {function} handler callback handler to be removed
 	     */
 
@@ -833,7 +843,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          handler = headers;
 	          headers = undefined;
 	        }
-	        this.instance.unregisterHandler(address, headers, handler);
+	        var mergedHeaders = this.getMergedHeaders(headers);
+	        this.instance.unregisterHandler(address, mergedHeaders, handler);
 	      }
 	    }
 
@@ -946,6 +957,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: "onclose",
 	    value: function onclose() {}
+
+	    // private
+
+	  }, {
+	    key: "getDefaultHeaders",
+	    value: function getDefaultHeaders() {
+	      return this.defaultHeaders;
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBus
+	     * @name .#applyDefaultHeaders
+	     *
+	     * @description
+	     * Stores the given default headers
+	     *
+	     * @param {object} headers additional standard headers
+	     */
+
+	  }, {
+	    key: "applyDefaultHeaders",
+	    value: function applyDefaultHeaders() {
+	      var headers = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	      this.defaultHeaders = angular.extend({}, headers);
+	    }
+
+	    // private
+
+	  }, {
+	    key: "getMergedHeaders",
+	    value: function getMergedHeaders() {
+	      var headers = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	      return angular.extend({}, this.defaultHeaders, headers);
+	    }
 	  }]);
 
 	  return BaseAdapter;
@@ -1077,6 +1126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DEFAULTS = {
 	  enabled: true,
 	  debugEnabled: false,
+	  authRequired: false,
 	  prefix: 'vertx-eventbus.',
 	  sockjsStateInterval: 10000,
 	  messageBuffer: 10000
@@ -1186,6 +1236,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  /**
+	   * @ngdoc method
+	   * @module knalli.angular-vertxbus
+	   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+	   * @name .#authHandler
+	   *
+	   * @description
+	   * Function or service reference name for function checking the authorization state.
+	   *
+	   * The result of the function must be a boolean or promise. The handler can (but is not required) to create authorization on demand.
+	   * If it is resolved, the authorization is valid.
+	   * If it is rejected, the authorization is invalid.
+	   *
+	   * @param {string|function} value authorization handler (either a function or a service name)
+	   * @returns {object} promise
+	   */
+	  this.authHandler = function (value) {
+	    options.authHandler = value;
+	    options.authRequired = !!value;
+	    return _this;
+	  };
+
+	  /**
 	   * @ngdoc service
 	   * @module knalli.angular-vertxbus
 	   * @name knalli.angular-vertxbus.vertxEventBusService
@@ -1215,18 +1287,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @requires $q
 	   * @requires $interval
 	   * @requires $log
+	   * @requires $injector
 	   */
 	  /* @ngInject */
-	  this.$get = function ($rootScope, $q, $interval, vertxEventBus, $log) {
+	  this.$get = function ($rootScope, $q, $interval, vertxEventBus, $log, $injector) {
 	    // Current options (merged defaults with application-wide settings)
 	    var instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
 	    if (instanceOptions.enabled) {
-	      return new _Delegator2.default(new _EventBusDelegate2.default($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions), $log);
+	      return new _Delegator2.default(new _EventBusDelegate2.default($rootScope, $interval, $log, $q, $injector, vertxEventBus, instanceOptions), $log);
 	    } else {
 	      return new _Delegator2.default(new _NoopDelegate2.default());
 	    }
 	  };
-	  this.$get.$inject = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log"];
+	  this.$get.$inject = ["$rootScope", "$q", "$interval", "vertxEventBus", "$log", "$injector"];
 	};
 
 	exports.default = VertxEventBusServiceProvider;
@@ -1326,14 +1399,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EventBusDelegate = function (_BaseDelegate) {
 	  _inherits(EventBusDelegate, _BaseDelegate);
 
-	  function EventBusDelegate($rootScope, $interval, $log, $q, eventBus, _ref) {
+	  function EventBusDelegate($rootScope, $interval, $log, $q, $injector, eventBus, _ref) {
 	    var enabled = _ref.enabled;
 	    var debugEnabled = _ref.debugEnabled;
 	    var prefix = _ref.prefix;
 	    var sockjsStateInterval = _ref.sockjsStateInterval;
 	    var messageBuffer = _ref.messageBuffer;
-	    var loginRequired = _ref.loginRequired;
-	    var loginInterceptor = _ref.loginInterceptor;
+	    var authRequired = _ref.authRequired;
+	    var authHandler = _ref.authHandler;
 
 	    _classCallCheck(this, EventBusDelegate);
 
@@ -1350,13 +1423,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      prefix: prefix,
 	      sockjsStateInterval: sockjsStateInterval,
 	      messageBuffer: messageBuffer,
-	      loginRequired: loginRequired
+	      authRequired: authRequired
 	    };
-	    _this.loginInterceptor = loginInterceptor;
+	    if (angular.isFunction(authHandler)) {
+	      _this.authHandler = authHandler;
+	    } else if (angular.isString(authHandler)) {
+	      try {
+	        _this.authHandler = $injector.get(authHandler);
+	      } catch (e) {
+	        if (_this.options.debugEnabled) {
+	          _this.$log.debug('[Vert.x EB Service] Failed to resolve authHandler: %s', e.message);
+	        }
+	      }
+	    }
 	    _this.connectionState = _this.eventBus.EventBus.CLOSED;
 	    _this.states = {
 	      connected: false,
-	      validSession: false
+	      authorized: false
 	    };
 	    _this.observers = [];
 	    // internal store of buffered messages
@@ -1435,18 +1518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#observe
-	     *
-	     * @description
-	     * Adds an observer
-	     *
-	     * @param {object} observer observer
-	     * @param {function=} observer.afterEventbusConnected will be called after establishing a new connection
-	     */
+	    // internal
 
 	  }, {
 	    key: 'observe',
@@ -1486,22 +1558,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	    }
-
-	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#registerHandler
-	     *
-	     * @description
-	     * Registers a callback handler for the specified address match.
-	     *
-	     * @param {string} address target address
-	     * @param {object} headers optional headers
-	     * @param {function} callback handler with params `(message, replyTo)`
-	     * @returns {function=} deconstructor
-	     */
-
 	  }, {
 	    key: 'registerHandler',
 	    value: function registerHandler(address, headers, callback) {
@@ -1527,21 +1583,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.callbackMap.put(callback, callbackWrapper);
 	      return this.eventBus.registerHandler(address, headers, callbackWrapper);
 	    }
-
-	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#unregisterHandler
-	     *
-	     * @description
-	     * Removes a callback handler for the specified address match.
-	     *
-	     * @param {string} address target address
-	     * @param {object} headers optional headers
-	     * @param {function} callback handler with params `(message, replyTo)`
-	     */
-
 	  }, {
 	    key: 'unregisterHandler',
 	    value: function unregisterHandler(address, headers, callback) {
@@ -1558,24 +1599,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.eventBus.unregisterHandler(address, headers, this.callbackMap.get(callback));
 	      this.callbackMap.remove(callback);
 	    }
-	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#send
-	     *
-	     * @description
-	     * Sends a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_send vertxEventBus.send()}).
-	     *
-	     * @param {string} address target address
-	     * @param {object} message payload message
-	     * @param {object=} headers
-	     * @param {number=} [timeout=10000] timeout (in ms) after which the promise will be rejected
-	     * @param {boolean=} [expectReply=true] if false, the promise will be resolved directly and
-	     *                                       no replyHandler will be created
-	     * @returns {object} promise
-	     */
-
 	  }, {
 	    key: 'send',
 	    value: function send(address, message, headers) {
@@ -1584,13 +1607,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var timeout = arguments.length <= 3 || arguments[3] === undefined ? 10000 : arguments[3];
 	      var expectReply = arguments.length <= 4 || arguments[4] === undefined ? true : arguments[4];
 
-	      if (angular.isNumber(headers)) {
-	        if (typeof timeout === 'boolean') {
-	          expectReply = timeout;
-	        }
-	        timeout = headers;
-	        headers = undefined;
-	      }
 	      var deferred = this.$q.defer();
 	      var next = function next() {
 	        if (expectReply) {
@@ -1610,9 +1626,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	              } else {
 	                deferred.resolve(reply);
 	              }
-	            }, function (err) {
-	              _this4.$interval.cancel(timer); // because it's resolved
-	              deferred.reject(err);
 	            });
 	          })();
 	        } else {
@@ -1621,27 +1634,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      };
 	      next.displayName = _config.moduleName + '.service.delegate.live.send.next';
-	      if (!this.ensureOpenAuthConnection(next)) {
-	        deferred.reject();
-	      }
+	      this.ensureOpenAuthConnection(next).then(null, deferred.reject);
 	      return deferred.promise;
 	    }
-
-	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#publish
-	     *
-	     * @description
-	     * Publishes a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_publish vertxEventBus.publish()}).
-	     *
-	     * @param {string} address target address
-	     * @param {object} message payload message
-	     * @param {object=} headers optional headers
-	     * @returns {boolean} false if cannot be send or queued
-	     */
-
 	  }, {
 	    key: 'publish',
 	    value: function publish(address, message, headers) {
@@ -1653,48 +1648,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#ensureOpenConnection
-	     *
-	     * @description
 	     * Ensures the callback will be performed with an open connection.
 	     *
 	     * Unless an open connection was found, the callback will be queued in the message buffer (if available).
 	     *
 	     * @param {function} fn callback
-	     * @returns {boolean} false if the callback cannot be performed or queued
+	     * @returns {object} promise (resolved on either performed or queued)
 	     */
 
 	  }, {
 	    key: 'ensureOpenConnection',
 	    value: function ensureOpenConnection(fn) {
+	      var deferred = this.$q.defer();
 	      if (this.isConnectionOpen()) {
 	        fn();
-	        return true;
+	        deferred.resolve({
+	          inQueue: false
+	        });
 	      } else if (this.options.messageBuffer) {
 	        this.messageQueue.push(fn);
-	        return true;
+	        deferred.resolve({
+	          inQueue: true
+	        });
+	      } else {
+	        deferred.reject();
 	      }
-	      return false;
+	      return deferred.promise;
 	    }
 
 	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#ensureOpenAuthConnection
-	     *
-	     * @description
 	     * Ensures the callback will be performed with a valid session.
 	     *
-	     * Unless `loginRequired` is enabled, this will be simple forward.
+	     * Unless `authRequired` is enabled, this will be simple forward.
 	     *
 	     * Unless a valid session exist (but required), the callback will be not invoked.
 	     *
 	     * @param {function} fn callback
-	     * @returns {boolean} false if the callback cannot be performed or queued
+	     * @returns {object} promise (resolved on either performed or queued)
 	     */
 
 	  }, {
@@ -1702,18 +1692,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function ensureOpenAuthConnection(fn) {
 	      var _this6 = this;
 
-	      if (!this.options.loginRequired) {
+	      if (!this.options.authRequired) {
 	        // easy: no login required
 	        return this.ensureOpenConnection(fn);
 	      } else {
 	        var fnWrapper = function fnWrapper() {
-	          if (_this6.states.validSession) {
-	            fn();
+	          if (_this6.authHandler) {
+	            var onValidAuth = function onValidAuth() {
+	              _this6.states.authorized = true;
+	              fn();
+	            };
+	            var onInvalidAuth = function onInvalidAuth() {
+	              _this6.states.authorized = false;
+	              if (_this6.options.debugEnabled) {
+	                _this6.$log.debug('[Vert.x EB Service] Message was not sent due authHandler rejected');
+	              }
+	            };
+	            var authResult = _this6.authHandler(_this6.eventBus);
+	            if (!(authResult && angular.isFunction(authResult.then))) {
+	              if (_this6.options.debugEnabled) {
+	                _this6.$log.debug('[Vert.x EB Service] Message was not sent because authHandler is returning not a promise');
+	              }
+	              return false;
+	            }
+	            authResult.then(onValidAuth, onInvalidAuth);
 	            return true;
 	          } else {
 	            // ignore this message
 	            if (_this6.options.debugEnabled) {
-	              _this6.$log.debug('[Vert.x EB Service] Message was not sent because login is required');
+	              _this6.$log.debug('[Vert.x EB Service] Message was not sent because no authHandler is defined');
 	            }
 	            return false;
 	          }
@@ -1724,12 +1731,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#getConnectionState
-	     *
-	     * @description
 	     * Returns the current connection state. The state is being cached internally.
 	     *
 	     * @param {boolean=} [immediate=false] if true, the connection state will be queried directly.
@@ -1750,12 +1751,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#isConnectionOpen
-	     *
-	     * @description
 	     * Returns true if the current connection state ({@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()}) is `OPEN`.
 	     *
 	     * @returns {boolean} connection open state
@@ -1768,21 +1763,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#isValidSession
-	     *
-	     * @description
 	     * Returns true if the session is valid
 	     *
 	     * @returns {boolean} state
 	     */
 
 	  }, {
-	    key: 'isValidSession',
-	    value: function isValidSession() {
-	      return this.states.validSession;
+	    key: 'isAuthorized',
+	    value: function isAuthorized() {
+	      return this.states.authorized;
 	    }
 
 	    // internal
@@ -1792,19 +1781,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function isConnected() {
 	      return this.states.connected;
 	    }
-
-	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#isEnabled
-	     *
-	     * @description
-	     * Returns true if service is being enabled.
-	     *
-	     * @returns {boolean} state
-	     */
-
 	  }, {
 	    key: 'isEnabled',
 	    value: function isEnabled() {
@@ -1812,12 +1788,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * @ngdoc method
-	     * @module knalli.angular-vertxbus
-	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
-	     * @name .#isConnectionOpen
-	     *
-	     * @description
 	     * Returns the current amount of messages in the internal buffer.
 	     *
 	     * @returns {number} amount
@@ -2046,6 +2016,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  _createClass(BaseDelegate, [{
+	    key: "observe",
+	    value: function observe() {}
+	  }, {
 	    key: "getConnectionState",
 	    value: function getConnectionState() {
 	      return 3; // CLOSED
@@ -2056,8 +2029,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return false;
 	    }
 	  }, {
-	    key: "isValidSession",
-	    value: function isValidSession() {
+	    key: "isAuthorized",
+	    value: function isAuthorized() {
 	      return false;
 	    }
 	  }, {
@@ -2186,15 +2159,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#registerHandler
+	     *
+	     * @description
+	     * Registers a callback handler for the specified address match.
+	     *
+	     * @param {string} address target address
+	     * @param {object} headers optional headers
+	     * @param {function} callback handler with params `(message, replyTo)`
+	     * @returns {function} deconstructor
+	     */
+
 	  }, {
 	    key: 'registerHandler',
 	    value: function registerHandler(address, headers, callback) {
 	      var _this2 = this;
 
-	      if (angular.isFunction(headers) && !callback) {
-	        callback = headers;
-	        headers = undefined;
-	      }
 	      if (!this.handlers[address]) {
 	        this.handlers[address] = [];
 	      }
@@ -2227,31 +2212,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	      deconstructor.displayName = _config.moduleName + '.service.registerHandler.deconstructor';
 	      return deconstructor;
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#on
+	     *
+	     * @description
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_registerHandler registerHandler()})
+	     */
+
 	  }, {
 	    key: 'on',
 	    value: function on(address, headers, callback) {
-	      if (typeof headers === 'function' && !callback) {
-	        callback = headers;
-	        headers = undefined;
-	      }
 	      return this.registerHandler(address, headers, callback);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#addListener
+	     *
+	     * @description
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_registerHandler registerHandler()})
+	     */
+
 	  }, {
 	    key: 'addListener',
 	    value: function addListener(address, headers, callback) {
-	      if (typeof headers === 'function' && !callback) {
-	        callback = headers;
-	        headers = undefined;
-	      }
 	      return this.registerHandler(address, headers, callback);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#unregisterHandler
+	     *
+	     * @description
+	     * Removes a callback handler for the specified address match.
+	     *
+	     * @param {string} address target address
+	     * @param {object} headers optional headers
+	     * @param {function} callback handler with params `(message, replyTo)`
+	     */
+
 	  }, {
 	    key: 'unregisterHandler',
 	    value: function unregisterHandler(address, headers, callback) {
-	      if (typeof headers === 'function' && !callback) {
-	        callback = headers;
-	        headers = undefined;
-	      }
 	      // Remove from internal map
 	      if (this.handlers[address]) {
 	        var index = this.handlers[address].indexOf({ headers: headers, callback: callback });
@@ -2267,75 +2277,244 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.delegate.unregisterHandler(address, headers, callback);
 	      }
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#un
+	     *
+	     * @description
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_registerHandler unregisterHandler()})
+	     */
+
 	  }, {
 	    key: 'un',
 	    value: function un(address, headers, callback) {
-	      if (typeof headers === 'function' && !callback) {
-	        callback = headers;
-	        headers = undefined;
-	      }
 	      return this.unregisterHandler(address, headers, callback);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#removeListener
+	     *
+	     * @description
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_registerHandler unregisterHandler()})
+	     */
+
 	  }, {
 	    key: 'removeListener',
 	    value: function removeListener(address, headers, callback) {
-	      if (typeof headers === 'function' && !callback) {
-	        callback = headers;
-	        headers = undefined;
-	      }
 	      return this.unregisterHandler(address, headers, callback);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#send
+	     *
+	     * @description
+	     * Sends a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_send vertxEventBus.send()}).
+	     *
+	     * @param {string} address target address
+	     * @param {object} message payload message
+	     * @param {object} headers headers
+	     * @param {number=} [options.timeout=10000] (in ms) after which the promise will be rejected
+	     * @param {boolean=} [options.expectReply=true] if false, the promise will be resolved directly and
+	     *                                       no replyHandler will be created
+	     * @returns {object} promise
+	     */
+
 	  }, {
 	    key: 'send',
 	    value: function send(address, message) {
-	      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	      var headers = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	      var options = arguments.length <= 3 || arguments[3] === undefined ? { timeout: 10000, expectReply: true } : arguments[3];
 
-
-	      // FALLBACK: signature change since 2.0
-	      if (!angular.isObject(options)) {
-	        this.$log.error(_config.moduleName + ': Signature of vertxEventBusService.send() has been changed!');
-	        return this.send(address, message, {
-	          timeout: arguments[2] !== undefined ? arguments[2] : 10000,
-	          expectReply: arguments[3] !== undefined ? arguments[3] : true
-	        });
-	      }
-
-	      return this.delegate.send(address, message, options.timeout, options.expectReply);
+	      return this.delegate.send(address, message, headers, options.timeout, options.expectReply);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#publish
+	     *
+	     * @description
+	     * Publishes a message to the specified address (using {@link knalli.angular-vertxbus.vertxEventBus#methods_publish vertxEventBus.publish()}).
+	     *
+	     * @param {string} address target address
+	     * @param {object} message payload message
+	     * @param {object=} headers headers
+	     * @returns {object} promise (resolved on either performed or queued)
+	     */
+
 	  }, {
 	    key: 'publish',
 	    value: function publish(address, message) {
-	      return this.delegate.publish(address, message);
+	      var headers = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	      return this.delegate.publish(address, message, headers);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#emit
+	     *
+	     * @description
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_publish publish()})
+	     */
+
 	  }, {
 	    key: 'emit',
 	    value: function emit(address, message) {
-	      return this.publish(address, message);
+	      var headers = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	      return this.publish(address, message, headers);
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#getConnectionState
+	     *
+	     * @description
+	     * Returns the current connection state. The state is being cached internally.
+	     *
+	     * @returns {number} state type of vertx.EventBus
+	     */
+
 	  }, {
 	    key: 'getConnectionState',
 	    value: function getConnectionState() {
 	      return this.delegate.getConnectionState();
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#readyState
+	     *
+	     * @description
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()})
+	     */
+
 	  }, {
 	    key: 'readyState',
 	    value: function readyState() {
 	      return this.getConnectionState();
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isConnectionOpen
+	     *
+	     * @description
+	     * Returns true if the current connection state ({@link knalli.angular-vertxbus.vertxEventBusService#methods_getConnectionState getConnectionState()}) is `OPEN`.
+	     *
+	     * @returns {boolean} connection open state
+	     */
+
+	  }, {
+	    key: 'isConnectionOpen',
+	    value: function isConnectionOpen() {
+	      return this.isConnectionOpen();
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isEnabled
+	     *
+	     * @description
+	     * Returns true if service is being enabled.
+	     *
+	     * @returns {boolean} state
+	     */
+
 	  }, {
 	    key: 'isEnabled',
 	    value: function isEnabled() {
 	      return this.delegate.isEnabled();
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isConnected
+	     *
+	     * @description
+	     * Returns true if service (and the eventbus) is being connected.
+	     *
+	     * @returns {boolean} state
+	     */
+
 	  }, {
 	    key: 'isConnected',
 	    value: function isConnected() {
 	      return this.delegate.isConnected();
 	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isAuthorized
+	     *
+	     * @description
+	     * Returns true if the authorization is valid
+	     *
+	     * @returns {boolean} state
+	     */
+
 	  }, {
-	    key: 'login',
-	    value: function login(username, password, timeout) {
-	      return this.delegate.login(username, password, timeout);
+	    key: 'isAuthorized',
+	    value: function isAuthorized() {
+	      return this.delegate.isAuthorized();
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#isValidSession
+	     *
+	     * See (using {@link knalli.angular-vertxbus.vertxEventBusService#methods_isAuthorized isAuthorized()})
+	     */
+
+	  }, {
+	    key: 'isValidSession',
+	    value: function isValidSession() {
+	      return this.delegate.isAuthorized();
+	    }
+
+	    /**
+	     * @ngdoc method
+	     * @module knalli.angular-vertxbus
+	     * @methodOf knalli.angular-vertxbus.vertxEventBusService
+	     * @name .#getMessageQueueLength
+	     *
+	     * @description
+	     * Returns the current amount of messages in the internal buffer.
+	     *
+	     * @returns {number} amount
+	     */
+
+	  }, {
+	    key: 'getMessageQueueLength',
+	    value: function getMessageQueueLength() {
+	      return this.delegate.getMessageQueueLength();
 	    }
 	  }]);
 
