@@ -183,7 +183,7 @@ export default class Delegator {
    * @param {string} address target address
    * @param {object} message payload message
    * @param {object=} headers headers
-   * @returns {boolean} false if cannot be send or queued
+   * @returns {object} promise (resolved on either performed or queued)
    */
   publish(address, message, headers = {}) {
     return this.delegate.publish(address, message, headers);

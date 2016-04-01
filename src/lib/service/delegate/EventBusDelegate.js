@@ -234,9 +234,7 @@ export default class EventBusDelegate extends BaseDelegate {
       }
     };
     next.displayName = `${moduleName}.service.delegate.live.send.next`;
-    if (!this.ensureOpenAuthConnection(next)) {
-      deferred.reject();
-    }
+    this.ensureOpenAuthConnection(next).then(null, deferred.reject);
     return deferred.promise;
   }
 
@@ -250,17 +248,24 @@ export default class EventBusDelegate extends BaseDelegate {
    * Unless an open connection was found, the callback will be queued in the message buffer (if available).
    *
    * @param {function} fn callback
-   * @returns {boolean} false if the callback cannot be performed or queued
+   * @returns {object} promise (resolved on either performed or queued)
    */
   ensureOpenConnection(fn) {
+    const deferred = this.$q.defer();
     if (this.isConnectionOpen()) {
       fn();
-      return true;
+      deferred.resolve({
+        inQueue: false
+      });
     } else if (this.options.messageBuffer) {
       this.messageQueue.push(fn);
-      return true;
+      deferred.resolve({
+        inQueue: true
+      });
+    } else {
+      deferred.reject();
     }
-    return false;
+    return deferred.promise;
   }
 
   /**
@@ -271,7 +276,7 @@ export default class EventBusDelegate extends BaseDelegate {
    * Unless a valid session exist (but required), the callback will be not invoked.
    *
    * @param {function} fn callback
-   * @returns {boolean} false if the callback cannot be performed or queued
+   * @returns {object} promise (resolved on either performed or queued)
    */
   ensureOpenAuthConnection(fn) {
     if (!this.options.authRequired) {
