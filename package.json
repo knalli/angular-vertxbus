@@ -29,7 +29,8 @@
     "compile-distmin": "BUILD_MINIFIED=1 webpack",
     "compile": "grunt clean && npm run -q compile-dist && npm run -q compile-distmin && grunt build-post",
     "build": "npm run -q test && npm run -q compile",
-    "release": "npm run -q clean && npm run -q build && grunt release"
+    "release": "npm run -q clean && npm run -q build && grunt release",
+    "docs": "grunt docs"
   },
   "author": {
     "name": "Jan Philipp",
