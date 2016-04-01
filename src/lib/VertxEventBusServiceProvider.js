@@ -13,6 +13,7 @@ import Delegator from './service/Delegator';
 const DEFAULTS = {
   enabled : true,
   debugEnabled : false,
+  authRequired : false,
   prefix : 'vertx-eventbus.',
   sockjsStateInterval : 10000,
   messageBuffer : 10000
@@ -111,6 +112,28 @@ let VertxEventBusServiceProvider = function () {
   };
 
   /**
+   * @ngdoc method
+   * @module knalli.angular-vertxbus
+   * @methodOf knalli.angular-vertxbus.vertxEventBusServiceProvider
+   * @name .#authHandler
+   *
+   * @description
+   * Function or service reference name for function checking the authorization state.
+   *
+   * The result of the function must be a boolean or promise. The handler can (but is not required) to create authorization on demand.
+   * If it is resolved, the authorization is valid.
+   * If it is rejected, the authorization is invalid.
+   *
+   * @param {string|function} value authorization handler (either a function or a service name)
+   * @returns {object} promise
+   */
+  this.authHandler = (value) => {
+    options.authHandler = value;
+    options.authRequired = !!value;
+    return this;
+  };
+
+  /**
    * @ngdoc service
    * @module knalli.angular-vertxbus
    * @name knalli.angular-vertxbus.vertxEventBusService
@@ -140,14 +163,15 @@ let VertxEventBusServiceProvider = function () {
    * @requires $q
    * @requires $interval
    * @requires $log
+   * @requires $injector
    */
   /* @ngInject */
-  this.$get = ($rootScope, $q, $interval, vertxEventBus, $log) => {
+  this.$get = ($rootScope, $q, $interval, vertxEventBus, $log, $injector) => {
     // Current options (merged defaults with application-wide settings)
     let instanceOptions = angular.extend({}, vertxEventBus.getOptions(), options);
     if (instanceOptions.enabled) {
       return new Delegator(
-        new EventBusDelegate($rootScope, $interval, $log, $q, vertxEventBus, instanceOptions),
+        new EventBusDelegate($rootScope, $interval, $log, $q, $injector, vertxEventBus, instanceOptions),
         $log
       );
     } else {

@@ -4,15 +4,14 @@ var SockJSHandler = require("vertx-web-js/sock_js_handler");
 var router = Router.router(vertx);
 
 var options = {
-  'inboundPermitteds': [
-    // Allow calls to login and authorise
+  'inboundPermitteds' : [
     {
-      'address': 'vertx.basicauthmanager.login'
+      'address' : 'commands'
     }
   ],
   'outboundPermitteds' : [
     {
-      'address': 'what-time-is-it'
+      'address' : 'what-time-is-it'
     }
   ]
 };
@@ -27,33 +26,30 @@ vertx.createHttpServer().requestHandler(router.accept).listen(8080);
 
 // de-knallisworld-mock
 
-vertx.eventBus().consumer('vertx.basicauthmanager.login', function(message) {
-  var messageBody = message.body();
-  if (messageBody.action === 'findone' && messageBody.collection === 'users') {
-    console.log("username:" + messageBody.matcher.username);
-    if (messageBody.matcher.username === 'valid') {
+vertx.eventBus().consumer('commands', function (message) {
+  var headers = message.headers();
+  var body = message.body();
+  var token = headers.get('token');
+  console.log('Intercepted token: ' + token);
+  if (token && token.substring(0, 6) === 'VALID-') {
+    if (body.type === 'PING') {
       message.reply({
-        status: 'ok',
-        result: {
-          username: 'validuser'
-        }
+        type : 'PONG'
       });
     } else {
       message.reply({
-        status: 'denied',
-        message: 'Could not found'
+        type : 'NON-PING'
       });
     }
   } else {
     message.reply({
-      status: 'error',
-      message: 'Unknown collection or action'
+      type : 'NO_AUTH'
     });
   }
 });
 
 vertx.setPeriodic(1000, function (timerId) {
   vertx.eventBus().publish('what-time-is-it', {
-    time: new Date().getTime()
+    time : new Date().getTime()
   });
 });

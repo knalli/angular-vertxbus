@@ -5,12 +5,24 @@
 
 <body ng-app="app">
 
-  <div ng-controller="MyController">
+  <div ng-controller="MyController as ctrl">
     <form>
-      <input type="button" value="Register for TimeService" ng-click="registerTimeService()">
-      <input type="button" value="Deregister for TimeService" ng-click="deregisterTimeService()" ng-disabled="!timeServiceActive">
-      <input type="button" value="Deregister for TimeService (2x)" ng-click="deregisterTimeService2x()" ng-disabled="!timeServiceActive">
-      <input type="text" size="50" disabled ng-model="currentDateTime">
+      <input type="button" value="Register for TimeService" ng-click="ctrl.registerTimeService()">
+      <input type="button" value="Deregister for TimeService" ng-click="ctrl.deregisterTimeService()" ng-disabled="!ctrl.timeServiceActive">
+      <input type="button" value="Deregister for TimeService (2x)" ng-click="ctrl.deregisterTimeService2x()" ng-disabled="!ctrl.timeServiceActive">
+      <input type="text" size="50" disabled ng-model="ctrl.currentDateTime">
+      <br>
+      Custom headers: <input type="text" size="50" ng-model="ctrl.customToken" placeholder="Valid tokens starts with 'VALID-'">
+      <input type="button" value="Store token" ng-click="ctrl.refreshDefaultHeaders(ctrl.customToken)">
+      <pre>The commands will be only successful if header named token and a valid value exist.</pre>
+      <br>
+      Auth Handler:
+      <input type="button" value="Enable authHandler" ng-click="ctrl.enableAuthHandler()">
+      <input type="button" value="Disable authHandler" ng-click="ctrl.disableAuthHandler()">
+      <pre>If enabled, the authHandler will set such a token automatically on-the-fly.</pre>
+      <br>
+      <input type="button" value="Send PING" ng-click="ctrl.sendPing()">
+      <input type="button" value="Send NON-PING" ng-click="ctrl.sendNonPing()">
     </form>
   </div>
 
@@ -27,6 +39,8 @@
       <dd>{{moduleStats.service.isEnabled}}</dd>
       <dt>vertxEventBusService.isConnected()</dt>
       <dd>{{moduleStats.service.isConnected}}</dd>
+      <dt>vertxEventBusService.isAuthorized()</dt>
+      <dd>{{moduleStats.service.isAuthorized}}</dd>
     </dl>
   </fieldset>
 

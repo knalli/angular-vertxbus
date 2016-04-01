@@ -27,6 +27,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {object} message payload message
+ * @param {object=} headers headers
  * @param {function=} replyHandler optional callback
  * @param {function=} failureHandler optional callback
  */
@@ -39,6 +40,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {object} message payload message
+ * @param {object=} headers headers
  */
 
 /**
@@ -49,6 +51,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {function} handler callback handler
+ * @param {object=} headers headers
  */
 
 /**
@@ -59,6 +62,7 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  *
  * @param {string} address target address
  * @param {function} handler callback handler to be removed
+ * @param {object=} headers headers
  */
 
 /**
@@ -115,6 +119,7 @@ export default class EventBusAdapter extends BaseAdapter {
       sockjsOptions
     };
     this.disconnectTimeoutEnabled = true;
+    this.applyDefaultHeaders();
     if (initialConnectEnabled) {
       // asap create connection
       this.connect();
@@ -253,18 +258,13 @@ export default class EventBusAdapter extends BaseAdapter {
    *
    * @param {string} address target address
    * @param {object} message payload message
-   * @param {object=} headers
+   * @param {object} headers optional headers
    * @param {function=} replyHandler optional callback
-   * @param {function=} failureHandler optional callback (since Vert.x 3.0.0)
    */
-  send(address, message, headers, replyHandler, failureHandler) {
+  send(address, message, headers, replyHandler) {
     if (this.instance) {
-      if (angular.isFunction(headers)) {
-        failureHandler = replyHandler;
-        replyHandler = headers;
-        headers = undefined;
-      }
-      this.instance.send(address, message, headers, replyHandler, failureHandler);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.send(address, message, mergedHeaders, replyHandler);
     }
   }
 
@@ -286,7 +286,8 @@ export default class EventBusAdapter extends BaseAdapter {
    */
   publish(address, message, headers) {
     if (this.instance) {
-      this.instance.publish(address, message, headers);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.publish(address, message, mergedHeaders);
     }
   }
 
@@ -303,7 +304,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * - {@link global.EventBus#methods_registerHandler EventBus.registerHandler()}
    *
    * @param {string} address target address
-   * @param {object} headers optional headers
+   * @param {object=} headers optional headers
    * @param {function} handler callback handler
    */
   registerHandler(address, headers, handler) {
@@ -312,10 +313,11 @@ export default class EventBusAdapter extends BaseAdapter {
         handler = headers;
         headers = undefined;
       }
-      this.instance.registerHandler(address, headers, handler);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.registerHandler(address, mergedHeaders, handler);
       // and return the deregister callback
       let deconstructor = () => {
-        this.unregisterHandler(address, headers, handler);
+        this.unregisterHandler(address, mergedHeaders, handler);
       };
       deconstructor.displayName = `${moduleName}.wrapper.eventbus.registerHandler.deconstructor`;
       return deconstructor;
@@ -335,7 +337,7 @@ export default class EventBusAdapter extends BaseAdapter {
    * - {@link global.EventBus#methods_unregisterHandler EventBus.unregisterHandler()}
    *
    * @param {string} address target address
-   * @param {object} headers optional headers
+   * @param {object=} headers optional headers
    * @param {function} handler callback handler to be removed
    */
   unregisterHandler(address, headers, handler) {
@@ -344,7 +346,8 @@ export default class EventBusAdapter extends BaseAdapter {
         handler = headers;
         headers = undefined;
       }
-      this.instance.unregisterHandler(address, headers, handler);
+      const mergedHeaders = this.getMergedHeaders(headers);
+      this.instance.unregisterHandler(address, mergedHeaders, handler);
     }
   }
 

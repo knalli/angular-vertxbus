@@ -1,5 +1,7 @@
 export default class BaseDelegate {
 
+  observe() {}
+
   getConnectionState() {
     return 3; // CLOSED
   }
@@ -8,7 +10,7 @@ export default class BaseDelegate {
     return false;
   }
 
-  isValidSession() {
+  isAuthorized() {
     return false;
   }
 
