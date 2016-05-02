@@ -72,7 +72,7 @@
     "jasmine-webpack-plugin": "^0.1.1",
     "karma": "^0.13.11",
     "karma-babel-preprocessor": "^6.0.1",
-    "karma-chrome-launcher": "^0.2.1",
+    "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^0.5.2",
     "karma-expect": "~1.1.0",
     "karma-firefox-launcher": "~0.1.3",
