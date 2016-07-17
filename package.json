@@ -10,7 +10,7 @@
     "websocket"
   ],
   "engines": {
-    "node": ">=4.0"
+    "node": ">=4.4"
   },
   "scripts": {
     "clean": "grunt clean",
