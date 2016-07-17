@@ -14,7 +14,7 @@ Client side library using VertX Event Bus as an Angular Service module
 
 ## How to get
 
-Either download it manually or install it automatically with Bower: `bower install angular-vertxbus --save`
+Either download it manually or install it automatically with Bower `bower install -D angular-vertxbus` or npm `npm install -D angular-vertxbus`.
 
 Then only import `dist/angular-vertxbus.js` or `dist/angular-vertxbus.min.js`. The file itself comes with a CJS header.
 
