@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v6.0.0 - 2016-04-01
+/*! angular-vertxbus - v6.1.0 - 2016-07-17
  * http://github.com/knalli/angular-vertxbus
  * Copyright (c) 2016 Jan Philipp
  * @license MIT */

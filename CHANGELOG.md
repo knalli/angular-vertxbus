@@ -1,3 +1,8 @@
+<a name="6.1.0"></a>
+# [6.1.0](https://github.com/knalli/angular-vertxbus/compare/6.0.0...v6.1.0) (2016-07-17)
+
+
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/knalli/angular-vertxbus/compare/5.0.0...v6.0.0) (2016-04-01)
 
