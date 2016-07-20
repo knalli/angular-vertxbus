@@ -44,7 +44,7 @@
   "license": "MIT",
   "devDependencies": {
     "babel": "^6.5.0",
-    "babel-cli": "^6.5.0",
+    "babel-cli": "^6.11.4",
     "babel-core": "^6.0.2",
     "babel-eslint": "^6.0.1",
     "babel-istanbul-loader": "^0.1.0",
