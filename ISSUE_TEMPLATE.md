@@ -2,7 +2,7 @@
 Describe your issue here. This is only a template useful as an advice. Delete everything you do not need.
 
 ### Your environment
-* version of angular-translate
+* version of angular-vertxbus
 * version of angular
 * which browser and its version
 
