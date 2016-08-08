@@ -83,7 +83,7 @@
     "karma-webpack": "^1.7.0",
     "load-grunt-tasks": "^3.3.0",
     "lodash": "^4.13.1",
-    "mocha": "^2.5.1",
+    "mocha": "^3.0.2",
     "ng-annotate-webpack-plugin": "^0.1.2",
     "npm-run-all": "^2.3.0",
     "phantomjs-prebuilt": "^2.1.3",
