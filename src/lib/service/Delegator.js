@@ -5,7 +5,7 @@ export default class Delegator {
   constructor(delegate, $log) {
     this.delegate = delegate;
     this.$log = $log;
-    this.handlers = [];
+    this.handlers = {};
     this.delegate.observe({
       afterEventbusConnected: () => this.afterEventbusConnected()
     });
@@ -13,10 +13,12 @@ export default class Delegator {
 
   afterEventbusConnected() {
     for (let address in this.handlers) {
-      let callbacks = this.handlers[address];
-      if (callbacks && callbacks.length) {
-        for (let {headers, callback} of callbacks) {
-          this.delegate.registerHandler(address, headers, callback);
+      if (Object.prototype.hasOwnProperty.call(this.handlers, address)) {
+        let callbacks = this.handlers[address];
+        if (callbacks && callbacks.length) {
+          for (let {headers, callback} of callbacks) {
+            this.delegate.registerHandler(address, headers, callback);
+          }
         }
       }
     }
