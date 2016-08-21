@@ -1,0 +1,3 @@
+# don't run unlicensed test on any development dependencies
+tests:
+  unlicensed: skip # broken due vertx-ventbus-client (https://dependencyci.com/github/knalli/angular-vertxbus/builds/6)
