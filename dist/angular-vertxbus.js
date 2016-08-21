@@ -1,4 +1,4 @@
-/*! angular-vertxbus - v6.1.0 - 2016-07-17
+/*! angular-vertxbus - v6.1.1 - 2016-08-21
  * http://github.com/knalli/angular-vertxbus
  * Copyright (c) 2016 Jan Philipp
  * @license MIT */
@@ -559,7 +559,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, EventBusAdapter);
 
 	    // actual EventBus type
-
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EventBusAdapter).call(this, $q));
 
 	    _this.EventBus = EventBus;
@@ -1073,7 +1072,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, NoopAdapter);
 
 	    // actual EventBus type
-
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(NoopAdapter).call(this, $q));
 
 	    _this.EventBus = EventBus;
@@ -1825,7 +1823,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 FIFO: #push() + #first()
 	 LIFO: #push() + #last()
 	 */
-
 	var Queue = function () {
 	  function Queue() {
 	    var maxSize = arguments.length <= 0 || arguments[0] === undefined ? 10 : arguments[0];
@@ -1891,7 +1888,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	 This implementation allows usage of non serializable keys for values.
 	 */
-
 	var SimpleMap = function () {
 	  function SimpleMap() {
 	    _classCallCheck(this, SimpleMap);
@@ -2116,7 +2112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.delegate = delegate;
 	    this.$log = $log;
-	    this.handlers = [];
+	    this.handlers = {};
 	    this.delegate.observe({
 	      afterEventbusConnected: function afterEventbusConnected() {
 	        return _this.afterEventbusConnected();
@@ -2128,31 +2124,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'afterEventbusConnected',
 	    value: function afterEventbusConnected() {
 	      for (var address in this.handlers) {
-	        var callbacks = this.handlers[address];
-	        if (callbacks && callbacks.length) {
-	          var _iteratorNormalCompletion = true;
-	          var _didIteratorError = false;
-	          var _iteratorError = undefined;
+	        if (Object.prototype.hasOwnProperty.call(this.handlers, address)) {
+	          var callbacks = this.handlers[address];
+	          if (callbacks && callbacks.length) {
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
 
-	          try {
-	            for (var _iterator = callbacks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	              var _step$value = _step.value;
-	              var headers = _step$value.headers;
-	              var callback = _step$value.callback;
-
-	              this.delegate.registerHandler(address, headers, callback);
-	            }
-	          } catch (err) {
-	            _didIteratorError = true;
-	            _iteratorError = err;
-	          } finally {
 	            try {
-	              if (!_iteratorNormalCompletion && _iterator.return) {
-	                _iterator.return();
+	              for (var _iterator = callbacks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                var _step$value = _step.value;
+	                var headers = _step$value.headers;
+	                var callback = _step$value.callback;
+
+	                this.delegate.registerHandler(address, headers, callback);
 	              }
+	            } catch (err) {
+	              _didIteratorError = true;
+	              _iteratorError = err;
 	            } finally {
-	              if (_didIteratorError) {
-	                throw _iteratorError;
+	              try {
+	                if (!_iteratorNormalCompletion && _iterator.return) {
+	                  _iterator.return();
+	                }
+	              } finally {
+	                if (_didIteratorError) {
+	                  throw _iteratorError;
+	                }
 	              }
 	            }
 	          }

@@ -1,3 +1,13 @@
+<a name="6.1.1"></a>
+## [6.1.1](https://github.com/knalli/angular-vertxbus/compare/6.1.0...v6.1.1) (2016-08-21)
+
+
+### Bug Fixes
+
+* **service:** add missing hasOwnProperty check ([834f95f](https://github.com/knalli/angular-vertxbus/commit/834f95f)), closes [#212](https://github.com/knalli/angular-vertxbus/issues/212)
+
+
+
 <a name="6.1.0"></a>
 # [6.1.0](https://github.com/knalli/angular-vertxbus/compare/6.0.0...v6.1.0) (2016-07-17)
 
