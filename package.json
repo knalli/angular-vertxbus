@@ -68,7 +68,7 @@
     "grunt-ngdocs": "^0.2.9",
     "imports-loader": "^0.6.5",
     "istanbul": "^0.4.0",
-    "jasmine-core": "^2.3.4",
+    "jasmine-core": "^2.5.0",
     "jasmine-webpack-plugin": "^0.1.1",
     "karma": "^1.1.1",
     "karma-babel-preprocessor": "^6.0.1",
