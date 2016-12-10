@@ -27,7 +27,7 @@
     "url": "git://github.com/knalli/angular-vertxbus"
   },
   "dependencies": {
-    "angular": ">=1.2 <=1.5",
+    "angular": ">=1.2 <=1.6",
     "sockjs-client": "1.0.3",
     "vertx3-eventbus-client": "~3.2.1"
   },
