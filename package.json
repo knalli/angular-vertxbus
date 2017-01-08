@@ -10,16 +10,21 @@
     "websocket"
   ],
   "engines": {
-    "node": ">=4.4"
+    "node": ">*"
+  },
+  "devEngines": {
+    "node": ">=6.9",
+    "npm": ">=3"
   },
   "scripts": {
+    "check-env": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
     "clean": "grunt clean",
     "clean-test-scopes": "for f in test_scopes/*; do (cd $f; rm -rf bower_components); done",
     "prepublish": "bower install",
     "lint": "eslint --ignore-pattern node_modules/**,bower_components/** --ext .js src/** *.js",
     "test-karma-headless": "karma start --browsers='PhantomJS' karma.conf.js",
     "test-karma": "karma start karma.conf.js",
-    "test": "npm run -q lint && grunt install-test && npm run -q test-karma",
+    "test": "npm run -q check-env && npm run -q lint && grunt install-test && npm run -q test-karma",
     "test-scopes": "grunt install-test && for f in test_scopes/*; do TEST_SCOPE=\"`basename $f`\" npm run -q test; done",
     "start-it-web-server": "babel-node test/e2e/server.js",
     "install-it-vertx-server": "cd test/e2e/vertx && ./install-vertx.sh",
@@ -28,7 +33,7 @@
     "compile-dist": "webpack",
     "compile-distmin": "BUILD_MINIFIED=1 webpack",
     "compile": "grunt clean && npm run -q compile-dist && npm run -q compile-distmin && grunt build-post",
-    "build": "npm run -q test && npm run -q compile",
+    "build": "npm run -q check-env && npm run -q test && npm run -q compile",
     "release": "npm run -q clean && npm run -q build && grunt release",
     "docs": "grunt docs"
   },
@@ -58,6 +63,7 @@
     "eslint-plugin-angular": "^1.0.0",
     "estraverse": "^4.1.0",
     "express": "^4.13.3",
+    "fbjs-scripts": "^0.7.1",
     "grunt": "~1.0.1",
     "grunt-babel": "^6.0.0",
     "grunt-bower-install-simple": "~1.2.3",
