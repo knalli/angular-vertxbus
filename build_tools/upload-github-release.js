@@ -15,11 +15,12 @@ const mkdirSync = function (path) {
       throw e;
     }
   }
-}
+};
 
 // Find changelog for a specific version
 const getChangelog = (changelogFilePath, forVersion) => {
-  const prefix = '# ';
+  const prefix = '<a name="';
+  const skipLines = 1;
   return new Promise((resolve) => {
     fs.readFile(changelogFilePath, (err, bytes) => {
       if (err) {
@@ -31,8 +32,8 @@ const getChangelog = (changelogFilePath, forVersion) => {
         let bodyStartIndex = lines.findIndex((str) => str.substr(0, prefix.length + forVersion.length) === `${prefix}${forVersion}`);
         if (bodyStartIndex > -1) {
           let bodyEndIndex = lines.findIndex((str, idx) => idx > bodyStartIndex && str.substr(0, prefix.length) === prefix);
-          let header = lines[bodyStartIndex].substring(prefix.length);
-          let body = lines.slice(bodyStartIndex + 1, bodyEndIndex).join('\n');
+          let header = forVersion;
+          let body = lines.slice(bodyStartIndex + 1 + skipLines, bodyEndIndex).join('\n');
           resolve({header, body});
         } else {
           resolve({header : forVersion, body : ''});
@@ -153,7 +154,7 @@ resetTempResources()
   .then(([changelog, assets]) => {
     return publish({
       ghApiToken : process.env.GH_TOKEN,
-      projectOwner : 'angular-translate',
+      projectOwner : 'knalli',
       projectRepo : process.env.PROJECT_REPO || pkg.name,
       projectVersion : pkg.version,
       projectVersionName : `${pkg.name} ${changelog.header || pkg.version}`,
