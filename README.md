@@ -1,6 +1,6 @@
 # angular-vertxbus
 
-![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
+![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![cdnjs](https://img.shields.io/cdnjs/v/angular-vertxbus.svg)](https://cdnjs.com/libraries/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
@@ -30,9 +30,9 @@ Depending on your target clients, you probably need to include a browser polyfil
 recommends the [requirement of its own polyfill](https://babeljs.io/docs/usage/polyfill/). Either you use the explained
 way using npm modules and/or browserify, or you can use the alternative artifact variant `dist/angular-vertxbus.withpolyfill.js`.
 
-### AngularJS
+### AngularJS 1.x
 
-This library is being developed against *AngularJS 1.4*, and additional tests are performed against *AngularJS 1.2* and *AngularJS 1.3*.
+This library performs integration tests for *AngularJS 1.2 - 1.6*!
 
 ### Vert.x
 
@@ -188,4 +188,4 @@ The *end-to-end tests* start and utilize a full Vert.x node and a NodeJS based w
 
 ## License
 
-Copyright 2016 by Jan Philipp. Licensed under MIT.
+Copyright 2017 by Jan Philipp. Licensed under MIT.
