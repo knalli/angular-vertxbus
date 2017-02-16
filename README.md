@@ -1,6 +1,6 @@
 # angular-vertxbus
 
-![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
+![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![cdnjs](https://img.shields.io/cdnjs/v/angular-vertxbus.svg)](https://cdnjs.com/libraries/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
