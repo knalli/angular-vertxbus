@@ -1,14 +1,11 @@
 sudo: false
 language: node_js
 node_js:
-  - "4.4"
+  - "6.9"
 
 addons:
   code_climate:
     repo_token: 94ea5ac76984c311dcbadb53a52dd219400775e20402587a0063d8b9d3a66bca
-
-before_install:
-  - npm install -qg npm
 
 before_script:
   - export DISPLAY=:99.0
@@ -23,3 +20,4 @@ env:
   - TEST_SCOPE=angular_1.3.x
   - TEST_SCOPE=angular_1.4.x
   - TEST_SCOPE=angular_1.5.x
+  - TEST_SCOPE=angular_1.6.x

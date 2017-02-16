@@ -6,11 +6,11 @@ const NgAnnotatePlugin = require('ng-annotate-webpack-plugin');
 
 const pkg = require('./package.json');
 const banner = '' +
-'/*! ' + (pkg.title || pkg.name) + ' - v' + (pkg.version) + ' - ' + (new Date().toISOString().substring(0, 10)) + '\n' +
-' * ' + (pkg.homepage) + '\n' +
-' * Copyright (c) ' + (new Date().toISOString().substring(0, 4)) + ' ' + (pkg.author.name) + '\n' +
-' * @license ' + (pkg.license) + ' */' +
-'';
+  '/*! ' + (pkg.title || pkg.name) + ' - v' + (pkg.version) + ' - ' + (new Date().toISOString().substring(0, 10)) + '\n' +
+  ' * ' + (pkg.homepage) + '\n' +
+  ' * Copyright (c) ' + (new Date().toISOString().substring(0, 4)) + ' ' + (pkg.author.name) + '\n' +
+  ' * @license ' + (pkg.license) + ' */' +
+  '';
 
 const factory = function (options) {
   var minified = options.minified || false;
@@ -33,22 +33,21 @@ const factory = function (options) {
       }
     ],
     module : {
-      preLoaders: [
-        {
-          test: /\.js$/,
-          exclude : /(node_modules|bower_components)/,
-          loader: 'eslint',
-        },
-      ],
       loaders : [
+        {
+          enforce : 'pre',
+          test : /\.js$/,
+          exclude : /(node_modules|bower_components)/,
+          loader : 'eslint-loader',
+        },
         {
           test : /\.js$/,
           exclude : /(node_modules|bower_components)/,
-          loader : 'babel',
-          query : 'presets[]=es2015',
-          plugins : [
-            'transform-runtime'
-          ],
+          loader : 'babel-loader',
+          options : {
+            presets : ['es2015'],
+            plugins : ['transform-runtime']
+          },
         },
       ]
     },
@@ -56,16 +55,17 @@ const factory = function (options) {
     devtool : 'source-map',
   };
 
-  result.plugins.push(new webpack.BannerPlugin(banner, {
-    raw: true,
-    entryOnly: true,
+  result.plugins.push(new webpack.BannerPlugin({
+    banner : banner,
+    raw : true,
+    entryOnly : true,
   }));
   result.plugins.push(new NgAnnotatePlugin({
     add : true,
   }));
   if (minified) {
     result.plugins.push(new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
+      sourceMap : true,
     }));
   }
 
@@ -73,5 +73,5 @@ const factory = function (options) {
 };
 
 module.exports = factory({
-  minified: process.env.BUILD_MINIFIED ? true : false
+  minified : process.env.BUILD_MINIFIED ? true : false
 });

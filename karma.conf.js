@@ -61,14 +61,14 @@ module.exports = function (config) {
     },
 
     webpack : {
-      debug : true,
       devtool : 'source-map',
       //entry: [],
       resolve : {
-        root : [
+        modules : [
           path.join(__dirname, ''),
           path.join(__dirname, 'src'),
           path.join(__dirname, 'test'),
+          'node_modules'
         ],
         alias : {
           'sockjs-client' : 'test/unit/mock/sockjs.js',
@@ -76,35 +76,36 @@ module.exports = function (config) {
         }
       },
       module : {
-        preLoaders : [
+        rules : [
           {
+            enforce : 'pre',
             test : /\.js$/,
             exclude : [
               /(node_modules|bower_components)/,
             ],
-            loader : 'babel',
-            query : 'presets[]=es2015',
-            plugins : [
-              'transform-runtime'
-            ]
+            loader : 'babel-loader',
+            options : {
+              presets : ['es2015'],
+              plugins : ['transform-runtime'],
+            },
           },
-          {
-            test : /\.js$/,
-            include : [
-              path.resolve('src/')
-            ],
-            exclude : [
-              /(node_modules|bower_components)/,
-            ],
-            loader : 'babel-istanbul',
-          },
-        ],
-        loaders : [
+          // {
+          //   enforce : 'pre',
+          //   test : /\.js$/,
+          //   include : [
+          //     path.resolve('src/')
+          //   ],
+          //   exclude : [
+          //     /(node_modules|bower_components)/,
+          //   ],
+          //   loader : 'babel-istanbul-loader',
+          // },
           {
             test : /vertx-eventbus\.js$/,
-            loaders : [
-              'imports?SockJS=sockjs-client'
-            ]
+            loader : 'imports-loader',
+            options : {
+              'SockJS' : 'sockjs-client',
+            },
           },
         ]
       },
@@ -123,11 +124,13 @@ module.exports = function (config) {
       noInfo : true
     },
 
-    coverageReporter : isDefaultScope(scope) ? {
-      dir : 'build/coverage',
-      subdir : 'report',
-      type : 'lcov'
-    } : undefined,
+    coverageReporter : isDefaultScope(scope)
+      ? {
+        dir : 'build/coverage',
+        subdir : 'report',
+        type : 'lcov'
+      }
+      : undefined,
 
     // web server port
     port : 9876,
