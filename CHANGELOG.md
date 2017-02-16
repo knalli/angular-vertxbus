@@ -1,3 +1,14 @@
+<a name="6.2.0"></a>
+# [6.2.0](https://github.com/knalli/angular-vertxbus/compare/6.1.1...v6.2.0) (2017-02-16)
+
+
+### Features
+
+* add AngularJS 1.6 support ([f383f29](https://github.com/knalli/angular-vertxbus/commit/f383f29))
+* add AngularJS 1.6 support (fixup) ([180c494](https://github.com/knalli/angular-vertxbus/commit/180c494))
+
+
+
 <a name="6.1.1"></a>
 ## [6.1.1](https://github.com/knalli/angular-vertxbus/compare/6.1.0...v6.1.1) (2016-08-21)
 
