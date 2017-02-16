@@ -30,9 +30,9 @@ Depending on your target clients, you probably need to include a browser polyfil
 recommends the [requirement of its own polyfill](https://babeljs.io/docs/usage/polyfill/). Either you use the explained
 way using npm modules and/or browserify, or you can use the alternative artifact variant `dist/angular-vertxbus.withpolyfill.js`.
 
-### AngularJS
+### AngularJS 1.x
 
-This library is being developed against *AngularJS 1.4*, and additional tests are performed against *AngularJS 1.2* and *AngularJS 1.3*.
+This library performs integration tests for *AngularJS 1.2 - 1.6*!
 
 ### Vert.x
 
