@@ -22,7 +22,7 @@
     "clean-test-scopes": "for f in test_scopes/*; do (cd $f; rm -rf bower_components); done",
     "prepublish": "bower install",
     "lint": "eslint --ignore-pattern node_modules/**,bower_components/** --ext .js src/** *.js",
-    "test-karma-headless": "karma start --browsers='PhantomJS' karma.conf.js",
+    "test-headless": "karma start --browsers='PhantomJS' karma.conf.js",
     "test-karma": "karma start karma.conf.js",
     "test": "npm run -s check-env && npm run -s lint && grunt install-test && npm run -s test-karma",
     "test-scopes": "grunt install-test && for f in test_scopes/*; do TEST_SCOPE=\"`basename $f`\" npm run -s test; done",
