@@ -24,7 +24,7 @@ Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](http
 
 ### JavaScript (Polyfill)
 
-The source code is written using newer JavaScript 2015 (partly) and is using the JavaScript transpiler [BabelJS](https://babeljs.io).
+The source code is written using newer JavaScript ([ECMAScript 2015+](https://babeljs.io/learn-es2015/))and is using the JavaScript transpiler [BabelJS](https://babeljs.io).
 
 Depending on your target clients, you probably need to include a browser polyfill (for ES5 clients). BabelJS itself
 recommends the [requirement of its own polyfill](https://babeljs.io/docs/usage/polyfill/). Either you use the explained

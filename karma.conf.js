@@ -85,7 +85,7 @@ module.exports = function (config) {
             ],
             loader : 'babel-loader',
             options : {
-              presets : ['es2015'],
+              presets : ['env'],
               plugins : ['transform-runtime'],
             },
           },
