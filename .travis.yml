@@ -15,9 +15,19 @@ after_script:
   - if [ "$TEST_SCOPE" == "" ]; then npm install -g codeclimate-test-reporter && codeclimate-test-reporter < build/coverage/report/lcov.info; fi
 
 env:
-  - TEST_SCOPE=
-  - TEST_SCOPE=angular_1.2.x
-  - TEST_SCOPE=angular_1.3.x
-  - TEST_SCOPE=angular_1.4.x
-  - TEST_SCOPE=angular_1.5.x
-  - TEST_SCOPE=angular_1.6.x
+  matrix:
+    - TEST_SCOPE=
+    - TEST_SCOPE= SAUCE_ENABLED=$_SAUCE_ENABLED SAUCE_USERNAME=$_SAUCE_USERNAME SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY
+    - TEST_SCOPE=angular_1.2.x
+    - TEST_SCOPE=angular_1.3.x
+    - TEST_SCOPE=angular_1.4.x
+    - TEST_SCOPE=angular_1.5.x
+    - TEST_SCOPE=angular_1.6.x
+  global:
+    - secure: "BQeu14UTGr7gWrEz9O2NSDb4g4F40dWw2QKgglkLX58VmJYZn6anQLIavotmNr9XEG7car8lWkxuDrcQEbUvp/nunhSd2EvDn3fZwI5lLAfuWwvGgAd37SRbD4xKykrzqmSNfH6jHAB+Zm5UcYPr127OzrEUY08ArEDj9lyhnkY="
+    - secure: "oCZdWQUJcqiPpy9Izg+/TTP1KX1dvif3et+tSJQSYXEm0bgWvQXV9QA9YE8s1ixVpWIN4Gt4/p6lNYonxtf9mb7rNUe4nLznFcD5oMAjJSN668mNJZ/lPfh+lINCtxlqtwgtcCllXWdhNEAIPEIsx3JeN1zrcS5oEoh1I3u1n8k="
+    - secure: "oR1sfCFm+wgbCfE6uMyx5D1g9HfXW1F4umCsBSd/1ef5ccore78y+HicBCSqhLQqGLolmBraZWRjpgeykoslozQP6GYMplNpuqZtQuomuSu53b2qFvr9NyDWNuE7xJ4hPCtATkiB/JZrqUTSnzpgnU+pn01mPxyaQsUpwYC9hqM="
+
+matrix:
+  allow_failures:
+    - env: TEST_SCOPE= SAUCE_ENABLED=$_SAUCE_ENABLED SAUCE_USERNAME=$_SAUCE_USERNAME SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY

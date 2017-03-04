@@ -1,6 +1,6 @@
 # angular-vertxbus
 
-![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![cdnjs](https://img.shields.io/cdnjs/v/angular-vertxbus.svg)](https://cdnjs.com/libraries/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/knalli/angular-vertxbus.svg)](https://greenkeeper.io/)
+![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![cdnjs](https://img.shields.io/cdnjs/v/angular-vertxbus.svg)](https://cdnjs.com/libraries/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Sauce Test Status](https://saucelabs.com/buildstatus/knalli-angular-vertxbus)](https://saucelabs.com/u/knalli-angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/knalli/angular-vertxbus.svg)](https://greenkeeper.io/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
@@ -10,6 +10,10 @@ Client side library using VertX Event Bus as an Angular Service module
 | --- | --- | --- |
 | Canary | unstable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.svg?branch=canary)](https://travis-ci.org/knalli/angular-vertxbus) |
 | Master | stable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.svg?branch=master)](https://travis-ci.org/knalli/angular-vertxbus) |
+
+Automatic tests running against the latest version of the major browsers:
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/knalli-angular-vertxbus.svg)](https://saucelabs.com/u/knalli-angular-vertxbus)
 
 
 ## How to get

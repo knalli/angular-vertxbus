@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
+const browserslist = require('browserslist');
 
 var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDefaultScope;
 
@@ -34,11 +35,108 @@ var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDef
     };
 })();
 
+/**
+ * Configuration set for SauceLabs browser tests
+ * @type {{enabled, launchers, buildOptions}}
+ */
+const sourcelabsConfig = ((browsers) => {
+
+  const enabled = !!process.env.SAUCE_ENABLED;
+
+  // parse list of browsers (by browserslist) and build a useful list
+  const launchers = browsers
+    .map((string) => {
+      let [name, version] = string.split(' ');
+      return {
+        name,
+        version,
+      };
+    })
+    .filter(browser => {
+      switch (browser.name) {
+        case 'chrome':
+        case 'edge':
+        case 'firefox':
+        case 'ie':
+        case 'opera':
+        case 'safari':
+          return true;
+        default:
+          return false;
+      }
+    })
+    .map(browser => {
+      switch (browser.name) {
+        case 'chrome':
+          return {
+            id : `sl_${browser.name}_${browser.version}`,
+            base : 'SauceLabs',
+            browserName : browser.name,
+            platform : 'Windows 7',
+            version : browser.version
+          };
+        case 'firefox':
+          return {
+            id : `sl_${browser.name}_${browser.version}`,
+            base : 'SauceLabs',
+            browserName : browser.name,
+            platform : 'Windows 7',
+            version : browser.version
+          };
+        case 'ie':
+          return {
+            id : `sl_${browser.name}_${browser.version}`,
+            base : 'SauceLabs',
+            browserName : 'internet explorer',
+            platform : 'Windows 7',
+            version : browser.version
+          };
+        case 'edge':
+          return {
+            id : `sl_${browser.name}_${browser.version}`,
+            base : 'SauceLabs',
+            browserName : 'microsoftedge',
+            platform : 'Windows 10',
+            version : browser.version
+          };
+        case 'safari':
+          // skip 9
+          if (browser.version.substring(0, 1) === '9') {
+            break;
+          }
+          return {
+            id : `sl_${browser.name}_${browser.version}`,
+            base : 'SauceLabs',
+            browserName : browser.name,
+            platform : 'macOS 10.12',
+            version : browser.version
+          };
+      }
+    })
+    .filter(browser => browser);
+
+  const buildOptions = (scope) => {
+    return {
+      testName : `angular-vertxbus Unit Tests, scope: ${scope}`,
+      verbose : true,
+      doctor : true,
+      logger : console.log
+    };
+  };
+
+  return {
+    enabled,
+    launchers,
+    buildOptions,
+  };
+})(browserslist('last 2 versions, Firefox ESR'));
+
 module.exports = function (config) {
 
-  var scope = process.env.TEST_SCOPE;
+  const scope = process.env.TEST_SCOPE;
+  const actualScope = getAffectiveScope(scope);
   console.log('Available test scopes: ', AVAILABLE_SCOPES);
-  console.log('Currently selected scope: ', getAffectiveScope(scope));
+  console.log('Currently selected scope: ', actualScope);
 
   var vertxEventBusFile = injectByScope(scope, 'vertx3-eventbus-client/vertx-eventbus.js');
 
@@ -54,11 +152,49 @@ module.exports = function (config) {
 
     frameworks : ['expect', 'mocha', 'jasmine'],
 
-    reporters : isDefaultScope(scope) ? ['progress', 'coverage'] : ['progress'],
+    reporters : (() => {
+      let reporters = ['progress'];
+      if (isDefaultScope(scope)) {
+        reporters.push('coverage');
+      }
+      if (sourcelabsConfig.enabled) {
+        reporters.push('saucelabs');
+      }
+      return reporters;
+    })(),
 
     preprocessors : {
       'test/unit/test_index.js' : ['webpack'],
     },
+
+    // SourceLabs
+    // https://oligofren.wordpress.com/2014/05/27/running-karma-tests-on-browserstack/
+    // http://stackoverflow.com/questions/24093155/karma-sauce-launcher-disconnects-every-test-run-resulting-in-failed-runs-with-ie
+    sauceLabs : ((scope) => {
+      if (sourcelabsConfig.enabled) {
+        return sourcelabsConfig.buildOptions(scope);
+      }
+    })(actualScope),
+    customLaunchers : (() => {
+      if (sourcelabsConfig.enabled) {
+        return sourcelabsConfig.launchers;
+      }
+    })(),
+    browserDisconnectTimeout : (() => {
+      if (sourcelabsConfig.enabled) {
+        return 10000; // default 2000
+      }
+    })(),
+    browserDisconnectTolerance : (() => {
+      if (sourcelabsConfig.enabled) {
+        return 1; // default 0
+      }
+    })(),
+    browserNoActivityTimeout : (() => {
+      if (sourcelabsConfig.enabled) {
+        return 5 * 60 * 1000; // default 10000
+      }
+    })(),
 
     webpack : {
       devtool : 'source-map',
@@ -124,13 +260,15 @@ module.exports = function (config) {
       noInfo : true
     },
 
-    coverageReporter : isDefaultScope(scope)
-      ? {
-        dir : 'build/coverage',
-        subdir : 'report',
-        type : 'lcov'
+    coverageReporter : (() => {
+      if (isDefaultScope(scope)) {
+        return {
+          dir : 'build/coverage',
+          subdir : 'report',
+          type : 'lcov'
+        };
       }
-      : undefined,
+    })(),
 
     // web server port
     port : 9876,
@@ -156,10 +294,30 @@ module.exports = function (config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers : process.env.WATCH ? [] : [process.env.TRAVIS ? 'Firefox' : 'Chrome'],
+    browsers : (() => {
+      if (process.env.WATCH) {
+        return [];
+      }
+
+      let browsers = [];
+      if (sourcelabsConfig.enabled) {
+        browsers = [...browsers, ...Object.keys(sourcelabsConfig.launchers)];
+      } else if (process.env.TRAVIS) {
+        browsers.push('Firefox');
+      } else {
+        browsers.push('Chrome');
+      }
+      return browsers;
+    })(),
 
     // If browser does not capture in given timeout [ms], kill it
-    captureTimeout : 60000,
+    captureTimeout : (() => {
+      if (sourcelabsConfig.enabled) {
+        return 5 * 60 * 1000; // default 60000
+      } else {
+        return 1 * 60 * 1000;
+      }
+    })(),
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
