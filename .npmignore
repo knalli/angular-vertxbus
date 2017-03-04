@@ -5,6 +5,10 @@ bower_components
 temp
 dist/docs
 
+.github
+.idea
+.vertx
+
 # Test Stuff
 /test/
 /test_scopes/
