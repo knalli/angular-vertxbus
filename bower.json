@@ -32,7 +32,7 @@
     "vertx3-eventbus-client": "~3.2.1"
   },
   "devDependencies": {
-    "angular": "~1.4.4",
-    "angular-mocks": "~1.4.4"
+    "angular": "~1.6.2",
+    "angular-mocks": "~1.6.2"
   }
 }
