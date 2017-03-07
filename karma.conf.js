@@ -146,6 +146,7 @@ module.exports = function (config) {
     files : [
       injectByScope(scope, 'angular/angular.js'),
       injectByScope(scope, 'angular-mocks/angular-mocks.js'),
+      'test/unit/util/unhandledRejectionTracing.js',
       'node_modules/babel-polyfill/browser.js',
       'test/unit/test_index.js',
     ],

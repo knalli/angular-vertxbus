@@ -1,7 +1,8 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
 /* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
-var SockJS = require('sockjs-client');
+const SockJS = require('sockjs-client');
+const enableUnhandledRejectionTracing = require('../util/unhandledRejectionTracing.js');
 require('../../../src/module.js');
 
 describe('integration of module::vertxEventBus', function () {
@@ -9,6 +10,7 @@ describe('integration of module::vertxEventBus', function () {
   beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
+    enableUnhandledRejectionTracing(angular, $provide);
     $provide.value('$log', {
       log: function () {},
       debug: function () {},
