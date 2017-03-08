@@ -1,0 +1,17 @@
+{
+  "author": "Jan Philipp",
+  "name": "angular-vertxbus",
+  "description": "",
+  "version": "0.0.0",
+  "homepage": "http://github.com/knalli/angular-vertxbus",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/knalli/angular-vertxbus"
+  },
+  "devDependencies": {
+    "angular": "~1.6.0",
+    "angular-mocks": "~1.6.0",
+    "sockjs-client": "~1.0.3",
+    "vertx3-eventbus-client": "~3.2.0"
+  }
+}

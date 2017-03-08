@@ -23,6 +23,8 @@ env:
     - TEST_SCOPE=angular_1.4.x
     - TEST_SCOPE=angular_1.5.x
     - TEST_SCOPE=angular_1.6.x
+    - TEST_SCOPE=sockjs-client_1.0.x
+    - TEST_SCOPE=sockjs-client_1.1.x
     - TEST_SCOPE=vertx-bus_3.2.x
     - TEST_SCOPE=vertx-bus_3.3.x
     - TEST_SCOPE=vertx-bus_3.4.x
