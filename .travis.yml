@@ -29,6 +29,7 @@ env:
     - TEST_SCOPE=vertx-bus_3.3.x
     - TEST_SCOPE=vertx-bus_3.4.x
   global:
+    - CXX=g++-4.8
     - secure: "BQeu14UTGr7gWrEz9O2NSDb4g4F40dWw2QKgglkLX58VmJYZn6anQLIavotmNr9XEG7car8lWkxuDrcQEbUvp/nunhSd2EvDn3fZwI5lLAfuWwvGgAd37SRbD4xKykrzqmSNfH6jHAB+Zm5UcYPr127OzrEUY08ArEDj9lyhnkY="
     - secure: "clpyd43PGosqt4eig31MMoDHOBoHRKHM+sx25GP8bWIw7ixp46z9yb00cOibHEwvbTW/reBiEmb3giDk0AHyduxDPJaK5uTKe/XjQNH+0fxilCvq9sY1bjhH95h7VV8TacASwTrhswgEMnALvTWxonNzsMgU5iTvrsGqXOVX4Z4="
     - secure: "KnYZgICysNrYQFBavQ3IQU6oUGCHabawI6aDlAtSUvi6O5g6GOvbTcU7XFlFU8OVNaujgRPDSSuSsHcv4Dmz8hKKIQ94G54qL1ZaxmLOP/PluItnGRQI8+jAsL8qoBCXfw/0ce0DBKi2QEwSxkNsv3uxlAg57d/L3YDrGUiYSp8="
@@ -36,3 +37,10 @@ env:
 matrix:
   allow_failures:
     - env: TEST_SCOPE= SAUCE_ENABLED=$_SAUCE_ENABLED SAUCE_USERNAME=$_SAUCE_USERNAME SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
