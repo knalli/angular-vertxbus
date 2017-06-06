@@ -1,3 +1,24 @@
+<a name="6.3.0"></a>
+# [6.3.0](https://github.com/knalli/angular-vertxbus/compare/6.2.0...v6.3.0) (2017-06-06)
+
+
+### Bug Fixes
+
+* **package:** change dependency version check ([b407d3b](https://github.com/knalli/angular-vertxbus/commit/b407d3b))
+* **service:** fix missing promise rejection handlers ([59f43a5](https://github.com/knalli/angular-vertxbus/commit/59f43a5))
+* **tests:** test_scopes should use scoped angular libs :bomb: ([ad7ab24](https://github.com/knalli/angular-vertxbus/commit/ad7ab24))
+
+
+### Features
+
+* add automatic tests at SauceLabs, for the latest browsers ([e440c6a](https://github.com/knalli/angular-vertxbus/commit/e440c6a))
+* switch to babel-preset-env using browserlist (“last 3 versions”) ([88d590c](https://github.com/knalli/angular-vertxbus/commit/88d590c))
+* **tests:** add sockjs-client 1.0 and 1.1 as target libraries ([170d5f7](https://github.com/knalli/angular-vertxbus/commit/170d5f7))
+* **tests:** add vertx-bus 3.2, 3.3, and 3.4 as target libraries ([443b383](https://github.com/knalli/angular-vertxbus/commit/443b383))
+* update preferred dependencies for SockJS and vertx-bus to latest ([e0cf3dd](https://github.com/knalli/angular-vertxbus/commit/e0cf3dd))
+
+
+
 <a name="6.2.0"></a>
 # [6.2.0](https://github.com/knalli/angular-vertxbus/compare/6.1.1...v6.2.0) (2017-02-16)
 
