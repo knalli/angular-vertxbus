@@ -1,7 +1,8 @@
 /* jshint camelcase: false, undef: true, unused: true, browser: true */
 /* global module: false, describe: false, it: false, expect: false, beforeEach: false, inject: false, SockJS: false */
 
-var SockJS = require('sockjs-client');
+const SockJS = require('sockjs-client');
+const enableUnhandledRejectionTracing = require('../util/unhandledRejectionTracing.js');
 require('../../../src/module.js');
 
 describe('integration of module::vertxEventBusService', function () {
@@ -9,6 +10,7 @@ describe('integration of module::vertxEventBusService', function () {
   beforeEach(angular.mock.module('knalli.angular-vertxbus'));
 
   beforeEach(angular.mock.module('knalli.angular-vertxbus', function ($provide) {
+    enableUnhandledRejectionTracing(angular, $provide);
     $provide.value('$log', {
       log: function () {},
       debug: function () {},
@@ -229,10 +231,10 @@ describe('integration of module::vertxEventBusService', function () {
       describe('should replay queued items', function () {
         it('when eventbus is reopened', function (done) {
           setTimeout(function () {
-            vertxEventBusService.send('xyz', {data : 0});
-            vertxEventBusService.send('xyz', {data : 1});
-            vertxEventBusService.send('xyz', {data : 2});
-            vertxEventBusService.send('xyz', {data : 3});
+            vertxEventBusService.send('xyz', {data : 0}).then(null, angular.noop);
+            vertxEventBusService.send('xyz', {data : 1}).then(null, angular.noop);
+            vertxEventBusService.send('xyz', {data : 2}).then(null, angular.noop);
+            vertxEventBusService.send('xyz', {data : 3}).then(null, angular.noop);
 
             // fake connect
             vertxEventBus.readyState = function () {
@@ -562,13 +564,13 @@ describe('integration of module::vertxEventBusService', function () {
         expect(typeof promise.finally).to.be('function');
         promise.then(function () {
           results.then++;
-        });
+        }, angular.noop); // ignore error (because error is expected)
         promise.catch(function () {
           results.catch++;
         });
         promise.finally(function () {
           results.finally++;
-        });
+        }).then(null, angular.noop); // ignore error (because error is expected)
         $rootScope.$apply();
         setTimeout(function () {
           expect(results.then).to.be(0);
@@ -618,16 +620,16 @@ describe('integration of module::vertxEventBusService', function () {
         expect(typeof promise.finally).to.be('function');
         promise.then(function () {
           results.then++;
-        });
+        }, angular.noop); // ignore error (because error is expected)
         promise.catch(function () {
           results.catch++;
         });
         promise.finally(function () {
           results.finally++;
-        });
+        }).then(null, angular.noop); // ignore error (because error is expected)
         $rootScope.$apply();
         setTimeout(function () {
-          window.console.log(results);
+          window.console.warn(results);
           expect(results.then).to.be(0);
           expect(results.catch).to.be(1);
           expect(results.finally).to.be(1);

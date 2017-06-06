@@ -1,13 +1,11 @@
 # Contributing Guide
-
 Contributing to this repo is fairly easy. This document shows you how to
 get the project, run all provided tests and generate a production ready build.
 
 It also covers provided grunt tasks, that help you developing on this repo.
 
 ## Dependencies
-
-To make sure, that the following instructions work, please install the following dependencies
+To make sure the following instructions work, please install the following dependencies
 on you machine:
 
 - Node.js
@@ -15,12 +13,8 @@ on you machine:
 - Git
 
 If you install node through the binary installation file, **npm** will be already there.
-When **npm** is installed, use it to install the needed npm packages:
-
-- grunt-cli <code>npm install -g grunt-cli</code>
 
 ## Installation
-
 To get the source of this project clone the git repository via:
 
 ````
@@ -36,42 +30,67 @@ $ npm install
 
 (This will invoke a `bower install` automatically.)
 
-The project is now installed and ready to be built.
+This commands installs everything which is required for building and testing the project.
+
+## Testing
+Internally `angular-vertxbus` depends on **Grunt** and **Webpack**, however there have been been masked all steps behind 
+simple tasks processed by **npm**.
+
+### Source linting: `npm run lint`
+`npm run lint` performs a lint for all (also part of `test`).
+
+### Unit testing: `npm run test`
+`npm run test` executes (as you might think) the unit tests, which are located
+in `test/unit`. The task uses **karma**, the spectacular test runner, to execute the tests with 
+the **jasmine testing framework**.
+
+#### Testing of different scopes: `npm run test-scopes`
+Because `angular-vertxbus` supports multiple different versions of AngularJS 1.x, you should run the tests the code against these also.
+
+`npm run test-scopes` performs a `npm run test` against each registered scope which can be found at `/test_scopes/*`.
+
+#### Testing headless: `npm run test-headless`
+Just like `npm run test`, the command `npm run test-headless` performs the test against a headless PhantomJS. Maybe 
+useful in case of automatic tests.
 
 ## Building
-
-This repo comes with a few **grunt tasks** which help you to automate
-the development process. The following grunt tasks are provided:
-
-#### <code>grunt</code>
-
-Running <code>grunt</code> without any parameters, will actually execute the registered
-default task. This includes a default linter and CoffeeScript transpiling.
-
-#### <code>grunt test</code>
-
-<code>grunt test</code> executes (as you might thought) the unit tests, which are located
-in <code>test/unit</code>. The task uses **karma** the spectacular test runner to executes
-the tests with the **jasmine testing framework**.
-
-#### <code>grunt build</code>
-
-You only have to use this task, if you want to generate a production ready build of
-this project. This task will also **lint**, **test** and **minify** the
+### Standard build
+You will probably being never required using the command `npm run build`, because it will create a production-ready 
+build of `angular-vertxbus`. This task will also **lint**, **test** and **minify** the
 source. After running this task, you'll find the following files in a generated
-<code>dist</code> folder:
+`/dist`folder:
 
 ````
 dist/angular-vertxbus.js
 dist/angular-vertxbus.min.js
+dist/angular-vertxbus.withpolyfill.js
+dist/angular-vertxbus.withpolyfill.min.js
 ````
 
-#### <code>grunt watch</code>
+### Compile only
+The command `npm run compile` creates production-ready files at `/dist`, also part of `npm run build`.
 
-This task will watch all relevant files. When it notice a change, it'll run the
-**lint** and **test** task. Use this task while developing on the source
-to make sure, everytime you make a change you get notified if your code is incosistent
-or doesn't pass the tests.
+````
+dist/angular-vertxbus.js
+dist/angular-vertxbus.min.js
+dist/angular-vertxbus.withpolyfill.js
+dist/angular-vertxbus.withpolyfill.min.js
+````
+
+## Developing
+The *local test environment* starts and utilizes a full Vert.x node and a NodeJS based web server.
+
+**Easy:** Just run `npm run -s start-server` and open `http://localhost:3000/` in your preferred browser.
+
+If you have changed something, just invoke `npm run -s compile` in parallel and refresh the browser.
+
+Alternatively:
+
+1. `npm run install-it-vertx-server` downloads and installs a Vert.x locally. This will store a cached download artifact at `test/e2e//vertx/`.
+2. `npm run start-it-vertx-server` starts an Vert.x on port `8080`.
+3. `npm run start-it-web-server` starts a web server on port `3000`.
+4. Ensure at least `npm run -s compile` has been invoked so there is a `dist/angular-vertxbus.js`.
+5. Open http://localhost:3000/ in your browser.
 
 ## Contributing/Submitting changes
 

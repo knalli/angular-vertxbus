@@ -164,6 +164,7 @@ export default class Delegator {
    * @param {string} address target address
    * @param {object} message payload message
    * @param {object} headers headers
+   * @param {Object} options additional options
    * @param {number=} [options.timeout=10000] (in ms) after which the promise will be rejected
    * @param {boolean=} [options.expectReply=true] if false, the promise will be resolved directly and
    *                                       no replyHandler will be created

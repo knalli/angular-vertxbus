@@ -1,6 +1,6 @@
 # angular-vertxbus
 
-![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![cdnjs](https://img.shields.io/cdnjs/v/angular-vertxbus.svg)](https://cdnjs.com/libraries/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
+![Bower version](https://img.shields.io/bower/v/angular-vertxbus.svg) [![npm version](https://img.shields.io/npm/v/angular-vertxbus.svg)](https://www.npmjs.com/package/angular-vertxbus) [![cdnjs](https://img.shields.io/cdnjs/v/angular-vertxbus.svg)](https://cdnjs.com/libraries/angular-vertxbus) [![Build Status](https://img.shields.io/travis/knalli/angular-vertxbus.svg)](https://travis-ci.org/knalli/angular-vertxbus) [![Sauce Test Status](https://saucelabs.com/buildstatus/knalli-angular-vertxbus)](https://saucelabs.com/u/angular-vertxbus) [![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/) [![Greenkeeper badge](https://badges.greenkeeper.io/knalli/angular-vertxbus.svg)](https://greenkeeper.io/)
 
 Client side library using VertX Event Bus as an Angular Service module
 
@@ -10,6 +10,10 @@ Client side library using VertX Event Bus as an Angular Service module
 | --- | --- | --- |
 | Canary | unstable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.svg?branch=canary)](https://travis-ci.org/knalli/angular-vertxbus) |
 | Master | stable | [![Build Status](https://travis-ci.org/knalli/angular-vertxbus.svg?branch=master)](https://travis-ci.org/knalli/angular-vertxbus) |
+
+Automatic tests running against the latest version of the major browsers:
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/angular-vertxbus.svg)](https://saucelabs.com/)
 
 
 ## How to get
@@ -24,7 +28,7 @@ Alternatively you can use the cdnjs: [cdnjs.com/libraries/angular-vertxbus](http
 
 ### JavaScript (Polyfill)
 
-The source code is written using newer JavaScript 2015 (partly) and is using the JavaScript transpiler [BabelJS](https://babeljs.io).
+The source code is written using newer JavaScript ([ECMAScript 2015+](https://babeljs.io/learn-es2015/))and is using the JavaScript transpiler [BabelJS](https://babeljs.io).
 
 Depending on your target clients, you probably need to include a browser polyfill (for ES5 clients). BabelJS itself
 recommends the [requirement of its own polyfill](https://babeljs.io/docs/usage/polyfill/). Either you use the explained
@@ -175,16 +179,23 @@ Note: Check that dependencies are be installed (`npm install`).
 
 The *unit tests* are available with `npm test` which is actually a shortcut for `grunt test`. It performs tests under the current primary target version of AngularJS. Use `npm run test-scopes` for testing other scoped versions as well.
 
-### E2E tests (manually)
+### Local test environment
 
 Note: Check that dependencies are be installed (`npm install`).
 
-The *end-to-end tests* start and utilize a full Vert.x node and a NodeJS based web server.
+The *local test environment* starts and utilizes a full Vert.x node and a NodeJS based web server.
 
-1. `npm run install-it-vertx-server` downloads and installs a Vert.x locally.
-2. `npm run start-it-vertx-server` starts Vert.x on port `8080`.
+**Easy:** Just run `npm run -s start-server` and open `http://localhost:3000/` in your preferred browser.
+
+If you have changed something, just invoke `npm run -s compile` in parallel and refresh the browser.
+
+Alternatively:
+
+1. `npm run install-it-vertx-server` downloads and installs a Vert.x locally. This will store a cached download artifact at `test/e2e//vertx/`.
+2. `npm run start-it-vertx-server` starts an Vert.x on port `8080`.
 3. `npm run start-it-web-server` starts a web server on port `3000`.
-4. Open http://localhost:3000/ in your browser.
+4. Ensure at least `npm run -s compile` has been invoked so there is a `dist/angular-vertxbus.js`.
+5. Open http://localhost:3000/ in your browser.
 
 ## License
 
