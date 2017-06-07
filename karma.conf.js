@@ -306,7 +306,11 @@ module.exports = function (config) {
       } else if (process.env.TRAVIS) {
         browsers.push('Firefox');
       } else {
-        browsers.push('Chrome');
+        if (process.env.NO_HEADLESS) {
+          browsers.push('Chrome');
+        } else {
+          browsers.push('ChromeHeadless');
+        }
       }
       return browsers;
     })(),
