@@ -156,7 +156,7 @@ module.exports = function (config) {
     reporters : (() => {
       let reporters = ['progress'];
       if (isDefaultScope(scope)) {
-        reporters.push('coverage');
+        reporters.push('coverage-istanbul');
       }
       if (sourcelabsConfig.enabled) {
         reporters.push('saucelabs');
@@ -226,17 +226,22 @@ module.exports = function (config) {
               plugins : ['transform-runtime'],
             },
           },
-          // {
-          //   enforce : 'pre',
-          //   test : /\.js$/,
-          //   include : [
-          //     path.resolve('src/')
-          //   ],
-          //   exclude : [
-          //     /(node_modules|bower_components)/,
-          //   ],
-          //   loader : 'babel-istanbul-loader',
-          // },
+          {
+            enforce : 'post',
+            test : /\.js$/,
+            use: {
+              loader : 'istanbul-instrumenter-loader',
+              options : {
+                esModules : true,
+              },
+            },
+            include : [
+              path.resolve('src/')
+            ],
+            exclude : [
+              /(node_modules|bower_components)/,
+            ],
+          },
           {
             test : /vertx-eventbus\.js$/,
             loader : 'imports-loader',
@@ -261,12 +266,19 @@ module.exports = function (config) {
       noInfo : true
     },
 
-    coverageReporter : (() => {
+    coverageIstanbulReporter : (() => {
       if (isDefaultScope(scope)) {
         return {
+          fixWebpackSourcePaths: true,
+          reports: [
+            'text-summary',
+            'lcovonly',
+          ],
           dir : 'build/coverage',
-          subdir : 'report',
-          type : 'lcov'
+          lcovonly: {
+            subdir : 'report',
+            type : 'lcov',
+          },
         };
       }
     })(),
