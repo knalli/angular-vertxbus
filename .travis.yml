@@ -1,7 +1,7 @@
 sudo: false
 language: node_js
 node_js:
-  - "6.10"
+  - "8.2"
 
 addons:
   code_climate:
@@ -12,7 +12,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 
 after_script:
-  - if [ "$TEST_SCOPE" == "" ]; then npm install -g codeclimate-test-reporter && codeclimate-test-reporter < build/coverage/report/lcov.info; fi
+  - if [ "$TEST_SCOPE" == "" ]; then npm install -g codeclimate-test-reporter && codeclimate-test-reporter < build/coverage/lcov.info; fi
 
 env:
   matrix:

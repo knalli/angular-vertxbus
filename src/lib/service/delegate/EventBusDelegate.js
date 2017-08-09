@@ -64,15 +64,21 @@ import BaseDelegate from './BaseDelegate';
 
 export default class EventBusDelegate extends BaseDelegate {
 
-  constructor($rootScope, $interval, $log, $q, $injector, eventBus, {
-    enabled,
-    debugEnabled,
-    prefix,
-    sockjsStateInterval,
-    messageBuffer,
-    authRequired,
-    authHandler
-    }) {
+  constructor($rootScope,
+              $interval,
+              $log,
+              $q,
+              $injector,
+              eventBus,
+              {
+                enabled,
+                debugEnabled,
+                prefix,
+                sockjsStateInterval,
+                messageBuffer,
+                authRequired,
+                authHandler
+              }) {
     super();
     this.$rootScope = $rootScope;
     this.$interval = $interval;

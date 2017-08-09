@@ -94,15 +94,18 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
 
 export default class EventBusAdapter extends BaseAdapter {
 
-  constructor(EventBus, $timeout, $log, $q, {
-    enabled,
-    debugEnabled,
-    initialConnectEnabled,
-    connectionConfig,
-    reconnectEnabled,
-    sockjsReconnectInterval,
-    sockjsOptions
-    }) {
+  constructor(EventBus,
+              $timeout,
+              $log,
+              $q, {
+                enabled,
+                debugEnabled,
+                initialConnectEnabled,
+                connectionConfig,
+                reconnectEnabled,
+                sockjsReconnectInterval,
+                sockjsOptions
+              }) {
     super($q);
     // actual EventBus type
     this.EventBus = EventBus;
