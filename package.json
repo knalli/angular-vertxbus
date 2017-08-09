@@ -13,14 +13,14 @@
     "node": ">*"
   },
   "devEngines": {
-    "node": ">=6.10",
-    "npm": ">=3"
+    "node": ">=8.2",
+    "npm": ">=5.3"
   },
   "scripts": {
     "check-env": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
     "clean": "grunt clean",
     "clean-test-scopes": "for f in test_scopes/*; do (cd $f; rm -rf bower_components); done",
-    "prepublish": "bower install",
+    "prepare": "bower install",
     "lint": "eslint --ignore-pattern node_modules/**,bower_components/** --ext .js src/** *.js",
     "test-headless": "karma start --browsers='PhantomJS' karma.conf.js",
     "test-karma": "karma start karma.conf.js",
