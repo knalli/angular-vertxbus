@@ -30,9 +30,9 @@ var AVAILABLE_SCOPES = [], isValidScope, injectByScope, getAffectiveScope, isDef
     }
     return prefix + 'bower_components/' + path;
   },
-    isDefaultScope = function (scope) {
-      return !isValidScope(scope);
-    };
+  isDefaultScope = function (scope) {
+    return !isValidScope(scope);
+  };
 })();
 
 /**
