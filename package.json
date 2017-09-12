@@ -52,7 +52,7 @@
     "adm-zip": "^0.4.7",
     "babel-cli": "^6.5.0",
     "babel-core": "^6.0.2",
-    "babel-eslint": "^7.1.1",
+    "babel-eslint": "^8.0.0",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-runtime": "^6.5.2",
     "babel-polyfill": "^6.0.14",
