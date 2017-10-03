@@ -1,7 +1,7 @@
 sudo: false
 language: node_js
 node_js:
-  - "8.2"
+  - "8.5"
 
 addons:
   code_climate:
