@@ -28,7 +28,7 @@
     "test-scopes": "grunt install-test && for f in test_scopes/*; do TEST_SCOPE=\"`basename $f`\" npm run -s test; done",
     "start-it-web-server": "babel-node test/e2e/server.js",
     "install-it-vertx-server": "cd test/e2e/vertx && ./install-vertx.sh",
-    "start-it-vertx-server": "cd test/e2e/vertx/app && ../runtime/bin/vertx run vertx3-config.js",
+    "start-it-vertx-server": "cd test/e2e/vertx/app && ../runtime/vertx/bin/vertx run vertx3-config.js",
     "start-server": "npm-run-all --silent clean compile-dist install-it-vertx-server --parallel start-it-vertx-server start-it-web-server",
     "compile-dist": "webpack",
     "compile-distmin": "BUILD_MINIFIED=1 webpack",
