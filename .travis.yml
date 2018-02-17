@@ -1,17 +1,17 @@
 dist: trusty
-sudo: false
+sudo: required
 language: node_js
 node_js:
   - "8.9"
 
 addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8 google-chrome-stable
+  chrome: stable
   code_climate:
     repo_token: 94ea5ac76984c311dcbadb53a52dd219400775e20402587a0063d8b9d3a66bca
+
+before_install:
+  - sudo chown root /opt/google/chrome/chrome-sandbox
+  - sudo chmod 4755 /opt/google/chrome/chrome-sandbox
 
 before_script:
   - export DISPLAY=:99.0
