@@ -119,8 +119,8 @@ export default class EventBusDelegate extends BaseDelegate {
     }
     this.connectionState = this.eventBus.EventBus.CLOSED;
     this.states = {
-      connected: false,
-      authorized: false
+      connected : false,
+      authorized : false
     };
     this.observers = [];
     // internal store of buffered messages
@@ -283,12 +283,12 @@ export default class EventBusDelegate extends BaseDelegate {
     if (this.isConnectionOpen()) {
       fn();
       deferred.resolve({
-        inQueue: false
+        inQueue : false
       });
     } else if (this.options.messageBuffer) {
       this.messageQueue.push(fn);
       deferred.resolve({
-        inQueue: true
+        inQueue : true
       });
     } else {
       deferred.reject();
