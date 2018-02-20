@@ -121,7 +121,7 @@ export default class EventBusAdapter extends BaseAdapter {
       sockjsReconnectInterval,
       sockjsOptions
     };
-    this.nativeReconnectAvailable = false,
+    this.nativeReconnectAvailable = false;
     this.disconnectTimeoutEnabled = true;
     this.applyDefaultHeaders();
     if (initialConnectEnabled) {
