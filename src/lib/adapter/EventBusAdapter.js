@@ -92,6 +92,15 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  * Defines the callback called on any error.
  */
 
+/**
+ * @ngdoc property
+ * @module global
+ * @propertyOf global.EventBus
+ * @name .#onreconnect
+ * @description
+ * Defines the callback called on reconnecting the connection (after onopen).
+ */
+
 export default class EventBusAdapter extends BaseAdapter {
 
   constructor(EventBus,
@@ -207,6 +216,12 @@ export default class EventBusAdapter extends BaseAdapter {
     this.instance.onerror = (message) => {
       if (angular.isFunction(this.onerror)) {
         this.onerror(message);
+      }
+    };
+    // instance onReconnect handler
+    this.instance.onreconnect = (message) => {
+      if (angular.isFunction(this.onreconnect)) {
+        this.onreconnect(message);
       }
     };
     return deferred.promise;
