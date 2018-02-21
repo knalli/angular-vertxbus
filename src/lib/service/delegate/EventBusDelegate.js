@@ -248,17 +248,26 @@ export default class EventBusDelegate extends BaseDelegate {
           deferred.reject();
         }), timeout, 1);
         // Send message
-        this.eventBus.send(address, message, headers, (err, reply) => {
+        try {
+          this.eventBus.send(address, message, headers, (err, reply) => {
+            this.$interval.cancel(timer); // because it's resolved
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(reply);
+            }
+          });
+        } catch (e) {
           this.$interval.cancel(timer); // because it's resolved
-          if (err) {
-            deferred.reject(err);
-          } else {
-            deferred.resolve(reply);
-          }
-        });
+          deferred.reject(e);
+        }
       } else {
-        this.eventBus.send(address, message, headers);
-        deferred.resolve(); // we don't care
+        try {
+          this.eventBus.send(address, message, headers);
+          deferred.resolve();
+        } catch (e) {
+          deferred.reject(e);
+        }
       }
     };
     next.displayName = `${moduleName}.service.delegate.live.send.next`;
@@ -281,7 +290,11 @@ export default class EventBusDelegate extends BaseDelegate {
   ensureOpenConnection(fn) {
     const deferred = this.$q.defer();
     if (this.isConnectionOpen()) {
-      fn();
+      try {
+        fn();
+      } catch (e) {
+        deferred.reject(e);
+      }
       deferred.resolve({
         inQueue : false
       });
