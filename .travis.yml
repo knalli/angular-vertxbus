@@ -1,15 +1,22 @@
-sudo: false
+dist: trusty
+sudo: required
 language: node_js
 node_js:
-  - "8.2"
+  - "8.9"
 
 addons:
+  chrome: stable
   code_climate:
     repo_token: 94ea5ac76984c311dcbadb53a52dd219400775e20402587a0063d8b9d3a66bca
 
+before_install:
+  - sudo chown root /opt/google/chrome/chrome-sandbox
+  - sudo chmod 4755 /opt/google/chrome/chrome-sandbox
+
 before_script:
   - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+  - sh -e /etc/init.d/xvfb start &
+  - sleep 3
 
 after_script:
   - if [ "$TEST_SCOPE" == "" ]; then npm install -g codeclimate-test-reporter && codeclimate-test-reporter < build/coverage/lcov.info; fi
@@ -37,10 +44,3 @@ env:
 matrix:
   allow_failures:
     - env: TEST_SCOPE= SAUCE_ENABLED=$_SAUCE_ENABLED SAUCE_USERNAME=$_SAUCE_USERNAME SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8

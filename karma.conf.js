@@ -316,7 +316,7 @@ module.exports = function (config) {
       if (sourcelabsConfig.enabled) {
         browsers = [...browsers, ...Object.keys(sourcelabsConfig.launchers)];
       } else if (process.env.TRAVIS) {
-        browsers.push('Firefox');
+        browsers.push('ChromeHeadless');
       } else {
         if (process.env.NO_HEADLESS) {
           browsers.push('Chrome');

@@ -92,6 +92,15 @@ import ConnectionConfigHolder from './../support/ConnectionConfigHolder';
  * Defines the callback called on any error.
  */
 
+/**
+ * @ngdoc property
+ * @module global
+ * @propertyOf global.EventBus
+ * @name .#onreconnect
+ * @description
+ * Defines the callback called on reconnecting the connection (after onopen).
+ */
+
 export default class EventBusAdapter extends BaseAdapter {
 
   constructor(EventBus,
@@ -121,6 +130,7 @@ export default class EventBusAdapter extends BaseAdapter {
       sockjsReconnectInterval,
       sockjsOptions
     };
+    this.nativeReconnectAvailable = false;
     this.disconnectTimeoutEnabled = true;
     this.applyDefaultHeaders();
     if (initialConnectEnabled) {
@@ -157,6 +167,11 @@ export default class EventBusAdapter extends BaseAdapter {
     // Because we have rebuild an EventBus object (because it have to rebuild a SockJS object)
     // we must wrap the object. Therefore, we have to mimic the behavior of onopen and onclose each time.
     this.instance = new this.EventBus(url, this.options.sockjsOptions);
+    // Since vertx-eventbus 3.5.0 support for "native" reconnect is available
+    this.nativeReconnectAvailable = typeof this.instance.enableReconnect === 'function';
+    if (this.nativeReconnectAvailable && this.options.reconnectEnabled) {
+      this.instance.enableReconnect(true);
+    }
     this.instance.onopen = () => {
       if (this.options.debugEnabled) {
         this.$log.debug('[Vert.x EB Stub] Connected');
@@ -168,6 +183,12 @@ export default class EventBusAdapter extends BaseAdapter {
     };
     // instance onClose handler
     this.instance.onclose = () => {
+      // Since vertx-eventbus@3.5.0, the EventBus itself can handle reconnects
+      if (this.nativeReconnectAvailable && this.instance.reconnectTimerID) {
+        // 'reconnectTimerID' will be only set if reconnect is enabled
+        this.$log.debug('[Vert.x EB Stub] Reconnect required, but seems to be handled by EventBus itself');
+        return;
+      }
       if (this.options.debugEnabled) {
         this.$log.debug(`[Vert.x EB Stub] Reconnect in ${this.options.sockjsReconnectInterval}ms`);
       }
@@ -195,6 +216,12 @@ export default class EventBusAdapter extends BaseAdapter {
     this.instance.onerror = (message) => {
       if (angular.isFunction(this.onerror)) {
         this.onerror(message);
+      }
+    };
+    // instance onReconnect handler
+    this.instance.onreconnect = (message) => {
+      if (angular.isFunction(this.onreconnect)) {
+        this.onreconnect(message);
       }
     };
     return deferred.promise;

@@ -35,6 +35,19 @@ import BaseDelegate from './BaseDelegate';
  * @module knalli.angular-vertxbus
  * @eventOf knalli.angular-vertxbus.vertxEventBusService
  * @eventType broadcast on $rootScope
+ * @name reconnected
+ *
+ * @description
+ * After a connection was being re-established
+ *
+ * Event name is `prefix + 'system.reconnected'` (see {@link knalli.angular-vertxbus.vertxEventBusServiceProvider#methods_usePrefix prefix})
+ */
+
+/**
+ * @ngdoc event
+ * @module knalli.angular-vertxbus
+ * @eventOf knalli.angular-vertxbus.vertxEventBusService
+ * @eventType broadcast on $rootScope
  * @name login-succeeded
  *
  * @description
@@ -106,8 +119,8 @@ export default class EventBusDelegate extends BaseDelegate {
     }
     this.connectionState = this.eventBus.EventBus.CLOSED;
     this.states = {
-      connected: false,
-      authorized: false
+      connected : false,
+      authorized : false
     };
     this.observers = [];
     // internal store of buffered messages
@@ -122,6 +135,7 @@ export default class EventBusDelegate extends BaseDelegate {
   initialize() {
     this.eventBus.onopen = () => this.onEventbusOpen();
     this.eventBus.onclose = () => this.onEventbusClose();
+    this.eventBus.onreconnect = () => this.onEventbusReconnect();
 
     // Update the current connection state periodically.
     let connectionIntervalCheck = () => this.getConnectionState(true);
@@ -162,6 +176,14 @@ export default class EventBusDelegate extends BaseDelegate {
     if (this.states.connected) {
       this.states.connected = false;
       this.$rootScope.$broadcast(`${this.options.prefix}system.disconnected`);
+    }
+  }
+
+  // internal
+  onEventbusReconnect() {
+    // will be fired after a onEventbusOpen
+    if (this.states.connected) {
+      this.$rootScope.$broadcast(`${this.options.prefix}system.reconnected`);
     }
   }
 
@@ -226,17 +248,26 @@ export default class EventBusDelegate extends BaseDelegate {
           deferred.reject();
         }), timeout, 1);
         // Send message
-        this.eventBus.send(address, message, headers, (err, reply) => {
+        try {
+          this.eventBus.send(address, message, headers, (err, reply) => {
+            this.$interval.cancel(timer); // because it's resolved
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(reply);
+            }
+          });
+        } catch (e) {
           this.$interval.cancel(timer); // because it's resolved
-          if (err) {
-            deferred.reject(err);
-          } else {
-            deferred.resolve(reply);
-          }
-        });
+          deferred.reject(e);
+        }
       } else {
-        this.eventBus.send(address, message, headers);
-        deferred.resolve(); // we don't care
+        try {
+          this.eventBus.send(address, message, headers);
+          deferred.resolve();
+        } catch (e) {
+          deferred.reject(e);
+        }
       }
     };
     next.displayName = `${moduleName}.service.delegate.live.send.next`;
@@ -259,14 +290,18 @@ export default class EventBusDelegate extends BaseDelegate {
   ensureOpenConnection(fn) {
     const deferred = this.$q.defer();
     if (this.isConnectionOpen()) {
-      fn();
+      try {
+        fn();
+      } catch (e) {
+        deferred.reject(e);
+      }
       deferred.resolve({
-        inQueue: false
+        inQueue : false
       });
     } else if (this.options.messageBuffer) {
       this.messageQueue.push(fn);
       deferred.resolve({
-        inQueue: true
+        inQueue : true
       });
     } else {
       deferred.reject();

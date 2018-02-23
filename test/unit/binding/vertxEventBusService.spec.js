@@ -351,6 +351,104 @@ describe('integration of module::vertxEventBusService', function () {
 
     });
 
+    describe('when the service is not connected correctly (send throws exception because not open)', function () {
+      var $rootScope, vertxEventBus, vertxEventBusService, $timeout;
+
+      beforeEach(angular.mock.module('knalli.angular-vertxbus', function (vertxEventBusServiceProvider) {
+        vertxEventBusServiceProvider.useMessageBuffer(0).useDebug(true);
+      }));
+
+      beforeEach(angular.mock.inject(function (_$rootScope_, _vertxEventBus_, _vertxEventBusService_, _$timeout_) {
+        $rootScope = _$rootScope_;
+        $timeout = _$timeout_;
+        vertxEventBus = _vertxEventBus_;
+        vertxEventBusService = _vertxEventBusService_;
+        // Mock bus is opened (said to be)
+        _vertxEventBus_.readyState = function () {
+          return _vertxEventBus_.EventBus.OPEN;
+        };
+        _vertxEventBusService_.getConnectionState = function () {
+          return true;
+        };
+        var sendCalls = 0;
+        _vertxEventBus_.send = function () {
+          throw new Error('INVALID_STATE_ERR');
+        };
+        // extend object
+        vertxEventBus.getSendCalls = function () {
+          return sendCalls;
+        };
+      }));
+
+      describe('send() should call the error callback', function () {
+
+        var $interval;
+
+        beforeEach(angular.mock.inject(function (_$interval_) {
+          $interval = _$interval_; // angular.mock.$interval
+        }));
+
+        it('via promise.then()', function (done) {
+          var successCalled, errorCalled;
+          setTimeout(function () {
+            // very short timeout: 10
+            vertxEventBusService.send('xyz', {data : 1}, {}, {timeout : 10}).then(function () {
+              successCalled = true;
+            }, function () {
+              errorCalled = true;
+            });
+            $rootScope.$apply();
+            setTimeout(function () {
+              $interval.flush(20); // goto T+20
+              expect(successCalled).to.be(undefined);
+              expect(errorCalled).to.be(true);
+              done();
+            }, 300);
+          }, 200);
+        });
+
+        it('via promise.then() without expecting reply', function (done) {
+          var successCalled, errorCalled;
+          setTimeout(function () {
+            // very short timeout: 10
+            vertxEventBusService.send('xyz', {data : 1}, {}, {timeout : 10, expectReply : false}).then(function () {
+              successCalled = true;
+            }, function () {
+              errorCalled = true;
+            });
+            $rootScope.$apply();
+            setTimeout(function () {
+              $interval.flush(20); // goto T+20
+              expect(successCalled).to.be(undefined);
+              expect(errorCalled).to.be(true);
+              done();
+            }, 300);
+          }, 200);
+        });
+
+        it('via promise.catch()', function (done) {
+          var successCalled, errorCalled;
+          setTimeout(function () {
+            // very short timeout: 10
+            vertxEventBusService.send('xyz', {data : 1}, {}, {timeout : 10}).then(function () {
+              successCalled = true;
+            })['catch'](function () {
+              errorCalled = true;
+            });
+            $rootScope.$apply();
+            setTimeout(function () {
+              $interval.flush(20); // goto T+20
+              expect(successCalled).to.be(undefined);
+              expect(errorCalled).to.be(true);
+              done();
+            }, 300);
+          }, 200);
+        });
+
+      });
+
+    });
+
     describe('reconnect', function () {
       var $timeout, vertxEventBus, vertxEventBusService;
       beforeEach(angular.mock.inject(function (_vertxEventBus_, _vertxEventBusService_, _$timeout_) {
