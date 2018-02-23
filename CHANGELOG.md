@@ -1,3 +1,20 @@
+<a name="6.4.0"></a>
+# [6.4.0](https://github.com/knalli/angular-vertxbus/compare/6.3.0...6.4.0) (2018-02-23)
+
+
+### Bug Fixes
+
+* **service:** ensure promise wrapped exceptions will be handled ([d4a65ea](https://github.com/knalli/angular-vertxbus/commit/d4a65ea)), closes [#283](https://github.com/knalli/angular-vertxbus/issues/283)
+
+
+### Features
+
+* **adapter:** add diagnostic support for vertx-event internal reconnect ([229a29b](https://github.com/knalli/angular-vertxbus/commit/229a29b))
+* **adapter:** add support for vertx EventBus.onreconnect ([07fdcd0](https://github.com/knalli/angular-vertxbus/commit/07fdcd0))
+* **service:** add event reconnected ([e88b763](https://github.com/knalli/angular-vertxbus/commit/e88b763))
+
+
+
 <a name="6.3.0"></a>
 # [6.3.0](https://github.com/knalli/angular-vertxbus/compare/6.2.0...v6.3.0) (2017-06-06)
 
