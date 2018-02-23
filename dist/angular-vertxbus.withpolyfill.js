@@ -7573,7 +7573,7 @@ module.exports = _dereq_(23);
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}]},{},[1]);
 
-/*! angular-vertxbus - v6.4.0 - 2018-02-23
+/*! angular-vertxbus - v6.4.1 - 2018-02-23
  * https://github.com/knalli/angular-vertxbus
  * Copyright (c) 2018 Jan Philipp
  * @license MIT */
@@ -9348,7 +9348,9 @@ var EventBusAdapter = function (_BaseAdapter) {
         // Since vertx-eventbus@3.5.0, the EventBus itself can handle reconnects
         if (_this2.nativeReconnectAvailable && _this2.instance.reconnectTimerID) {
           // 'reconnectTimerID' will be only set if reconnect is enabled
-          _this2.$log.debug('[Vert.x EB Stub] Reconnect required, but seems to be handled by EventBus itself');
+          if (_this2.options.debugEnabled) {
+            _this2.$log.debug('[Vert.x EB Stub] Reconnect required, but seems to be handled by EventBus itself');
+          }
           return;
         }
         if (_this2.options.debugEnabled) {

@@ -1,3 +1,13 @@
+<a name="6.4.1"></a>
+## [6.4.1](https://github.com/knalli/angular-vertxbus/compare/6.4.0...6.4.1) (2018-02-23)
+
+
+### Bug Fixes
+
+* **adapter:** fix missing conditional logging ([38681b4](https://github.com/knalli/angular-vertxbus/commit/38681b4))
+
+
+
 <a name="6.4.0"></a>
 # [6.4.0](https://github.com/knalli/angular-vertxbus/compare/6.3.0...6.4.0) (2018-02-23)
 
