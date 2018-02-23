@@ -186,7 +186,9 @@ export default class EventBusAdapter extends BaseAdapter {
       // Since vertx-eventbus@3.5.0, the EventBus itself can handle reconnects
       if (this.nativeReconnectAvailable && this.instance.reconnectTimerID) {
         // 'reconnectTimerID' will be only set if reconnect is enabled
-        this.$log.debug('[Vert.x EB Stub] Reconnect required, but seems to be handled by EventBus itself');
+        if (this.options.debugEnabled) {
+          this.$log.debug('[Vert.x EB Stub] Reconnect required, but seems to be handled by EventBus itself');
+        }
         return;
       }
       if (this.options.debugEnabled) {
