@@ -69,7 +69,7 @@
     "grunt-babel": "^7.0.0",
     "grunt-bower-install-simple": "~1.2.3",
     "grunt-cli": "^1.2.0",
-    "grunt-contrib-clean": "~1.1.0",
+    "grunt-contrib-clean": "~2.0.0",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-conventional-changelog": "^6.1.0",
     "grunt-ngdocs": "^0.2.11",
