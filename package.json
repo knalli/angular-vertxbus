@@ -88,7 +88,7 @@
     "karma-jasmine": "^1.1.1",
     "karma-mocha": "^1.0.1",
     "karma-phantomjs-launcher": "^1.0.0",
-    "karma-sauce-launcher": "^1.2.0",
+    "karma-sauce-launcher": "^2.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.9",
     "load-grunt-tasks": "^3.3.0",
