@@ -79,7 +79,7 @@
     "jasmine-core": "^2.99.1",
     "jasmine-webpack-plugin": "^0.1.1",
     "karma": "^2.0.0",
-    "karma-babel-preprocessor": "^7.0.0",
+    "karma-babel-preprocessor": "^8.0.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.0.0",
     "karma-coverage-istanbul-reporter": "^1.4.1",
