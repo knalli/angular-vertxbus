@@ -65,6 +65,7 @@
     "estraverse": "^4.1.0",
     "express": "^4.16.2",
     "fbjs-scripts": "^0.8.0",
+    "fsevents": "^1.2.9",
     "grunt": "^1.0.2",
     "grunt-babel": "^7.0.0",
     "grunt-bower-install-simple": "~1.2.3",
