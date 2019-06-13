@@ -13,8 +13,8 @@
     "node": ">*"
   },
   "devEngines": {
-    "node": ">=8.9",
-    "npm": ">=5.3"
+    "node": ">=10.16",
+    "npm": ">=6.9"
   },
   "scripts": {
     "check-env": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
